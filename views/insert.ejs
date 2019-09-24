@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title> Elastic </title>
+    <style>
+      .cb {
+        float:left;width: calc(100% - 100px);
+      }
+      .r-btn {
+        float:left;margin-top: 35px;margin-left:10px;
+      }
+      .r-btn a {
+        border-radius: 100%;height: 30px;width: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- As a link -->
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">ELASTIC SEARCH</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/">Search</a>
+      <a class="nav-item nav-link" href="/insert">Insert</a>
+    </div>
+  </div>
+    </nav>
+    <br>
+    <div class="container">
+      <center>
+        <h4> Add New </h4>
+      </center>
+
+      <script>
+            var status = "<%= status%>";
+      </script>
+
+      <div class="alert <%= cc%>">
+        <center>
+          <script type="text/javascript">
+            if(status == "1") {
+              document.write("Document has been Saved!");
+            }else if(status == "0") {
+              document.write("Error Saving document");
+            }
+
+          </script>
+        </center>
+      </div>
+
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/insertdocument" method="POST" >
+            <input type="hidden" name="field_count" id="field_count" value="1">
+            <div class="row"  id="fields">
+              <div class="col-md-12">
+                <div class="form-group cb">
+                  <label >Data Field 1</label>
+                  <input type="text" class="form-control" name="Docfields" placeholder="Type here..." required>
+                </div>
+                <span class="r-btn"> <a href="#" class="btn btn-sm btn-danger r-a-btn" > X </a> </span>
+              </div>
+              
+            </div>
+              
+            <div class="row">
+                
+              <div class="col-md-2 ">
+                <input type="button" class="btn btn-info add_field" name="add_field" value="+ Add" style="width: 100%;">
+              </div>
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-success" name="submit" value="Submit" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+
+
+
+
+    <script type="text/javascript">
+
+    </script>
+
+    
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+      $(document).ready(function(){
+
+        $('.add_field').click(function(){
+          var count = $('#field_count').val();
+          count++;
+          $('#field_count').val(count);
+          var field = '<div class="col-md-12"> <div class="form-group cb"> <label>Data Field '+count+'</label> <input type="text" class="form-control" name="Docfields" placeholder="Type here..." required> </div> <span class="r-btn"> <a href="#" class="btn btn-sm btn-danger r-a-btn" > X </a> </span> </div>';
+
+
+          $('#fields').append(field);
+
+        })
+
+        $(document).on('click','.r-a-btn',function(){
+          var count = $('#field_count').val();
+          if( count != 1 ) {
+          count--;
+          $('#field_count').val(count);
+          $(this).parent().parent().remove();
+          } else {
+            alert("Field cannot be deleted!");
+          } 
+        
+        })        
+
+      }); 
+    </script>
+
+  </body>
+</html>

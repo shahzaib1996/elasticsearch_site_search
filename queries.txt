@@ -1,0 +1,278 @@
+GET mydocument/_search
+{
+  "size" : 10,
+  "query": {
+    "multi_match" : {
+      "query":  "*ssss-wwww-ssdd- bbbb-qqqq-rrrr-eeee-ssss ffff-hhhhh-wwww-tttt-ggyy ssss-bbbb-hhhh-wwww-qqqqq yyyyy-wwwee-aaaa-cccc xxxx-nnnn-yyyy-qqqq-www lloo-tttrrr-aasss-ppoo cccc-yyyyy- lll-rrrrr-wwwww-xxxx-tttt ii-wwww-ssss-dddd-tttt*",
+      "type":       "best_fields",
+      "fields": [ "*" ]
+    }
+  }
+}
+
+
+// Correct for Query string 3
+GET mydocument/_search
+{
+  "size" : 10,
+  "query": {
+          "bool": {
+             "should": [
+                {
+                   "multi_match": {
+                      "type": "best_fields",
+                      "query": "ssss-wwww-ssdd-",
+                      "operator": "and"
+                   }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "bbbb-qqqq-rrrr-eeee-ssss",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ffff-hhhhh-wwww-tttt-ggyy",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ssss-bbbb-hhhh-wwww-qqqqq",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "yyyyy-wwwee-aaaa-cccc",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "xxxx-nnnn-yyyy-qqqq-www",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "lloo-tttrrr-aasss-ppoo",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "wwwww-xxxx-tttt",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ii-wwww-ssss-dddd-tttt",
+                   "operator": "and"
+                }
+                }
+                
+             ]
+
+          }
+       }
+}
+
+// Testing for query result 1
+// ssss-wwww-ssdd-oo-pppd
+// bbbb-qqqq-rrrr-eeee-ssss
+// ffff-hhhhh-wwww-tttt-ggyy
+// ssss-bbbb-hhhh-wwww-qqqqq
+// yyyyy-wwwee-aaaa-cccc
+// xxxx-nnnn-yyyy-qqqq-www
+// lloo-tttrrr-aasss-ppoo
+// cccc-yyyyy-wwww-bbbb
+// lll-rrrrr-wwwww-xxxx-tttt
+// ii-wwww-ssss-dddd-tttt
+// GET mydocument/_search
+{
+  "size" : 10,
+  "min_score": 10,
+  "query": {
+          "bool": {
+             "should": [
+                {
+                   "multi_match": {
+                      "type": "best_fields",
+                      "query": "ssss-wwww-ssdd-oo-pppd",
+                      "operator": "and"
+                   }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "bbbb-qqqq-rrrr-eeee-ssss",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ffff-hhhhh-wwww-tttt-ggyy",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ssss-bbbb-hhhh-wwww-qqqqq",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "yyyyy-wwwee-aaaa-cccc",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "xxxx-nnnn-yyyy-qqqq-www",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "lloo-tttrrr-aasss-ppoo",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "cccc-yyyyy-wwww-bbbb",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "lll-rrrrr-wwwww-xxxx-tttt",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ii-wwww-ssss-dddd-tttt",
+                   "operator": "and"
+                }
+                }
+                
+             ]
+
+          }
+       }
+}
+
+// ..
+// ssss-wwww-ssdd-oo-pppd
+// bbbb-qqqq-rrrr-eeee-ssss
+// ffff-hhhhh-wwww-tttt-ggyy
+// ssss-bbbb-hhhh-wwww-qqqqq
+// yyyyy-wwwee-aaaa-cccc
+// xxxx-nnnn-yyyy-qqqq-www
+// lloo-tttrrr-aasss-ppoo
+// cccc-yyyyy-wwww-bbbb
+// lll-rrrrr-wwwww-xxxx-tttt
+// ii-wwww-ssss-dddd-tttt
+// GET mydocument/_search
+{
+  "size" : 10,
+  "query": {
+          "bool": {
+             "should": [
+                {
+                   "multi_match": {
+                      "type": "best_fields",
+                      "query": "ssss-wwww-ssdd-oo-pppd",
+                      "operator": "and"
+                   }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "bbbb-qqqq-rrrr-eeee-ssss",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ffff-hhhhh-wwww-tttt-ggyy",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ssss-bbbb-hhhh-wwww-qqqqq",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "yyyyy-wwwee-aaaa-cccc",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "xxxx-nnnn-yyyy-qqqq-www",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "lloo-tttrrr-aasss-ppoo",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "cccc-yyyyy-wwww-bbbb",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "lll-rrrrr-wwwww-xxxx-tttt",
+                   "operator": "and"
+                }
+                },
+                {
+                "multi_match": {
+                      "type": "best_fields",
+                   "query": "ii-wwww-ssss-dddd-tttt",
+                   "operator": "and"
+                }
+                }
+                
+             ]
+
+          }
+       }
+}

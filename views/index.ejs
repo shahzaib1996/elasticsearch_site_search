@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title> Elastic Search </title>
+  </head>
+  <body>
+    <!-- As a link -->
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">ELASTIC SEARCH</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/">Search</a>
+      <a class="nav-item nav-link" href="/insert">Insert</a>
+    </div>
+  </div>
+    </nav>
+    <br>
+    <div class="container">
+
+      <script>
+            var msg = "<%= message%>";
+      </script>
+
+      <div class="alert">
+        <center>
+          <script type="text/javascript">
+            document.write(msg);
+          </script>
+        </center>
+      </div>
+
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/general_search" method="POST" >
+            <div class="row ">
+              <div class="col-md-1"></div>
+              <div class="col-md-8">
+                <input type="text" class="form-control" name="search" value="<%= search_str%>" placeholder="Type here to search...">
+              </div>
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-success" name="submit" value="Search" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <br>
+    <br>
+
+    <div id="table-div" class="container">
+      <h5 id="r-s">Result</h5>
+      <table class="table table-bordered" style="font-size: 12px;">
+        <thead>
+          <tr>
+            <th width="5%">S.no</th>
+            <th width="10%">Doc Id</th>
+            <th width="10%">Match Score</th>
+            <th>Data</th>
+            <th width="180px" class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- <tr>
+            <td>1</td>
+            <td>sdasd-asdad-ada2dasd-12131adad-asdas</td>
+            <td>10</td>
+            <td>
+              d1: aadasdasdasd<br>
+              d1: aadasdasdasd<br>
+              d1: aadasdasdasd<br>
+              d1: aadasdasdasd<br>
+              d1: aadasdasdasd<br>
+            </td>
+          </tr> -->
+        </tbody>
+      </table>
+    </div>
+
+    <script type="text/javascript">
+      data = {};
+      data = <%- JSON.stringify(results) %>;
+    </script>
+
+    
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+      $(document).ready(function(){
+        
+        if( data != '' ) {
+          $('#tableBody').empty();
+        var i = 1;
+        $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
+
+        $.each(data['hits']['hits'],function(index,value){
+          console.log(value['_source']);
+          row = `<tr> <td> ${i} </td>`;
+          row += `<td>${value['_id']}</td>`
+          row += `<td>${value['_score']}</td>`
+          row += `<td>`;
+          $.each(value['_source'], function(i,v){
+            console.log(v+" - "+i);
+            row += `${i} : ${v}<br>`;
+          })
+          row += `<td> `;
+          row += `<form action="/document/delete" method="POST" style="float:right;"> <input type="hidden" name="del_id" value="${value['_id']}" > <input type="submit" name="submit" value="Delete" class="btn btn-danger btn-sm" > </form>`;
+          row += `<form action="/document/view" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="update_id" value="${value['_id']}" > <input type="submit" name="submit" value="Update" class="btn btn-info btn-sm" > </form>`;
+          row += `</div> </td>`
+          row += `</td> </tr>`;
+          $('#tableBody').append(row);
+          i++;
+        })
+        console.log(data['hits']['hits'][0]);
+        }
+
+      }); 
+    </script>
+
+  </body>
+</html>
