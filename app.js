@@ -49,11 +49,13 @@ app.get('/web-insert',function(req,res){
 			};
 		search('websites', searchBody)
 		  .then(results => {
-		    res.render('insert_web', {websites:results,status: '2',cc:'' } );
+		    res.render('insert_web', {websites:results,status: '2',cc:'',message:'' } );
 		  })
 		  .catch(console.error);
 
 	}, 1000); //timeout end
+
+	// res.render('insert_web', {websites:'',status: '2',cc:'' } );
 
 })
 
@@ -76,8 +78,7 @@ app.post('/insertweb',function(req,res){
 	client.index({
 		index: 'websites',
 		type: 'url',
-		// id: uuidv1(),
-		id: website,	
+		id: uuidv1(),	
 		body: docBody
 	}, function(err) {
 		if( err ) {
@@ -108,6 +109,83 @@ app.post('/insertweb',function(req,res){
 
 })
 
+app.post( '/website/view', function(req,res){
+
+	var doc_id = req.body.update_id;
+
+	client.get({
+	  index: 'websites',
+	  type: 'url',
+	  id: doc_id
+	}, function (error, response) {
+		if( error ) {
+			console.log(error);
+	  		res.status(200).send("error-"+error);
+		} else {
+			var doc_id = response['_id'];
+			var wn = response['_source']['website_name'];
+			var lang = response['_source']['language'];
+	  		res.status(200).render( 'update_web' ,{doc_id: doc_id,wn:wn,lang:lang,response:response,status:'',cc:''});
+		}
+
+	});
+
+})
+
+
+app.post('/updatewebsite', function(req, res){
+	var doc_id =  req.body.doc_id;
+	var wn =  req.body.website_name;
+	var lang =  req.body.language;
+
+	var docBody = {};
+
+	docBody['website_name'] = wn; 
+	docBody['language'] = lang; 
+	
+	// res.send(docBody);
+
+	client.index({
+		index: 'websites',
+		type: 'url',
+		id: doc_id,
+		body: docBody
+	}, function(err) {
+		if( err ) {
+			console.log(err);
+			res.status(200).send(err);
+		} else {
+
+				// request.post('/document/view', {
+				//   update_id: doc_id
+				// }, (error, res, body) => {
+				//   if (error) {
+				//     console.error(error);
+    // 				return
+				//   }
+				// })
+
+			res.status(200).send(" <form action='/website/view' method='POST'> <input type='hidden' value='"+doc_id+"' name='update_id'> <center> <input type='submit' value='Website Updated Go Back >> ' name='submit' style='font-size:14px;padding:10px;'> </center> </form> ");
+		}
+	});
+
+
+})
+
+
+app.post( '/website/delete' , function(req,res){
+	var del_id = req.body.del_id;
+	console.log("Deleting document ID: "+del_id);
+	client.delete({
+	  index: 'websites',
+	  type: 'url',
+	  id: del_id,
+	})
+
+	// res.status(200).send("Deleting Document : "+del_id);
+	res.redirect('/web-insert');
+
+})
 
 app.get('/', function(req, res){
 		// res.status(200).render('index',{results:'',search_str:'', message:''});
