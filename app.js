@@ -32,6 +32,12 @@ app.use( (req, res, next) => {
 
 app.listen(port, () => console.log('App Listening on port '+port) );
 
+
+app.get('/login',function(req,res){
+	res.render('login');
+})
+
+
 app.get('/', function(req, res){
 		// res.status(200).render('index',{results:'',search_str:'', message:''});
 	searchBody = {
