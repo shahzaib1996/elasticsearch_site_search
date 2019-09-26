@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title> Elastic </title>
+    <style>
+      .cb {
+        float:left;width: calc(100% - 100px);
+      }
+      .r-btn {
+        float:left;margin-top: 35px;margin-left:10px;
+      }
+      .r-btn a {
+        border-radius: 100%;height: 30px;width: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- As a link -->
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">ELASTIC SEARCH</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/">Search</a>
+      <a class="nav-item nav-link" href="/insert">Insert</a>
+    </div>
+  </div>
+    </nav>
+    <br>
+    <div class="container">
+      <center>
+        <h4> Add New Website </h4>
+      </center>
+
+      <script>
+            var status = "<%= status%>";
+      </script>
+
+      <div class="alert <%= cc%>">
+        <center>
+          <script type="text/javascript">
+            if(status == "1") {
+              document.write("Document has been Saved!");
+            }else if(status == "0") {
+              document.write("Error Saving document");
+            }
+
+          </script>
+        </center>
+      </div>
+
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/insertweb" method="POST" onsubmit="return checkURL();">
+            <div class="row" >
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Website Name</label>
+                  <input type="text" class="form-control" name="website_name" id="website_name" placeholder="e.g https://www.naasongs.com" required>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Language</label>
+                  <select class="form-control" name="language" required>
+                    <option value="">Select Language</option>
+                    <option value="english">English</option>
+                    <option value="hindi">Hindi</option>
+                    <option value="urdu">Urdu</option>
+                    <option value="bengali">Bengali</option>
+                  </select>
+                </div>
+              </div>
+              
+            </div>
+              
+            <div class="row">
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-success" name="submit" value="Add" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <br><br>
+      <div class="table-div">
+        <h1> <center> Websites </center> </h1>
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <td>Sno</td>
+              <td>Website Name</td>
+              <td>Language</td>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+              
+              
+
+          </tbody>
+        </table>
+      </div>
+
+
+
+    </div>
+
+    <script type="text/javascript">
+      data = {};
+      data = <%- JSON.stringify(websites) %>;
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+      function checkURL() {
+        var wn = $('#website_name').val();
+        // var url_re = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g;
+        // var wn_check = wn.match(url_re);
+
+        var expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g;
+        var regex = new RegExp(expression);
+        var t = 'www.google.com';
+
+        if (wn.match(regex)) {
+          console.log("Successful match");
+          return true;
+        } else {
+          console.log("No match");
+          alert("Please Enter valid url!");
+          return false;
+        }
+
+      }
+
+      $(document).ready(function(){
+
+        // match url re 
+        // https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}
+
+
+        console.log(data);
+        if( data != '' ) {
+          $('#tableBody').empty();
+          // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        var i = 1;
+        $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
+
+        $.each(data['hits']['hits'],function(index,value){
+          console.log(value['_source']);
+          row = `<tr> <td> ${i} </td>`;
+          row += `<td>${value['_id']}</td>`
+          row += `<td>${value['_source']['language']}</td>` 
+          row += `</tr>`;
+          $('#tableBody').append(row);
+          i++;
+        })
+        console.log(data['hits']['hits'][0]);
+        } else {
+          $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        }        
+
+      }); 
+    </script>
+
+  </body>
+</html>

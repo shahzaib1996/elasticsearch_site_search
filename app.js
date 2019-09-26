@@ -37,6 +37,77 @@ app.get('/login',function(req,res){
 	res.render('login');
 })
 
+app.get('/web-insert',function(req,res){
+	//timeout start
+	setTimeout(function(){
+
+		searchBody = {
+			"size" : 1000,
+		  	"query": {
+		         "match_all" : {}
+		       	}
+			};
+		search('websites', searchBody)
+		  .then(results => {
+		    res.render('insert_web', {websites:results,status: '2',cc:'' } );
+		  })
+		  .catch(console.error);
+
+	}, 1000); //timeout end
+
+})
+
+app.post('/insertweb',function(req,res){
+	var website = req.body.website_name;
+	var language = req.body.language;
+
+	var docBody = {};
+
+	docBody['website_name'] = website;
+	docBody['language'] = language;
+
+	// searchBody = {
+	// 	"size" : 1000,
+	//   	"query": {
+	//          "match_all" : {}
+	//        	}
+	// 	};
+
+	client.index({
+		index: 'websites',
+		type: 'url',
+		// id: uuidv1(),
+		id: website,	
+		body: docBody
+	}, function(err) {
+		if( err ) {
+			console.log(err);
+			// search('websites', searchBody)
+			//   .then(results => {
+			//     // res.render('insert_web', {websites:results,status: '2',cc:'' } );
+			//     res.status(200).render('insert_web',{websites:results, status: '0',cc: 'alert-danger'});
+			//   })
+			//   .catch(console.error);
+			res.redirect('/web-insert');
+
+			// res.status(200).render('insert_web',{websites:all_websites, status: '0',cc: 'alert-danger'});
+
+		} else {
+
+			// search('websites', searchBody)
+			//   .then(results => {
+			//     // res.render('insert_web', {websites:results,status: '2',cc:'' } );
+			//     res.status(200).render('insert_web',{websites:results, status: '1',cc: 'alert-success'});
+			//   })
+			//   .catch(console.error);
+			res.redirect('/web-insert');
+			// res.status(200).render('insert_web',{websites:all_websites, status: '1',cc: 'alert-success'});
+		
+		}
+	});
+
+})
+
 
 app.get('/', function(req, res){
 		// res.status(200).render('index',{results:'',search_str:'', message:''});
@@ -46,7 +117,7 @@ app.get('/', function(req, res){
 	         "match_all" : {}
 	       	}
 		};
-	search('mydocument', searchBody)
+	search('websites', searchBody)
 	  .then(results => {
 	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
 	    // console.log(`returned article titles:`);
