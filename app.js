@@ -55,7 +55,6 @@ app.get('/web-insert',function(req,res){
 
 	}, 1000); //timeout end
 
-	// res.render('insert_web', {websites:'',status: '2',cc:'' } );
 
 })
 
@@ -68,13 +67,6 @@ app.post('/insertweb',function(req,res){
 	docBody['website_name'] = website;
 	docBody['language'] = language;
 
-	// searchBody = {
-	// 	"size" : 1000,
-	//   	"query": {
-	//          "match_all" : {}
-	//        	}
-	// 	};
-
 	client.index({
 		index: 'websites',
 		type: 'url',
@@ -83,27 +75,10 @@ app.post('/insertweb',function(req,res){
 	}, function(err) {
 		if( err ) {
 			console.log(err);
-			// search('websites', searchBody)
-			//   .then(results => {
-			//     // res.render('insert_web', {websites:results,status: '2',cc:'' } );
-			//     res.status(200).render('insert_web',{websites:results, status: '0',cc: 'alert-danger'});
-			//   })
-			//   .catch(console.error);
 			res.redirect('/web-insert');
-
-			// res.status(200).render('insert_web',{websites:all_websites, status: '0',cc: 'alert-danger'});
 
 		} else {
-
-			// search('websites', searchBody)
-			//   .then(results => {
-			//     // res.render('insert_web', {websites:results,status: '2',cc:'' } );
-			//     res.status(200).render('insert_web',{websites:results, status: '1',cc: 'alert-success'});
-			//   })
-			//   .catch(console.error);
 			res.redirect('/web-insert');
-			// res.status(200).render('insert_web',{websites:all_websites, status: '1',cc: 'alert-success'});
-		
 		}
 	});
 
@@ -155,15 +130,6 @@ app.post('/updatewebsite', function(req, res){
 			console.log(err);
 			res.status(200).send(err);
 		} else {
-
-				// request.post('/document/view', {
-				//   update_id: doc_id
-				// }, (error, res, body) => {
-				//   if (error) {
-				//     console.error(error);
-    // 				return
-				//   }
-				// })
 
 			res.status(200).send(" <form action='/website/view' method='POST'> <input type='hidden' value='"+doc_id+"' name='update_id'> <center> <input type='submit' value='Website Updated Go Back >> ' name='submit' style='font-size:14px;padding:10px;'> </center> </form> ");
 		}
