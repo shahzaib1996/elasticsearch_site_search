@@ -13,6 +13,7 @@ var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
 	host: 'localhost:9200'
 })
+require('array.prototype.flatmap').shim();
 // const getResults = require("scraper");
 const port = 3000;
 
@@ -47,6 +48,7 @@ const fetchData = async (scrapURL) => {
   return cheerio.load(result.data);
 };
 
+//Scrap Sitemap
 const getResults = async (scrapURL) => {
   const $ = await fetchData(scrapURL);
   
@@ -210,10 +212,10 @@ app.post('/website/sitemaps', function(req,res){
 			console.log(error);
 	  		res.status(200).send("error-"+error);
 		} else {
-			var doc_id = response['_id'];
+			var website_id = response['_id'];
 			var wn = response['_source']['website_name'];
 			var lang = response['_source']['language'];
-	  		res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,sitemaps:sitemaps,status:'',cc:''});
+	  		res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,website_id:website_id,sitemaps:sitemaps,status:'',cc:''});
 		}
 
 	});
@@ -222,112 +224,16 @@ app.post('/website/sitemaps', function(req,res){
 
 })
 
-const inputArray = [
-    {
-      "index": {
-        "_index": "document_songs"
-      }
-    },
-    {
-      "data": {
-        "something1": "something new1",
-        "blah2":"blah2"
-      }
-      
-    },
-    {
-      "index": {
-        "_index": "document_songs"
-      }
-    },
-    {
-      "data": {
-        "something2": "something new2",
-        "blah2":"blah2"
-      }
-    },
-    {
-      "index": {
-        "_index": "document_songs"
-      }
-    },
-    {
-      "data": {
-        "something3": "something new3",
-        "blah2":"blah2"
-      }
-    }
-  ];
 
-const elasticStore = async (inputArray) => {
-    try {
-        const insert = await client.bulk({ body: inputArray, type: 'test_es'});
-        console.log(insert)
-    } catch (e) {
-        console.error('failed to insert events into elastic search', {e});
-    }
-};
-require('array.prototype.flatmap').shim();
-async function run (bulkArray) {
-  // await client.indices.create({
-  //   index: 'test_multiple_live',
-  //   body: {
-  //     mappings: {
-  //       properties: {
-  //         text: { type: 'text' },
-  //         user: { type: 'text' },
-  //         websitemap: { type: 'text' }
-  //       }
-  //     }
-  //   }
-  // }, { ignore: [400] })
+async function runInsertSitemapScrap (bulkArray) {
 
-    const dataset = bulkArray;
-
-
-  // const dataset = [
-  
-  // {
-  //   text: ' HHHHHH XXXXXasfgXXX ',
-  //   user: 'jon'
-  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
-  // },
-  
-  // {
-    
-  //   text: 'HHHHHH XXXXa sdXXXX',
-  //   user: 'ned'
-  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
-  // },
-  
-  // {
-    
-  //   text: 'HHHHHH XXXXXXadad XX ',
-  //   user: 'tyrion'
-  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
-  // },
-  
-  // {
-    
-  //   text: 'HHHHHH XXXasdXXXXX',
-  //   user: 'daenerys'
-  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
-  // },
-  
-  // {
-  //   // change this value to a string to see the bulk response with errors
-  //   text: 'HHHHHH XXXXXXxXX',
-  //   user: 'arya', 
-  //   websitemap:'www.naasongs.com/post_sitemap.xmlx'
-  // }]
-
+  const dataset = bulkArray;
 
   const body = dataset.flatMap(doc => [{ index: { _index: 'document_songs', _type: 'song_block' } }, doc])
   // const body = dataset;
 
   // const { body: bulkResponse } = await client.bulk({ refresh: true, body })
   const bulkInsertResponse = await client.bulk({ refresh: true, body })
-
 
   console.log(bulkInsertResponse['items'].length);
 
@@ -356,16 +262,63 @@ async function run (bulkArray) {
   const bulkInsertCount = await client.count({ index: 'document_songs' })
   console.log(bulkInsertCount)
 
-
 }
 
 app.post('/website/add/sitemap', async function(req,res){
 
+	var website_id = req.body.website_id;
 	var website_name = req.body.website_name;
 	var sitemap_ep = req.body.sitemap_ep;
 
 	var complete_url = website_name+sitemap_ep;
 
+	let searchBody = {
+		"size" : 10,
+		"min_score":0.5,
+  		"query": {
+         	"bool": {
+            	"should": [
+                	// {
+                 //   		"multi_match": {
+                 //      		"type": "best_fields",
+                 //      		"query": "ssss-wwww-ssdd-oo-pppd",
+                 //      		"operator": "and"
+                 //   		}
+                	// },
+                	// {
+                	// 	"multi_match": {
+                 //      		"type": "best_fields",
+                 //   			"query": "bbbb-qqqq-rrrr-eeee-ssss",
+                 //   			"operator": "and"
+                	// 	}
+                	// }
+  
+             	]
+
+          	}
+       	}
+	};
+
+
+	search('website_sitemaps', searchBody)
+	  .then(results => {
+	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
+	    // console.log(`returned article titles:`);
+	    // console.log(results);
+	    
+	    // res.render('index', {results:results, search_str:req.body.search, message:''} );
+
+	    // res.send(results['hits']['hits'][0]);
+	    // results.hits.hits.forEach(
+	    //   (hit, index) => console.log(
+	    //     `\t${body.from + ++index} - ${hit._source.id}`
+	    //   )
+	    // )
+	  })
+	  .catch(console.error);
+
+
+	//scrap sitemap
 	const result = await getResults(complete_url);
   	// res.send( result['blocks'] );
 
@@ -386,18 +339,24 @@ app.post('/website/add/sitemap', async function(req,res){
 	}
 
 	//Insert Blocks
-	run(bulkArray).catch(console.log);
+	runInsertSitemapScrap(bulkArray).catch(console.log);
 	
 	var itemsInserted = bulkArray.length;
-
+	let date_ob = new Date();
 	smBody = {};
+	smBody['website_id'] = website_id;
 	smBody['websitename'] = website_name; 
 	smBody['websitemap'] = complete_url; 
+	smBody['sm_endpoint'] = sitemap_ep; 
+	smBody['items_discovered'] = itemsInserted; 
+	smBody['date_inserted'] = date_ob;
+	smBody['last_read'] = date_ob;
 
-	client.index({
+	var sm_summ = await client.index({
 		index: 'website_sitemaps',
-		type: 'sitemaps',
-		id: uuidv1(),	
+		type: 'sitemaps_summary',
+		// id: uuidv1(),	
+		id: complete_url,	
 		body: smBody
 	}, function(err) {
 		if( err ) {
@@ -407,7 +366,8 @@ app.post('/website/add/sitemap', async function(req,res){
 		}
 	});
 
-	res.send(bulkArray.length);
+	console.log(sm_summ);
+	res.send(bulkArray.length+ " Working");
 	// for(i=0; i<result['blocks'].length;i++) {
 	// 	docBody = {}
 	// 	docBody['location'] = result['blocks'][i]['loc'];
