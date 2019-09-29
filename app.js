@@ -56,7 +56,8 @@ const getResults = async (scrapURL) => {
     blocks.add( { 
     	loc:$(element).find('loc').text(),
     	title:$(element).find('image\\:title').html(),
-    	image_link:$(element).find('image\\:loc').html() 
+    	image_link:$(element).find('image\\:loc').html(),
+    	caption:$(element).find('image\\:caption').html() 
     } );
     // image_link.add( $(element).find('image\\:loc').html() );
   });
@@ -269,78 +270,93 @@ const elasticStore = async (inputArray) => {
 require('array.prototype.flatmap').shim();
 async function run (bulkArray) {
   // await client.indices.create({
-  //   index: 'document_songs_test_new',
+  //   index: 'test_multiple_live',
   //   body: {
   //     mappings: {
   //       properties: {
-  //         id: { type: 'text' },
-  //         location: { type: 'text' },
-  //         title: { type: 'text' },
-  //         image_link: { type: 'text' }
+  //         text: { type: 'text' },
+  //         user: { type: 'text' },
+  //         websitemap: { type: 'text' }
   //       }
   //     }
   //   }
   // }, { ignore: [400] })
 
     const dataset = bulkArray;
-    // for(i=0;i<)
 
-  // const dataset = [{
-  //   id: 11,
-  //   text: 'If I fall, don\'t bring me back.',
-  //   user: 'jon',
-  //   date: new Date()
-  // }, {
-  //   id: 21,
-  //   text: 'Witer is coming',
-  //   user: 'ned',
-  //   date: new Date()
-  // }, {
-  //   id: 31,
-  //   text: 'A Lannister always pays his debts.',
-  //   user: 'tyrion',
-  //   date: new Date()
-  // }, {
-  //   id: 41,
-  //   text: 'I am the blood of the dragon.',
-  //   user: 'daenerys',
-  //   date: new Date()
-  // }, {
-  //   id: 51, // change this value to a string to see the bulk response with errors
-  //   text: 'A girl is Arya Stark of Winterfell. And I\'m going home.',
-  //   user: 'arya',
-  //   date: new Date()
+
+  // const dataset = [
+  
+  // {
+  //   text: ' HHHHHH XXXXXasfgXXX ',
+  //   user: 'jon'
+  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
+  // },
+  
+  // {
+    
+  //   text: 'HHHHHH XXXXa sdXXXX',
+  //   user: 'ned'
+  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
+  // },
+  
+  // {
+    
+  //   text: 'HHHHHH XXXXXXadad XX ',
+  //   user: 'tyrion'
+  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
+  // },
+  
+  // {
+    
+  //   text: 'HHHHHH XXXasdXXXXX',
+  //   user: 'daenerys'
+  //   , websitemap:'www.naasongs.com/post_sitemap.xmlx'
+  // },
+  
+  // {
+  //   // change this value to a string to see the bulk response with errors
+  //   text: 'HHHHHH XXXXXXxXX',
+  //   user: 'arya', 
+  //   websitemap:'www.naasongs.com/post_sitemap.xmlx'
   // }]
 
 
-  const body = dataset.flatMap(doc => [{ index: { _index: 'document_songs_test_newxxx', _type: 'song_block' } }, doc])
+  const body = dataset.flatMap(doc => [{ index: { _index: 'document_songs', _type: 'song_block' } }, doc])
+  // const body = dataset;
 
-  const { body: bulkResponse } = await client.bulk({ refresh: true, body })
+  // const { body: bulkResponse } = await client.bulk({ refresh: true, body })
+  const bulkInsertResponse = await client.bulk({ refresh: true, body })
 
-  // if (bulkResponse.errors) {
-  //   const erroredDocuments = []
-  //   // The items array has the same order of the dataset we just indexed.
-  //   // The presence of the `error` key indicates that the operation
-  //   // that we did for the document has failed.
-  //   bulkResponse.items.forEach((action, i) => {
-  //     const operation = Object.keys(action)[0]
-  //     if (action[operation].error) {
-  //       erroredDocuments.push({
-  //         // If the status is 429 it means that you can retry the document,
-  //         // otherwise it's very likely a mapping error, and you should
-  //         // fix the document before to try it again.
-  //         status: action[operation].status,
-  //         error: action[operation].error,
-  //         operation: body[i * 2],
-  //         document: body[i * 2 + 1]
-  //       })
-  //     }
-  //   })
-  //   console.log(erroredDocuments)
-  // }
 
-  const { body: count } = await client.count({ index: 'document_songs_test_newxxx' })
-  console.log(count)
+  console.log(bulkInsertResponse['items'].length);
+
+  if (bulkInsertResponse['errors']) {
+    const erroredDocuments = []
+    // The items array has the same order of the dataset we just indexed.
+    // The presence of the `error` key indicates that the operation
+    // that we did for the document has failed.
+    bulkResponse.items.forEach((action, i) => {
+      const operation = Object.keys(action)[0]
+      if (action[operation].error) {
+        erroredDocuments.push({
+          // If the status is 429 it means that you can retry the document,
+          // otherwise it's very likely a mapping error, and you should
+          // fix the document before to try it again.
+          status: action[operation].status,
+          error: action[operation].error,
+          operation: body[i * 2],
+          document: body[i * 2 + 1]
+        })
+      }
+    })
+    console.log(erroredDocuments)
+  }
+
+  const bulkInsertCount = await client.count({ index: 'document_songs' })
+  console.log(bulkInsertCount)
+
+
 }
 
 app.post('/website/add/sitemap', async function(req,res){
@@ -360,19 +376,38 @@ app.post('/website/add/sitemap', async function(req,res){
 	var bulkArray  = [];
 	for(i=0; i<result['blocks'].length;i++) {
 		docBody = {}
-		docBody['id'] = uuidv1();
+		docBody['websitename'] = website_name;
+		docBody['websitemap'] = complete_url;
 		docBody['location'] = result['blocks'][i]['loc'];
 		docBody['title'] = result['blocks'][i]['title'];
 		docBody['image_link'] = result['blocks'][i]['image_link'];
+		docBody['caption'] = result['blocks'][i]['caption'];
 		bulkArray.push(docBody);
 	}
 
-
+	//Insert Blocks
 	run(bulkArray).catch(console.log);
 	
+	var itemsInserted = bulkArray.length;
 
+	smBody = {};
+	smBody['websitename'] = website_name; 
+	smBody['websitemap'] = complete_url; 
 
-	res.send("Runed");
+	client.index({
+		index: 'website_sitemaps',
+		type: 'sitemaps',
+		id: uuidv1(),	
+		body: smBody
+	}, function(err) {
+		if( err ) {
+			console.log(err);
+		} else {
+			console.log("sitemap: "+complete_url+" has been crawled and added.");
+		}
+	});
+
+	res.send(bulkArray.length);
 	// for(i=0; i<result['blocks'].length;i++) {
 	// 	docBody = {}
 	// 	docBody['location'] = result['blocks'][i]['loc'];
