@@ -274,29 +274,14 @@ app.post('/website/add/sitemap', async function(req,res){
 
 	let searchBody = {
 		"size" : 10,
-		"min_score":0.5,
-  		"query": {
-         	"bool": {
-            	"should": [
-                	// {
-                 //   		"multi_match": {
-                 //      		"type": "best_fields",
-                 //      		"query": "ssss-wwww-ssdd-oo-pppd",
-                 //      		"operator": "and"
-                 //   		}
-                	// },
-                	// {
-                	// 	"multi_match": {
-                 //      		"type": "best_fields",
-                 //   			"query": "bbbb-qqqq-rrrr-eeee-ssss",
-                 //   			"operator": "and"
-                	// 	}
-                	// }
-  
-             	]
-
-          	}
-       	}
+		"query" : {
+		    "term" : {
+		      "websitemap.keyword" : {
+		        "value" : "https://wsongs.com/post-sitemap2.xml",
+		        "boost" : 1.0
+		      }
+		    }
+		}
 	};
 
 
