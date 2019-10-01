@@ -50,6 +50,8 @@ const fetchData = async (scrapURL) => {
 
 //Scrap Sitemap
 const getResults = async (scrapURL) => {
+  
+  
   const $ = await fetchData(scrapURL);
   
   // image\\:image
@@ -199,10 +201,33 @@ app.post( '/website/delete' , function(req,res){
 
 // =SITEMAP START====================================================================
 
-app.post('/website/sitemaps', function(req,res){
+app.post('/website/sitemaps', async function(req,res){
 
 	var website_id = req.body.website_id;
-	var sitemaps = '';
+	// var sitemaps = '';
+
+	let fetchWebsiteSitemaps = {
+			"size" : 10,
+			"query" : {
+			    "term" : {
+			      "website_id.keyword" : {
+			        "value" : website_id
+			      }
+			    }
+			}
+		};
+
+		fetch_sitemaps = [];
+		fs = await search('website_sitemaps', fetchWebsiteSitemaps)
+		  .then(results => {
+		    
+		    fetch_sitemaps = results['hits']['hits'];
+
+		    
+		  })
+		  .catch(console.error);
+
+
 	client.get({
 	  index: 'websites',
 	  type: 'url',
@@ -215,7 +240,7 @@ app.post('/website/sitemaps', function(req,res){
 			var website_id = response['_id'];
 			var wn = response['_source']['website_name'];
 			var lang = response['_source']['language'];
-	  		res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,website_id:website_id,sitemaps:sitemaps,status:'',cc:''});
+	  		res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,website_id:website_id,sitemaps:fetch_sitemaps,status:'',cc:''});
 		}
 
 	});
@@ -277,125 +302,119 @@ app.post('/website/add/sitemap', async function(req,res){
 		"query" : {
 		    "term" : {
 		      "websitemap.keyword" : {
-		        "value" : "https://wsongs.com/post-sitemap2.xml",
-		        "boost" : 1.0
+		        "value" : complete_url
 		      }
 		    }
 		}
 	};
 
-
-	search('website_sitemaps', searchBody)
+	var check_sitemap_data = [];
+	var check_sitemap = '';
+	check_sitemap = await search('website_sitemaps', searchBody)
 	  .then(results => {
-	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
-	    // console.log(`returned article titles:`);
-	    // console.log(results);
 	    
-	    // res.render('index', {results:results, search_str:req.body.search, message:''} );
+	    check_sitemap_data = results['hits']['hits'].length;
 
-	    // res.send(results['hits']['hits'][0]);
-	    // results.hits.hits.forEach(
-	    //   (hit, index) => console.log(
-	    //     `\t${body.from + ++index} - ${hit._source.id}`
-	    //   )
-	    // )
+	    
 	  })
 	  .catch(console.error);
 
+	if( check_sitemap_data != 0 ) {
+		res.send("Sitemap already exist");
+	} else {
 
-	//scrap sitemap
-	const result = await getResults(complete_url);
-  	// res.send( result['blocks'] );
+		//scrap sitemap
+		const result = await getResults(complete_url);
+	  	// res.send( result['blocks'] );
 
-	// var website = req.body.website_name;
-	// var language = req.body.language;
-	var docBody = {};
-	// elasticStore(inputArray);
-	var bulkArray  = [];
-	for(i=0; i<result['blocks'].length;i++) {
-		docBody = {}
-		docBody['websitename'] = website_name;
-		docBody['websitemap'] = complete_url;
-		docBody['location'] = result['blocks'][i]['loc'];
-		docBody['title'] = result['blocks'][i]['title'];
-		docBody['image_link'] = result['blocks'][i]['image_link'];
-		docBody['caption'] = result['blocks'][i]['caption'];
-		bulkArray.push(docBody);
-	}
-
-	//Insert Blocks
-	runInsertSitemapScrap(bulkArray).catch(console.log);
-	
-	var itemsInserted = bulkArray.length;
-	let date_ob = new Date();
-	smBody = {};
-	smBody['website_id'] = website_id;
-	smBody['websitename'] = website_name; 
-	smBody['websitemap'] = complete_url; 
-	smBody['sm_endpoint'] = sitemap_ep; 
-	smBody['items_discovered'] = itemsInserted; 
-	smBody['date_inserted'] = date_ob;
-	smBody['last_read'] = date_ob;
-
-	var sm_summ = await client.index({
-		index: 'website_sitemaps',
-		type: 'sitemaps_summary',
-		// id: uuidv1(),	
-		id: complete_url,	
-		body: smBody
-	}, function(err) {
-		if( err ) {
-			console.log(err);
-		} else {
-			console.log("sitemap: "+complete_url+" has been crawled and added.");
+		// var website = req.body.website_name;
+		// var language = req.body.language;
+		var docBody = {};
+		// elasticStore(inputArray);
+		var bulkArray  = [];
+		for(i=0; i<result['blocks'].length;i++) {
+			docBody = {}
+			docBody['websitename'] = website_name;
+			docBody['websitemap'] = complete_url;
+			docBody['location'] = result['blocks'][i]['loc'];
+			docBody['title'] = result['blocks'][i]['title'];
+			docBody['image_link'] = result['blocks'][i]['image_link'];
+			docBody['caption'] = result['blocks'][i]['caption'];
+			bulkArray.push(docBody);
 		}
-	});
 
-	console.log(sm_summ);
-	res.send(bulkArray.length+ " Working");
-	// for(i=0; i<result['blocks'].length;i++) {
-	// 	docBody = {}
-	// 	docBody['location'] = result['blocks'][i]['loc'];
-	// 	docBody['title'] = result['blocks'][i]['title'];
-	// 	docBody['image_link'] = result['blocks'][i]['image_link'];
-	// 	client.index({
-	// 		index: 'document_songs',
-	// 		type: 'songs',
-	// 		id: uuidv1(),	
-	// 		// website_name: website_name,
-	// 		// sitemap_link: complete_url,
-	// 		body: docBody
-	// 	}, function(err) {
-	// 		if( err ) {
-	// 			console.log(err);
-	// 		} else {
-	// 			console.log(i);
-	// 		}
-	// 	});
-	// 	// console.log(docBody);
-	// }
+		//Insert Blocks
+		runInsertSitemapScrap(bulkArray).catch(console.log);
+		
+		var itemsInserted = bulkArray.length;
+		let date_ob = new Date();
+		smBody = {};
+		smBody['website_id'] = website_id;
+		smBody['websitename'] = website_name; 
+		smBody['websitemap'] = complete_url; 
+		smBody['sm_endpoint'] = sitemap_ep; 
+		smBody['items_discovered'] = itemsInserted; 
+		smBody['date_inserted'] = date_ob;
+		smBody['last_read'] = date_ob;
+
+		var sm_summ = await client.index({
+			index: 'website_sitemaps',
+			type: 'sitemaps_summary',
+			// id: uuidv1(),	
+			id: complete_url,	
+			body: smBody
+		}, function(err) {
+			if( err ) {
+				console.log(err);
+			} else {
+				console.log("sitemap: "+complete_url+" has been crawled and added.");
+			}
+		});
 
 
 
-	// res.send( inputArray );
+		let fetchWebsiteSitemaps = {
+			"size" : 10,
+			"query" : {
+			    "term" : {
+			      "website_id.keyword" : {
+			        "value" : website_id
+			      }
+			    }
+			}
+		};
 
-	// docBody['website_name'] = website;
-	// docBody['language'] = language;
+		fetch_sitemaps = [];
+		fs = await search('website_sitemaps', fetchWebsiteSitemaps)
+		  .then(results => {
+		    
+		    fetch_sitemaps = results['hits']['hits'];
 
-	// client.index({
-	// 	index: 'websites',
-	// 	type: 'url',
-	// 	id: uuidv1(),	
-	// 	body: docBody
-	// }, function(err) {
-	// 	if( err ) {
-	// 		console.log(err);
-	// 		res.redirect('/web-insert');
+		    
+		  })
+		  .catch(console.error);
 
-	// 	} else {
-	// 		res.redirect('/web-insert');
-	// 	}
-	// });
+		console.log(sm_summ);
+		
+		client.get({
+		  index: 'websites',
+		  type: 'url',
+		  id: website_id
+		}, function (error, response) {
+			if( error ) {
+				console.log(error);
+		  		res.status(200).send("error-"+error);
+			} else {
+				var website_id = response['_id'];
+				var wn = response['_source']['website_name'];
+				var lang = response['_source']['language'];
+		  		res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,website_id:website_id,sitemaps:fetch_sitemaps,status:'',cc:''});
+			}
+
+		});
+
+
+	} // end od else of check sitemap exist or not
 
 })
 

@@ -101,9 +101,12 @@
           <thead>
             <tr>
               <td>Sno</td>
-              <td>Website Name</td>
-              <td>Language</td>
-              <td width="300">Action</td>
+              <td>Sitemap</td>
+              <td>Submitted</td>
+              <td>Last Read</td>
+              <td>Success</td>
+              <td>Discovered URLs</td>
+              <td>Resubmit</td>
             </tr>
           </thead>
           <tbody id="tableBody">
@@ -163,7 +166,7 @@
         // var i = 1;
         // $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
 
-        // $.each(data['hits']['hits'],function(index,value){
+        // $.each(data['_source'],function(index,value){
         //   console.log(value['_source']);
         //   row = `<tr> <td> ${i} </td>`;
         //   row += `<td>${value['_source']['website_name']}</td>`
