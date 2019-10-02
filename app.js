@@ -44,8 +44,19 @@ const blocks = new Set();
 
 
 const fetchData = async (scrapURL) => {
-  const result = await axios.get(scrapURL);
-  return cheerio.load(result.data);
+  // const result = await axios.get(scrapURL);
+  // return cheerio.load(result.data);
+  
+  	try {
+    const result = await axios.get(scrapURL);
+    // Success
+    console.log(result);
+  	return cheerio.load(result.data);
+	} catch (error) {
+		console.log("INVALID URL!");
+		return cheerio.load('');
+	}
+
 };
 
 //Scrap Sitemap
@@ -221,7 +232,7 @@ app.post('/website/sitemaps', async function(req,res){
 		fs = await search('website_sitemaps', fetchWebsiteSitemaps)
 		  .then(results => {
 		    
-		    fetch_sitemaps = results['hits']['hits'];
+		    fetch_sitemaps = results;
 
 		    
 		  })
