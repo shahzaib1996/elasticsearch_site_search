@@ -8,7 +8,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
 const uuidv1 = require('uuid/v1');
-const app = express()
+const app = express();
+var path = require('path');
+
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
 	host: 'localhost:9200'
@@ -24,6 +26,7 @@ const port = 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs')
+app.use(express.static(path.join(__dirname, 'public')));
 // app.use( '/api', routes );
 
 app.use( (req, res, next) => {
@@ -50,11 +53,11 @@ const fetchData = async (scrapURL) => {
   	try {
     const result = await axios.get(scrapURL);
     // Success
-    console.log(result);
+    // console.log(result);
   	return cheerio.load(result.data);
 	} catch (error) {
 		console.log("INVALID URL!");
-		return cheerio.load('');
+		return cheerio.load('<invalid>invalid</invalid>');
 	}
 
 };
@@ -64,6 +67,9 @@ const getResults = async (scrapURL) => {
   
   
   const $ = await fetchData(scrapURL);
+
+  var invalid = $("invalid").html();
+  console.log($("invalid").html());
   
   // image\\:image
   $("url").each((index, element) => {
@@ -79,6 +85,7 @@ const getResults = async (scrapURL) => {
 
   return {
     blocks: [...blocks].sort(),
+    invalid:invalid
   };
 };
 
@@ -300,6 +307,19 @@ async function runInsertSitemapScrap (bulkArray) {
 
 }
 
+app.post('/website/smtest', async function(req,res){
+
+	// var website_id = req.body.website_id;
+	// var website_name = req.body.website_name;
+	// var sitemap_ep = req.body.sitemap_ep;
+
+	// var complete_url = website_name+sitemap_ep;
+	var ddd = req.body
+	console.log(ddd['website_id']);
+	res.send(req.body);
+
+})
+
 app.post('/website/add/sitemap', async function(req,res){
 
 	var website_id = req.body.website_id;
@@ -331,32 +351,35 @@ app.post('/website/add/sitemap', async function(req,res){
 	  .catch(console.error);
 
 	if( check_sitemap_data != 0 ) {
-		res.send("Sitemap already exist");
+		res.send("2"); //2 = sitemap already exists
 	} else {
 
 		//scrap sitemap
 		const result = await getResults(complete_url);
 	  	// res.send( result['blocks'] );
-
+	  	
 		// var website = req.body.website_name;
 		// var language = req.body.language;
 		var docBody = {};
 		// elasticStore(inputArray);
 		var bulkArray  = [];
-		for(i=0; i<result['blocks'].length;i++) {
-			docBody = {}
-			docBody['websitename'] = website_name;
-			docBody['websitemap'] = complete_url;
-			docBody['location'] = result['blocks'][i]['loc'];
-			docBody['title'] = result['blocks'][i]['title'];
-			docBody['image_link'] = result['blocks'][i]['image_link'];
-			docBody['caption'] = result['blocks'][i]['caption'];
-			bulkArray.push(docBody);
-		}
+		if( result['invalid'] == 'invalid' ) {
+			res.send("3"); // 3 = URL is invalid
+		}else if( result ) {
+			for(i=0; i<result['blocks'].length;i++) {
+				docBody = {}
+				docBody['websitename'] = website_name;
+				docBody['websitemap'] = complete_url;
+				docBody['location'] = result['blocks'][i]['loc'];
+				docBody['title'] = result['blocks'][i]['title'];
+				docBody['image_link'] = result['blocks'][i]['image_link'];
+				docBody['caption'] = result['blocks'][i]['caption'];
+				bulkArray.push(docBody);
+			}
 
-		//Insert Blocks
-		runInsertSitemapScrap(bulkArray).catch(console.log);
-		
+			//Insert Blocks
+			runInsertSitemapScrap(bulkArray).catch(console.log);
+			
 		var itemsInserted = bulkArray.length;
 		let date_ob = new Date();
 		smBody = {};
@@ -379,50 +402,11 @@ app.post('/website/add/sitemap', async function(req,res){
 				console.log(err);
 			} else {
 				console.log("sitemap: "+complete_url+" has been crawled and added.");
+				res.send("1");
 			}
 		});
 
-
-
-		let fetchWebsiteSitemaps = {
-			"size" : 10,
-			"query" : {
-			    "term" : {
-			      "website_id.keyword" : {
-			        "value" : website_id
-			      }
-			    }
-			}
-		};
-
-		fetch_sitemaps = [];
-		fs = await search('website_sitemaps', fetchWebsiteSitemaps)
-		  .then(results => {
-		    
-		    fetch_sitemaps = results['hits']['hits'];
-
-		    
-		  })
-		  .catch(console.error);
-
-		console.log(sm_summ);
-		
-		client.get({
-		  index: 'websites',
-		  type: 'url',
-		  id: website_id
-		}, function (error, response) {
-			if( error ) {
-				console.log(error);
-		  		res.status(200).send("error-"+error);
-			} else {
-				var website_id = response['_id'];
-				var wn = response['_source']['website_name'];
-				var lang = response['_source']['language'];
-		  		res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,website_id:website_id,sitemaps:fetch_sitemaps,status:'',cc:''});
-			}
-
-		});
+		} //end of invalid sitemap url check
 
 
 	} // end od else of check sitemap exist or not

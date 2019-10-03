@@ -10,6 +10,9 @@
     <!-- Font awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <!-- Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <title> Elastic </title>
     <style>
       .cb {
@@ -25,10 +28,23 @@
         opacity: 0.6;
       }
       input:focus { outline:0 !important; }
+      div.loader-div {
+        display: none;
+        position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
+        text-align: center;
+      }
+      div.loader-div img {
+        top:30%;
+        position: relative;
+      }
 
     </style>
   </head>
   <body>
+    <div class="loader-div" id="loader-div">
+      <!-- <img src="https://icon-library.net/images/spinner-icon-gif/spinner-icon-gif-15.jpg"> -->
+      <img src="https://jeobi.com/images/loading.gif">
+    </div>
     <!-- As a link -->
     <nav class="navbar navbar-dark bg-dark">
       <a class="navbar-brand" href="/">ELASTIC SEARCH</a>
@@ -52,24 +68,15 @@
             var status = "<%= status%>";
       </script>
 
-      <div class="alert <%= cc%>">
-        <center>
-          <script type="text/javascript">
-            if(status == "1") {
-              document.write("Document has been Saved!");
-            }else if(status == "0") {
-              document.write("Error Saving document");
-            }
-
-          </script>
-        </center>
+      <div class="alert" id="alert-box">
+        
       </div>
 
       <div class="row"> 
         <div class="col-md-12">
-          <form class="form" action="/website/add/sitemap" method="POST" >
-            <input type="hidden" name="website_id" value="<%= website_id%>">
-            <input type="hidden" name="website_name" value="<%= wn%>">
+          <form class="form" action="javascript:void(0)" method="POST" id="sitemap-form" >
+            <input type="hidden" name="website_id" id="website_id"  value="<%= website_id%>">
+            <input type="hidden" name="website_name" id="website_name" value="<%= wn%>">
             <div class="row" >
               <div class="col-md-12">
                 <div class="form-group">
@@ -78,7 +85,7 @@
                     <span style="line-height: 40px;">
                       <%= wn%>  
                     </span>
-                    <input type="text" name="sitemap_ep" class="col-md-6" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
+                    <input type="text" name="sitemap_ep" id="sitemap_ep" class="col-md-6" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
                     <input type="submit" class="btn btn-success col-md-2" name="submit" value="ADD" style="margin-left: 10px;border-radius:0px;">  
                   </div> 
                   <!-- <input type="text" class="form-control" name="website_name" id="website_name" placeholder="e.g https://www.example.com" required> -->
@@ -130,7 +137,7 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
@@ -184,8 +191,67 @@
         })
         
         } else {
-          $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
-        }        
+          $('#tableBody').append(`<tr> <td colspan="7"> <center> No Sitemaps Found </center> </td> </tr>`);
+        }   
+
+
+        const insertSitemap = () =>{
+        
+            let website_id = $('#website_id').val();
+            let sitemap_ep = $('#sitemap_ep').val();
+            let website_name = $('#website_name').val();
+              
+            let filter = {
+              website_id:website_id,
+              sitemap_ep:sitemap_ep,
+              website_name:website_name
+            }
+
+            if( sitemap_ep == '' ) {
+              alert('Please! enter sitemap');
+              $('#loader-div').hide();
+            } else {
+
+              $.ajax({
+                  url: '/website/add/sitemap', data:filter,
+                  method:'POST', success: result => {
+
+                    // var data = JSON.parse(result);
+                    console.log("result yahan par aya ha!");
+                    console.log(result);
+                    $('#loader-div').hide();
+                    if( result == "2" ) {
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Sitemap already exists!</center>')
+                    }else if( result == "3" ) {
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Invalid Sitemap!</center>')
+                    } else if( result == "1") {
+                      $('#alert-box').addClass('alert-success');
+                      $('#alert-box').html('<center>Sitemap Successfully Crawled!</center>')
+                    }
+                    setTimeout(function(){
+                      location.reload();
+                    },3000);
+                  },
+                  error: e => {
+                    console.log("");
+                    $('#loader-div').hide();
+                    $('#alert-box').addClass('alert-danger');
+                    $('#alert-box').html('<center>Something went wrong!</center>')
+                  }
+                });
+
+            }
+
+          }
+
+          $('#sitemap-form').on('submit', () => {
+            $('#loader-div').show();
+              console.log('Insert sitemap initiated!');
+              insertSitemap();
+          })
+
 
       }); 
     </script>
