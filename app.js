@@ -413,8 +413,18 @@ app.post('/website/add/sitemap', async function(req,res){
 
 })
 
-
 // =SITEMAP END====================================================================
+
+// =SITEMAP Reindex Start====================================================================
+
+app.get('/testdelete', async function(req,res){
+
+	res.send("Test Bulk Delete Method Call");
+
+})
+
+// =SITEMAP Reindex END====================================================================
+
 
 app.get('/', function(req, res){
 		// res.status(200).render('index',{results:'',search_str:'', message:''});
