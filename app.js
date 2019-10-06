@@ -419,7 +419,62 @@ app.post('/website/add/sitemap', async function(req,res){
 
 app.get('/testdelete', async function(req,res){
 
-	res.send("Test Bulk Delete Method Call");
+// 	var checkdel = await client.deleteByQuery({
+//   index: 'document_songs',
+//   type: 'song_block',
+//   body: {
+//     query: {
+//     	"term" : {
+// 		      "websitemap.keyword" : {
+// 		        "value" : "https://naasongs.com/testsitemap.xml"
+// 		      }
+// 		    }
+//     }   
+//   }
+// });
+
+var docBody = {};
+var website_id = ; 
+var websitename = ; 
+var websitemap = ;
+var sm_endpoint = ;
+var date_inserted = ;
+
+var getWebSitemap = await client.get({
+	  index: 'websites',
+	  type: 'url',
+	  id: doc_id
+	}, function (error, response) {
+		if( error ) {
+			console.log(error);
+
+		} else {
+			var doc_id = response['_id'];
+			var wn = response['_source']['website_name'];
+			var lang = response['_source']['language'];
+
+		}
+
+	});
+
+docBody['items_discovered']= '444';
+
+client.index({
+		index: 'website_sitemaps',
+		type: 'sitemaps_summary',
+		id: 'https://naasongs.com/testsitemap.xml',	
+		body: docBody
+	}, function(err) {
+		if( err ) {
+			console.log(err);
+			res.send(err);
+
+		} else {
+			res.send(err);
+		}
+	});
+
+	
 
 })
 

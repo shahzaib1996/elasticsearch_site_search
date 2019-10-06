@@ -183,7 +183,11 @@
           row += `<td>${value['_source']['last_read']}</td>` 
           row += `<td> <span style="color:green;">Success</span> </td>` 
           row += `<td> ${value['_source']['items_discovered']} </td>` 
-          row += `<td> <i class="fa fa-refresh"></i> </td>` 
+          row += `<td> `;
+
+          row += `<form action="" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="submit" name="submit" class="btn btn-info btn-sm" > <i class="fa fa-refresh"></i> </button </form>`;
+
+          row += `</td>`; 
           
           row += `</tr>`;
           $('#tableBody').append(row);
