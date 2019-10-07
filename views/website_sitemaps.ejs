@@ -185,7 +185,7 @@
           row += `<td> ${value['_source']['items_discovered']} </td>` 
           row += `<td> `;
 
-          row += `<form action="" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="submit" name="submit" class="btn btn-info btn-sm" > <i class="fa fa-refresh"></i> </button </form>`;
+          row += `<form action="/sitemap/reindex" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="button" name="submit" class="btn btn-info btn-sm click-reindex" data-sitemap-id="${value['_id']}" data-websitename="<%= wn%>" > <i class="fa fa-refresh"></i> </button </form>`;
 
           row += `</td>`; 
           
@@ -250,11 +250,69 @@
 
           }
 
+
+
+          $('.click-reindex').click(function(){
+
+            $('#loader-div').show();
+            console.log('Insert sitemap initiated!');
+
+            let sitemap_id = $(this).data('sitemap-id');
+            let websitename = $(this).data('websitename');
+              
+            let filter = {
+              sitemap_id:sitemap_id,
+              websitename:websitename
+            }
+
+            if( sitemap_ep == '' ) {
+              alert('Please! enter sitemap');
+              $('#loader-div').hide();
+            } else {
+
+              $.ajax({
+                  url: '/sitemap/reindex', data:filter,
+                  method:'POST', success: result => {
+
+                    // var data = JSON.parse(result);
+                    console.log("result yahan par aya ha!");
+                    console.log(result);
+                    $('#loader-div').hide();
+                    if( result == "2" ) {
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Sitemap already exists!</center>')
+                    }else if( result == "3" ) {
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Invalid Sitemap!</center>')
+                    } else if( result == "1") {
+                      $('#alert-box').addClass('alert-success');
+                      $('#alert-box').html('<center>Sitemap Successfully Reindex/Recrawled!</center>')
+                    }
+                    setTimeout(function(){
+                      location.reload();
+                    },3000);
+                  },
+                  error: e => {
+                    console.log("");
+                    $('#loader-div').hide();
+                    $('#alert-box').addClass('alert-danger');
+                    $('#alert-box').html('<center>Something went wrong!</center>')
+                  }
+                });
+
+            }
+
+          });
+
+
+
           $('#sitemap-form').on('submit', () => {
             $('#loader-div').show();
               console.log('Insert sitemap initiated!');
               insertSitemap();
           })
+
+          
 
 
       }); 

@@ -417,62 +417,138 @@ app.post('/website/add/sitemap', async function(req,res){
 
 // =SITEMAP Reindex Start====================================================================
 
-app.get('/testdelete', async function(req,res){
+app.post('/sitemap/reindex', async function(req,res){
 
-// 	var checkdel = await client.deleteByQuery({
-//   index: 'document_songs',
-//   type: 'song_block',
-//   body: {
-//     query: {
-//     	"term" : {
-// 		      "websitemap.keyword" : {
-// 		        "value" : "https://naasongs.com/testsitemap.xml"
-// 		      }
-// 		    }
-//     }   
-//   }
-// });
+var sitemap_id = req.body.sitemap_id;
+var websitename = req.body.websitename;
 
+// delete old songs blocks
+  var checkdel = await client.deleteByQuery({
+  index: 'document_songs',
+  type: 'song_block',
+  body: {
+    query: {
+    	"term" : {
+		      "websitemap.keyword" : {
+		        "value" : sitemap_id
+		      }
+		    }
+    }   
+  }
+});
+
+
+//Web crawling / reindex start
+
+//scrap sitemap
+const result = await getResults(sitemap_id);
+	  	// res.send( result['blocks'] );
+	  	
+		// var website = req.body.website_name;
+		// var language = req.body.language;
+var docBody1 = {};
+		// elasticStore(inputArray);
+var bulkArray  = [];
+if( result['invalid'] == 'invalid' ) {
+	res.send("3"); // 3 = URL is invalid
+}else if( result ) {
+
+	for(i=0; i<result['blocks'].length;i++) {
+		docBody1 = {}
+		docBody1['websitename'] = websitename;
+		docBody1['websitemap'] = sitemap_id;
+		docBody1['location'] = result['blocks'][i]['loc'];
+		docBody1['title'] = result['blocks'][i]['title'];
+		docBody1['image_link'] = result['blocks'][i]['image_link'];
+		docBody1['caption'] = result['blocks'][i]['caption'];
+		bulkArray.push(docBody1);
+	}
+
+			//Insert Blocks
+runInsertSitemapScrap(bulkArray).catch(console.log);
+			
+var itemsInserted = bulkArray.length;
+
+// Web crawling / reindex end
+
+
+//Website sitemap summary updating
 var docBody = {};
-var website_id = ; 
-var websitename = ; 
-var websitemap = ;
-var sm_endpoint = ;
-var date_inserted = ;
+var website_id = ''; 
+var websitename = ''; 
+var websitemap = '';
+var sm_endpoint = '';
+var date_inserted = '';
 
-var getWebSitemap = await client.get({
-	  index: 'websites',
-	  type: 'url',
-	  id: doc_id
+//getting sitemap summary from sitemap
+await client.get({
+	  index: 'website_sitemaps',
+	  type: 'sitemaps_summary',
+	  id: sitemap_id
 	}, function (error, response) {
 		if( error ) {
 			console.log(error);
 
 		} else {
-			var doc_id = response['_id'];
-			var wn = response['_source']['website_name'];
-			var lang = response['_source']['language'];
+			// var doc_id = response['_id'];
+			console.log(response);
+			
+			docBody['websitemap']= sitemap_id; //complete url
+			docBody['sm_endpoint']= response['_source']['sm_endpoint'];
+			docBody['website_id']= response['_source']['website_id'];
+			docBody['websitename']= response['_source']['websitename'];
+			docBody['date_inserted']= response['_source']['date_inserted'];
+			docBody['last_read']= new Date();
+			docBody['items_discovered']= itemsInserted;
+
+			client.index({
+					index: 'website_sitemaps',
+					type: 'sitemaps_summary',
+					id: sitemap_id,	
+					body: docBody
+				}, function(err) {
+					if( err ) {
+						console.log(err);
+						res.status(500).send(err);
+
+					} else {
+						res.send('1');
+					}
+				});
 
 		}
 
 	});
 
-docBody['items_discovered']= '444';
+} //end of invalid sitemap url check
 
-client.index({
-		index: 'website_sitemaps',
-		type: 'sitemaps_summary',
-		id: 'https://naasongs.com/testsitemap.xml',	
-		body: docBody
-	}, function(err) {
-		if( err ) {
-			console.log(err);
-			res.send(err);
 
-		} else {
-			res.send(err);
-		}
-	});
+// docBody['websitemap']= sitemap_id; //complete url
+// docBody['sm_endpoint']= sm_endpoint;
+// docBody['website_id']= website_id;
+// docBody['websitename']= websitemap;
+// docBody['date_inserted']= date_inserted;
+// docBody['last_read']= new Date();
+// docBody['items_discovered']= '433';
+
+// console.log(docBody);
+
+// res.send(docBody);
+
+// client.index({
+// 		index: 'website_sitemaps',
+// 		type: 'sitemaps_summary',
+// 		id: sitemap_id,	
+// 		body: docBody
+// 	}, function(err) {
+// 		if( err ) {
+// 			console.log(err);
+// 			res.send(err);
+
+// 		} else {
+// 			res.send(err);
+// 		}
+// 	});
 
 	
 
