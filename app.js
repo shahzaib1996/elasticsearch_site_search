@@ -43,15 +43,15 @@ const axios = require("axios");
 // const siteUrl = "https://remoteok.io/";
 
 let siteName = "";
-const blocks = new Set();
+// var blocks = new Set();
 
 
-const fetchData = async (scrapURL) => {
+var fetchData = async (scrapURL) => {
   // const result = await axios.get(scrapURL);
   // return cheerio.load(result.data);
   
   	try {
-    const result = await axios.get(scrapURL);
+    var result = await axios.get(scrapURL);
     // Success
     // console.log(result);
   	return cheerio.load(result.data);
@@ -63,10 +63,10 @@ const fetchData = async (scrapURL) => {
 };
 
 //Scrap Sitemap
-const getResults = async (scrapURL) => {
+var getResults = async (scrapURL) => {
+  var blocks = new Set();
   
-  
-  const $ = await fetchData(scrapURL);
+  var $ = await fetchData(scrapURL);
 
   var invalid = $("invalid").html();
   console.log($("invalid").html());
@@ -111,11 +111,16 @@ app.get('/web-insert',function(req,res){
 			};
 		search('websites', searchBody)
 		  .then(results => {
+
 		    res.render('insert_web', {websites:results,status: '2',cc:'',message:'' } );
+
 		  })
-		  .catch(console.error);
+		  .catch(error => {
+		  	res.render('insert_web', {websites:[],status: '2',cc:'',message:'' } );
+		  });
 
 	}, 1000); //timeout end
+
 
 
 })
@@ -270,13 +275,13 @@ app.post('/website/sitemaps', async function(req,res){
 
 async function runInsertSitemapScrap (bulkArray) {
 
-  const dataset = bulkArray;
+  var dataset = bulkArray;
 
-  const body = dataset.flatMap(doc => [{ index: { _index: 'document_songs', _type: 'song_block' } }, doc])
+  var body = dataset.flatMap(doc => [{ index: { _index: 'document_songs', _type: 'song_block' } }, doc])
   // const body = dataset;
 
   // const { body: bulkResponse } = await client.bulk({ refresh: true, body })
-  const bulkInsertResponse = await client.bulk({ refresh: true, body })
+  var bulkInsertResponse = await client.bulk({ refresh: true, body })
 
   console.log(bulkInsertResponse['items'].length);
 
@@ -286,7 +291,7 @@ async function runInsertSitemapScrap (bulkArray) {
     // The presence of the `error` key indicates that the operation
     // that we did for the document has failed.
     bulkResponse.items.forEach((action, i) => {
-      const operation = Object.keys(action)[0]
+      var operation = Object.keys(action)[0]
       if (action[operation].error) {
         erroredDocuments.push({
           // If the status is 429 it means that you can retry the document,
@@ -303,7 +308,10 @@ async function runInsertSitemapScrap (bulkArray) {
   }
 
   const bulkInsertCount = await client.count({ index: 'document_songs' })
+  console.log("=-=-=-=-=-=-=-");
   console.log(bulkInsertCount)
+  console.log("=-=-=-=-=-=-=-");
+
 
 }
 
@@ -325,6 +333,7 @@ app.post('/website/add/sitemap', async function(req,res){
 	var website_id = req.body.website_id;
 	var website_name = req.body.website_name;
 	var sitemap_ep = req.body.sitemap_ep;
+	var weblanguage = req.body.language;
 
 	var complete_url = website_name+sitemap_ep;
 
@@ -370,6 +379,7 @@ app.post('/website/add/sitemap', async function(req,res){
 				docBody = {}
 				docBody['websitename'] = website_name;
 				docBody['websitemap'] = complete_url;
+				docBody['weblanguage'] = weblanguage;
 				docBody['location'] = result['blocks'][i]['loc'];
 				docBody['title'] = result['blocks'][i]['title'];
 				docBody['image_link'] = result['blocks'][i]['image_link'];
@@ -386,7 +396,8 @@ app.post('/website/add/sitemap', async function(req,res){
 		smBody['website_id'] = website_id;
 		smBody['websitename'] = website_name; 
 		smBody['websitemap'] = complete_url; 
-		smBody['sm_endpoint'] = sitemap_ep; 
+		smBody['sm_endpoint'] = sitemap_ep;
+		smBody['weblanguage'] = weblanguage;
 		smBody['items_discovered'] = itemsInserted; 
 		smBody['date_inserted'] = date_ob;
 		smBody['last_read'] = date_ob;
@@ -421,6 +432,7 @@ app.post('/sitemap/reindex', async function(req,res){
 
 var sitemap_id = req.body.sitemap_id;
 var websitename = req.body.websitename;
+var weblanguage = req.body.weblanguage;
 
 // delete old songs blocks
   var checkdel = await client.deleteByQuery({
@@ -428,7 +440,7 @@ var websitename = req.body.websitename;
   type: 'song_block',
   body: {
     query: {
-    	"term" : {
+    	term : {
 		      "websitemap.keyword" : {
 		        "value" : sitemap_id
 		      }
@@ -437,11 +449,20 @@ var websitename = req.body.websitename;
   }
 });
 
+// res.send(checkdel);
+console.log("========");
+console.log(checkdel);
+console.log("========");
+
+
+setTimeout( async function(){
+
+// }, 2000 );
 
 //Web crawling / reindex start
 
 //scrap sitemap
-const result = await getResults(sitemap_id);
+var result = await getResults(sitemap_id);
 	  	// res.send( result['blocks'] );
 	  	
 		// var website = req.body.website_name;
@@ -457,6 +478,7 @@ if( result['invalid'] == 'invalid' ) {
 		docBody1 = {}
 		docBody1['websitename'] = websitename;
 		docBody1['websitemap'] = sitemap_id;
+		docBody1['weblanguage'] = weblanguage;
 		docBody1['location'] = result['blocks'][i]['loc'];
 		docBody1['title'] = result['blocks'][i]['title'];
 		docBody1['image_link'] = result['blocks'][i]['image_link'];
@@ -469,6 +491,11 @@ runInsertSitemapScrap(bulkArray).catch(console.log);
 			
 var itemsInserted = bulkArray.length;
 
+  console.log("***************");
+  console.log(itemsInserted+" --- "+bulkArray.length);
+  console.log("***************");
+
+
 // Web crawling / reindex end
 
 
@@ -478,6 +505,7 @@ var website_id = '';
 var websitename = ''; 
 var websitemap = '';
 var sm_endpoint = '';
+var language = '';
 var date_inserted = '';
 
 //getting sitemap summary from sitemap
@@ -497,6 +525,7 @@ await client.get({
 			docBody['sm_endpoint']= response['_source']['sm_endpoint'];
 			docBody['website_id']= response['_source']['website_id'];
 			docBody['websitename']= response['_source']['websitename'];
+			docBody['weblanguage']= response['_source']['weblanguage'];
 			docBody['date_inserted']= response['_source']['date_inserted'];
 			docBody['last_read']= new Date();
 			docBody['items_discovered']= itemsInserted;
@@ -522,39 +551,22 @@ await client.get({
 
 } //end of invalid sitemap url check
 
-
-// docBody['websitemap']= sitemap_id; //complete url
-// docBody['sm_endpoint']= sm_endpoint;
-// docBody['website_id']= website_id;
-// docBody['websitename']= websitemap;
-// docBody['date_inserted']= date_inserted;
-// docBody['last_read']= new Date();
-// docBody['items_discovered']= '433';
-
-// console.log(docBody);
-
-// res.send(docBody);
-
-// client.index({
-// 		index: 'website_sitemaps',
-// 		type: 'sitemaps_summary',
-// 		id: sitemap_id,	
-// 		body: docBody
-// 	}, function(err) {
-// 		if( err ) {
-// 			console.log(err);
-// 			res.send(err);
-
-// 		} else {
-// 			res.send(err);
-// 		}
-// 	});
-
+}, 2000 );
 	
 
 })
 
 // =SITEMAP Reindex END====================================================================
+
+// =SITEMAP Search Page START====================================================================
+
+app.get('/searchpage', function(req,res){
+
+	res.status(200).render('search_page');
+
+})
+
+// =SITEMAP Search Page END====================================================================
 
 
 app.get('/', function(req, res){

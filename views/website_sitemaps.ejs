@@ -77,6 +77,7 @@
           <form class="form" action="javascript:void(0)" method="POST" id="sitemap-form" >
             <input type="hidden" name="website_id" id="website_id"  value="<%= website_id%>">
             <input type="hidden" name="website_name" id="website_name" value="<%= wn%>">
+            <input type="hidden" name="language" id="language" value="<%= lang%>">
             <div class="row" >
               <div class="col-md-12">
                 <div class="form-group">
@@ -101,11 +102,17 @@
             </div> -->
           </form>
         </div>
+
+        <div class="col-md-12">
+          <!-- <h3> <span class="badge badge-info"> website <%= wn%> </span> </h3> -->
+          <h3> <span class="badge badge-info"> Language <%= lang%> </span> </h3>
+        </div>
+
       </div>
 
       <br><br>
       <div class="table-div">
-        <h3>  Sitemaps  </h3>
+        <h3 class="op6">  Sitemaps  </h3>
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
@@ -185,7 +192,7 @@
           row += `<td> ${value['_source']['items_discovered']} </td>` 
           row += `<td> `;
 
-          row += `<form action="/sitemap/reindex" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="button" name="submit" class="btn btn-info btn-sm click-reindex" data-sitemap-id="${value['_id']}" data-websitename="<%= wn%>" > <i class="fa fa-refresh"></i> </button </form>`;
+          row += `<form action="/sitemap/reindex" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="button" name="submit" class="btn btn-info btn-sm click-reindex" data-sitemap-id="${value['_id']}" data-websitename="<%= wn%>" data-weblanguage="<%= lang%>" > <i class="fa fa-refresh"></i> </button </form>`;
 
           row += `</td>`; 
           
@@ -204,11 +211,13 @@
             let website_id = $('#website_id').val();
             let sitemap_ep = $('#sitemap_ep').val();
             let website_name = $('#website_name').val();
+            let language = $('#language').val();
               
             let filter = {
               website_id:website_id,
               sitemap_ep:sitemap_ep,
-              website_name:website_name
+              website_name:website_name,
+              language:language
             }
 
             if( sitemap_ep == '' ) {
@@ -259,10 +268,12 @@
 
             let sitemap_id = $(this).data('sitemap-id');
             let websitename = $(this).data('websitename');
+            let weblanguage = $(this).data('weblanguage');
               
             let filter = {
               sitemap_id:sitemap_id,
-              websitename:websitename
+              websitename:websitename,
+              weblanguage:weblanguage
             }
 
             if( sitemap_ep == '' ) {
@@ -279,12 +290,15 @@
                     console.log(result);
                     $('#loader-div').hide();
                     if( result == "2" ) {
+                      $('#alert-box').removeClass('alert-success');
                       $('#alert-box').addClass('alert-danger');
                       $('#alert-box').html('<center>Sitemap already exists!</center>')
                     }else if( result == "3" ) {
+                      $('#alert-box').removeClass('alert-success');
                       $('#alert-box').addClass('alert-danger');
                       $('#alert-box').html('<center>Invalid Sitemap!</center>')
                     } else if( result == "1") {
+                      $('#alert-box').removeClass('alert-danger');
                       $('#alert-box').addClass('alert-success');
                       $('#alert-box').html('<center>Sitemap Successfully Reindex/Recrawled!</center>')
                     }
