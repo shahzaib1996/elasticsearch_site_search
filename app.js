@@ -563,27 +563,72 @@ await client.get({
 app.get('/searchpage', async function(req,res){
 
 	var q = req.query.q;
+	var label = req.query.label;
 	
-	if( q  ) {
+	
+	if( q ) {
 
+	//query without language filter
+	// searchBody = {
+	// 	"from" : 0,
+	// 	"size" : 100,
+	//   	"query": {
+	//         "query_string" : {
+	//             "query" : "*"+q+"*",
+	//             // "default_field" : "title"
+	//         }
+	//     }
+	// };
+
+	//query with language filter
+	// searchBody = {
+	// 	"from" : 0,
+	// 	"size" : 100,
+	//   	"query": { 
+	// 	    "bool": { 
+	// 	      "must": [
+	// 	        { 
+	// 	          "query_string" : {
+	// 	              "query" : "*"+q+"*"
+	// 	          }
+	// 	        }
+	// 	      ],
+	// 	      "filter": [ 
+	// 	        { "term":  { "weblanguage": "hindi" }}
+	// 	      ]
+	// 	    }
+	// 	}
+	// };
 
 	searchBody = {
 		"from" : 0,
 		"size" : 100,
-	  	"query": {
-	        "query_string" : {
-	            "query" : "*"+q+"*",
-	            "default_field" : "title"
-	        }
-	    }
+	  	"query": { 
+		    "bool": { 
+		      "must": [
+		        { 
+		          "query_string" : {
+		              "query" : "*"+q+"*"
+		          }
+		        }
+		      ]
+		      //dynamically place filter here
+		    }
+		}
 	};
-	
+
+	if( label ) {
+		searchBody['query']['bool']['filter'] = [];
+		searchBody['query']['bool']['filter'].push( { "term":  { "weblanguage": label }} );
+	}
+
+	console.log(searchBody['query']['bool']['filter']);
 	
 
 	var search_results = await search('document_songs', searchBody)
 	  .then(results => {
 	    
-	    res.status(200).render('search_page', { data:results,q:q } );
+	    res.status(200).render('search_page', { data:results,q:q,label:label } );
 	    
 	  })
 	  .catch(console.error);

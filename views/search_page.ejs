@@ -60,7 +60,9 @@
         background: ;
         width:  60px;
         height: 40px;
-        display: inline-block;
+        /*display: inline-block;*/
+        display: block;
+        float: left;
         
 
       }
@@ -68,7 +70,7 @@
       img.sbimg {
         height: 60px;
         width: 60px; 
-        margin-top: -40px !important;       
+        /*margin-top: -40px !important;       */
       }
 
       p.desc {
@@ -90,6 +92,7 @@
           background: ;
           /*display: inline-block;*/
           line-height: 20px;
+          text-transform: capitalize;
           
         
       }
@@ -155,13 +158,32 @@
         padding: 10px 10px 10px 0px;
         opacity: 0.9;
         font-family: sans-serif;
+        display: none;
        }
 
+       .newbox {
+        width: 600px;
+    height: 80px;
+    display: inline-block;
+       }
 
+       div.loader-div {
+        display: block;
+        position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
+        text-align: center;
+      }
+      div.loader-div img {
+        top:30%;
+        position: relative;
+      }
 
     </style>
   </head>
   <body>
+    <div class="loader-div" id="loader-div">
+      <!-- <img src="https://icon-library.net/images/spinner-icon-gif/spinner-icon-gif-15.jpg"> -->
+      <img src="https://jeobi.com/images/loading.gif">
+    </div>
     <!-- As a link -->
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -172,7 +194,8 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     
-    <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;">
+    <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;" id="search-form" >
+      <input type="hidden" name="label" value="<%= label%>" id="input-lang">
       <input class="form-control mr-sm-2 sbox" type="search" name="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
       <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
     </form>
@@ -191,64 +214,65 @@
 
           <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-secondary active">
-              <input type="radio" name="language" id="" autocomplete="off" checked> All
+              <input type="radio" class="cb-lang" name="language" value="" id="" checked> All
             </label>
             <label class="btn btn-secondary">
-              <input type="radio" name="language" id="english" autocomplete="off"> English
+              <input type="radio" class="cb-lang" name="language" value="english" id="english" > English
             </label>
             <label class="btn btn-secondary">
-              <input type="radio" name="language" id="hindi" autocomplete="off"> Hindi
+              <input type="radio" class="cb-lang" name="language" value="hindi" id="hindi" > Hindi
             </label>
             <label class="btn btn-secondary">
-              <input type="radio" name="language" id="urdu" autocomplete="off"> Urdu
+              <input type="radio" class="cb-lang" name="language" value="urdu" id="urdu" > Urdu
             </label>
             <label class="btn btn-secondary">
-              <input type="radio" name="language" id="bengali" autocomplete="off"> Bengali
+              <input type="radio" class="cb-lang" name="language" value="bengali" id="bengali" > Bengali
             </label>
           </div>
 
           <div class="search-result-main-box">
 
-            <div class="noresult-box alert alert-warning">
+            <div class="re-sum" id="re-sum">
+              <!-- About 3,870 results (0.46 seconds) -->
+            </div>
+
+            <div id="noresult-box" class="noresult-box alert alert-warning">
               Cant find the results ? no problem, just drop a mail to info@example.com we will update ASAP.
             </div>
 
-            <div class="re-sum">
-
-              About 3,870 results (0.46 seconds)
-            </div>
 
 
             <div class="row" id="append-results">
               
             
-
-              
               <!-- Search Item Block -->
-              <div class="col-md-7 search-box m-t-20">
+              <!-- <div class="col-md-7 search-box m-t-20">
                   <a href="#" > Ok Bangaram Songs Free Download - Naa Songs</a>
                   <p class="g-link" > https://naasongs.com/ok-bangaram.html </p>
-                  <div class="img-desc">
-                    <img class="sbimg" src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
+                  <div class="newbox">
+                    <div class="img-desc">
+                      <img class="sbimg" src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
+                    </div>
+                    <div class="mytextbox">
+                      <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
+                    </div>
                   </div>
-                  <div class="mytextbox">
-                    <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
-                    <!-- <p class="lang" style=""> Labeled : <span> <u> urdu </u> </span></p> -->
-                  </div>
-              </div>
+              </div>-->
 
               <!-- Search Item Block -->
-              <div class="col-md-7 search-box">
+              <!-- <div class="col-md-7 search-box">
                   <a href="#" > Ok Bangaram Songs Free Download - Naa Songs</a>
                   <p class="g-link" > https://naasongs.com/ok-bangaram.html </p>
-                  <div class="img-desc">
-                    <img class="sbimg" src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
+                  <div class="newbox">
+                    <div class="img-desc">
+                      <img class="sbimg" src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
+                    </div>
+                    <div class="mytextbox">
+                      <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
+                      
+                    </div>
                   </div>
-                  <div class="mytextbox">
-                    <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
-                    <!-- <p class="lang" style=""> Labeled : <span> <u> urdu </u> </span></p> -->
-                  </div>
-              </div>
+              </div> -->
 
 
             </div>
@@ -282,63 +306,78 @@
 
       $(document).ready(function(){
 
+        $('input.cb-lang').change(function(){
+
+          var label = $('.cb-lang[name="language"]:checked').val();
+          $('#input-lang').val(label);
+
+          $('#search-form').submit();
+
+          // $(".cb-lang[name='language'][value='<%= label%>']").prop("checked",true);
+          // $(".cb-lang[name='language']").parent().each(function(){
+          //   $(this).removeClass('active');
+          // // })
+          // $(".cb-lang[name='language'][value='<%= label%>']").attr("checked",true);
+          // $(".cb-lang[name='language'][value='<%= label%>']").parent().addClass('active');
+
+        });
+
+      console.log("test");
+
       console.log(data);
 
+      $(".cb-lang[name='language']").parent().each(function(){
+        $(this).removeClass('active');
+      })
+      $(".cb-lang[name='language'][value='<%= label%>']").attr("checked",true);
+      $(".cb-lang[name='language'][value='<%= label%>']").parent().addClass('active');
 
-       if( data != '' ) {
-          $('#append-results').empty();
-          // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
-        var i = 1;
-        // $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
-
+      $('#re-sum').show();
+      $('#re-sum').html(" About "+data['hits']['total']['value']+" results ("+data['took']+" milliseconds) ");
+       if( data['hits']['hits'].length != 0 ) {
+        $('#append-results').empty();
+        
+        
+        
         $.each(data['hits']['hits'],function(index,value){
           console.log(value['_source']);
-          // var dd = value['']
+          
+          var tt = '';
+          var cap = '';
+          if( value['_source']['title'] ) {
+            var tt = value['_source']['title'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "");
+          } else {
+            return;
+          }
+          if( value['_source']['caption'] ) {
+            var cap = value['_source']['caption'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "");
+          }
+
+          var dd = tt+" - "+cap;
+
           row = `<div class="col-md-7 search-box">
-                  <a href="#" > ${value['_source']['title']} xxx </a>
+                  <a href="${value['_source']['location']}" target="_blank">  ${tt} </a>
                   <p class="g-link" > ${value['_source']['location']} </p>
-                  <div class="img-desc">
-                    <img class="sbimg" src="${value['_source']['image_link']}">
-                  </div>
-                  <div class="mytextbox">
-                    <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
-                    <!-- <p class="lang" style=""> Labeled : <span> <u> urdu </u> </span></p> -->
+                  <div class="newbox">
+                    <div class="img-desc">
+                      <img class="sbimg" src="${value['_source']['image_link']}">
+                    </div>
+                    <div class="mytextbox">
+                      <p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+                      
+                    </div>
                   </div>
               </div>`;
 
           $('#append-results').append(row);
-          i++;
+          $('#loader-div').hide();
         })
         console.log(data['hits']['hits'][0]);
         } else {
-          // $('#tableBody').append(`<tr> <td colspan="4"> <center> No Websites Found </center> </td> </tr>`);
+          $('#append-results').empty();
+          $('#noresult-box').show();
+          $('#loader-div').hide();
         } 
-
-        // console.log(data);
-        // if( data != '' ) {
-        //   $('#tableBody').empty();
-        //   // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
-        // var i = 1;
-        // $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
-
-        // $.each(data['hits']['hits'],function(index,value){
-        //   console.log(value['_source']);
-        //   row = `<tr> <td> ${i} </td>`;
-        //   row += `<td>${value['_source']['website_name']}</td>`
-        //   row += `<td>${value['_source']['language']}</td>` 
-        //   row += `<td> `;
-        //   row += `<form action="/website/delete" method="POST" style="float:right;"> <input type="hidden" name="del_id" value="${value['_id']}" > <input type="submit" name="submit" value="Delete" class="btn btn-danger btn-sm" > </form>`;
-        //   row += `<form action="/website/view" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="update_id" value="${value['_id']}" > <input type="submit" name="submit" value="Update" class="btn btn-info btn-sm" > </form>`;
-        //   row += `<form action="/website/sitemaps" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="website_id" value="${value['_id']}" > <input type="submit" name="submit" value="Sitemaps" class="btn btn-warning btn-sm" > </form>`;
-        //   row += `</td> `;
-        //   row += `</tr>`;
-        //   $('#tableBody').append(row);
-        //   i++;
-        // })
-        // console.log(data['hits']['hits'][0]);
-        // } else {
-        //   $('#tableBody').append(`<tr> <td colspan="4"> <center> No Websites Found </center> </td> </tr>`);
-        // } 
 
 
       }); 

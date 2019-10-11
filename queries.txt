@@ -278,8 +278,9 @@ GET mydocument/_search
 }
 
 
+//both queries below same search results 
 
-// working query 
+// working query with out filter
 GET /document_songs/_search
 {
     "query": {
@@ -288,4 +289,25 @@ GET /document_songs/_search
             "default_field" : "title"
         }
     }
+}
+
+//working query with language filters
+GET   document_songs/_search
+{
+  "from" : 0,
+  "size" : 100,
+  "query": { 
+    "bool": { 
+      "must": [
+        { 
+          "query_string" : {
+              "query" : "*2017*"
+          }
+        }
+      ],
+      "filter": [ 
+        { "term":  { "weblanguage": "hindi" }}
+      ]
+    }
+  }
 }
