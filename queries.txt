@@ -311,3 +311,36 @@ GET   document_songs/_search
     }
   }
 }
+
+
+//query without language filter
+  // searchBody = {
+  //  "from" : 0,
+  //  "size" : 100,
+  //    "query": {
+  //         "query_string" : {
+  //             "query" : "*"+q+"*",
+  //             // "default_field" : "title"
+  //         }
+  //     }
+  // };
+
+  //query with language filter
+  // searchBody = {
+  //  "from" : 0,
+  //  "size" : 100,
+  //    "query": { 
+  //      "bool": { 
+  //        "must": [
+  //          { 
+  //            "query_string" : {
+  //                "query" : "*"+q+"*"
+  //            }
+  //          }
+  //        ],
+  //        "filter": [ 
+  //          { "term":  { "weblanguage": "hindi" }}
+  //        ]
+  //      }
+  //  }
+  // };

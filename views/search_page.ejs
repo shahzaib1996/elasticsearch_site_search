@@ -11,6 +11,9 @@
 <!-- Roboto font -->
 <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
 
+<!-- Jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <title> Elastic </title>
     <style>
       .cb {
@@ -168,13 +171,17 @@
        }
 
        div.loader-div {
-        display: block;
+        display: none;
         position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
         text-align: center;
       }
       div.loader-div img {
         top:30%;
         position: relative;
+      }
+
+      div.small-loader-div {
+        display: none;
       }
 
     </style>
@@ -196,7 +203,7 @@
     
     <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;" id="search-form" >
       <input type="hidden" name="label" value="<%= label%>" id="input-lang">
-      <input class="form-control mr-sm-2 sbox" type="search" name="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
+      <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
       <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
     </form>
   </div>
@@ -277,6 +284,10 @@
 
             </div>
 
+            <div class="small-loader-div" id="small-loader-div">
+              <img src="https://wpamelia.com/wp-content/uploads/2018/11/ezgif-2-6d0b072c3d3f.gif">
+            </div>
+
           </div>
 
           
@@ -297,7 +308,6 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
@@ -305,6 +315,9 @@
       
 
       $(document).ready(function(){
+
+        var aj_page = 1;
+        var data_status = 1;
 
         $('input.cb-lang').change(function(){
 
@@ -320,6 +333,97 @@
           // $(".cb-lang[name='language'][value='<%= label%>']").attr("checked",true);
           // $(".cb-lang[name='language'][value='<%= label%>']").parent().addClass('active');
 
+        });
+
+
+        $(window).scroll(function() {
+            if($(window).scrollTop() == $(document).height() - $(window).height()) {
+                  
+                  $('#small-loader-div').show();
+
+                  var aj_q = $('#q').val();
+                  var aj_label = $('#input-lang').val();
+                  
+
+                  let filter = {
+                    q:aj_q,
+                    label:aj_label,
+                    page:aj_page
+                  }
+
+                  if( data_status != 0 ) {
+
+                    if( aj_q == '' ) {
+                      $('#small-loader-div').hide();
+                    } else {
+
+                      $.ajax({
+                          url: '/search_page_ajax', data:filter,
+                          method:'POST', success: result => {
+
+                            // var data = JSON.parse(result);
+                            console.log("Result Success!");
+                            console.log(result['data']);
+                            aj_page = result['page'];
+                            if( result['data'].length == 0 ) {
+                              data_status = 0;
+                            }
+
+                            $.each(result['data'],function(index,value){
+                              console.log(value['_source']);
+                              
+                              var tt = '';
+                              var cap = '';
+                              if( value['_source']['title'] ) {
+                                var tt = value['_source']['title'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "");
+                              } else {
+                                return;
+                              }
+                              if( value['_source']['caption'] ) {
+                                var cap = value['_source']['caption'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "");
+                              }
+
+                              var dd = tt+" - "+cap;
+
+                              row = `<div class="col-md-7 search-box">
+                                      <a href="${value['_source']['location']}" target="_blank">  ${tt} </a>
+                                      <p class="g-link" > ${value['_source']['location']} </p>
+                                      <div class="newbox">
+                                        <div class="img-desc">
+                                          <img class="sbimg" src="${value['_source']['image_link']}">
+                                        </div>
+                                        <div class="mytextbox">
+                                          <p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+                                          
+                                        </div>
+                                      </div>
+                                  </div>`;
+
+                              $('#append-results').append(row);
+                              
+                            })
+
+                            $('#small-loader-div').hide();
+                                                      
+
+                          },
+                          error: e => {
+                            console.log("Error Reported!");
+                            data_status = 0;
+                            $('#small-loader-div').hide();
+
+                          }
+                        });
+
+                    }
+
+                  } else {
+                    
+                              $('#small-loader-div').hide();
+                            
+                  }
+
+            }
         });
 
       console.log("test");
