@@ -560,11 +560,42 @@ await client.get({
 
 // =SITEMAP Search Page START====================================================================
 
-app.get('/searchpage', function(req,res){
+app.get('/searchpage', async function(req,res){
 
-	res.status(200).render('search_page');
+	var q = req.query.q;
+	
+	if( q  ) {
+
+
+	searchBody = {
+		"from" : 0,
+		"size" : 100,
+	  	"query": {
+	        "query_string" : {
+	            "query" : "*"+q+"*",
+	            "default_field" : "title"
+	        }
+	    }
+	};
+	
+	
+
+	var search_results = await search('document_songs', searchBody)
+	  .then(results => {
+	    
+	    res.status(200).render('search_page', { data:results,q:q } );
+	    
+	  })
+	  .catch(console.error);
+
+	} else {
+		res.status(200).render('search_page_main',{ data:[] });
+	}
+	// res.status(200).render('search_page');
 
 })
+
+
 
 // =SITEMAP Search Page END====================================================================
 

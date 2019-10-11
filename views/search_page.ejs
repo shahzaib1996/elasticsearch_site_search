@@ -32,10 +32,15 @@
         border-radius: 0px !important;margin-right: 0px !important;width: 500px !important;
       }
 
-      .search-box {
+      .m-t-20 {
         margin-top: 20px;
-        width: 800px;
-        height: 100px;
+      }
+
+      .search-box {
+        /*margin-top: 20px;*/
+        /*width: 800px;*/
+        /*margin: auto;*/
+        /*height: 100px;*/
       }
 
       .search-box a {
@@ -48,36 +53,53 @@
         font-family: sans-serif;
         font-size: 14px;
         margin-bottom: 0px;
+        width: 500px;
       }
 
-      .search-box .img-desc {
-        background: red;
+      .img-desc {
+        background: ;
+        width:  60px;
+        height: 40px;
+        display: inline-block;
+        
+
       }
 
-      .search-box .img-desc img {
+      img.sbimg {
         height: 60px;
-        width: 60px;
-        float: left;
+        width: 60px; 
+        margin-top: -40px !important;       
       }
 
-      .search-box .img-desc p.desc {
-        float: left;
+      p.desc {
+        /*float: left;*/
         margin-left: 10px;
         font-size: 13px;
         /*line-height: 20px;*/
-        width: 500px;
+        /*width: 500px;*/
+        height: 60px;
          /*overflow-wrap: break-word;
          overflow: hidden;
          text-overflow: ellipsis;
          white-space: nowrap;*/
-         overflow: hidden;
-          position: relative;
+         /*overflow: hidden;*/
+          /*position: relative;*/
+          /*line-height: 20px;*/
+          /*max-height: 40px;*/
+          text-align: left;
+          background: ;
+          /*display: inline-block;*/
           line-height: 20px;
-          max-height: 40px;
-          text-align: justify;
-          margin-right: -1em;
-          padding-right: 1em;
+          
         
+      }
+
+      .mytextbox {
+        background: ;
+        width: 520px;
+        height: 60px;
+        display: inline-block;
+        opacity: 0.9;
       }
 
       /* mixin for multiline */
@@ -90,7 +112,8 @@
         margin-right: -1em;
         padding-right: 1em;
       }*/
-      .search-box .img-desc p.desc:before {
+      
+      /*.search-box .img-desc p.desc:before {
         content: '...';
         position: absolute;
         right: 0;
@@ -104,16 +127,34 @@
         height: 20px;
         margin-top: 0.2em;
         background: white;
-      }
+      */}
 
-       .search-box .img-desc p.lang {
+       p.lang {
         /*float: left;*/
-        position: absolute;
-        margin-left: 70px;
-        top: 145px;
+        background: ;
+        /*position: absolute;*/
+        /*margin-left: 70px;*/
+        /*top: 145px;*/
         font-size: 13px;
         text-transform: capitalize;
+       
 
+       }
+
+       .noresult-box {
+        padding: 10px;
+        border-radius: 0px;
+        font-size: 13px;
+        width: 600px;
+        text-align: center;
+        margin-top: 20px;
+        display: none;
+       }
+
+       .re-sum {
+        padding: 10px 10px 10px 0px;
+        opacity: 0.9;
+        font-family: sans-serif;
        }
 
 
@@ -124,15 +165,15 @@
     <!-- As a link -->
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#" style="padding: 20px;"> <img src="https://arthurgreeno.com/wp-content/uploads/2016/07/arthur-logo-3.png" style="height: 30px;width: auto;"> </a>
+  <a class="navbar-brand col-md-2" href="#" style="padding: 20px;margin-right: 0px; "> <img src="https://arthurgreeno.com/wp-content/uploads/2016/07/arthur-logo-3.png" style="height: 30px;width: auto;"> </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     
-    <form class="form-inline my-2 my-lg-0" style="margin-left:30px;">
-      <input class="form-control mr-sm-2 sbox" type="search" placeholder="Search" aria-label="Search" >
+    <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;">
+      <input class="form-control mr-sm-2 sbox" type="search" name="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
       <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
     </form>
   </div>
@@ -167,50 +208,50 @@
           </div>
 
           <div class="search-result-main-box">
+
+            <div class="noresult-box alert alert-warning">
+              Cant find the results ? no problem, just drop a mail to info@example.com we will update ASAP.
+            </div>
+
+            <div class="re-sum">
+
+              About 3,870 results (0.46 seconds)
+            </div>
+
+
+            <div class="row" id="append-results">
+              
+            
+
               
               <!-- Search Item Block -->
-              <div class="search-box">
+              <div class="col-md-7 search-box m-t-20">
                   <a href="#" > Ok Bangaram Songs Free Download - Naa Songs</a>
                   <p class="g-link" > https://naasongs.com/ok-bangaram.html </p>
                   <div class="img-desc">
-                    <img src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
-                    <p class="desc"> Yaakinge songs free download | Yaakinge movie songs free downloadad | Yaakinge smovie asdsongs free download | Yaakinge smovie songs free download | Yaakinge smovie songs free download | Yaakinge s movie songs free download | Yaakinge s oangs asd downlaoad Yaakinasdge songs free download | Yaakinge m </p> 
-                    <p class="lang"> Labeled : <span> <u> hindi </u> </span></p>
+                    <img class="sbimg" src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
+                  </div>
+                  <div class="mytextbox">
+                    <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
+                    <!-- <p class="lang" style=""> Labeled : <span> <u> urdu </u> </span></p> -->
                   </div>
               </div>
 
               <!-- Search Item Block -->
-              <div class="search-box">
+              <div class="col-md-7 search-box">
                   <a href="#" > Ok Bangaram Songs Free Download - Naa Songs</a>
                   <p class="g-link" > https://naasongs.com/ok-bangaram.html </p>
                   <div class="img-desc">
-                    <img src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
-                    <p class="desc"> Yaakinge songs free download | Yaakinge movie songs free downloadad | Yaakinge smovie asdsongs free download | Yaakinge smovie songs free download | Yaakinge smovie songs free download | Yaakinge s movie songs free download | Yaakinge s oangs asd downlaoad Yaakinasdge songs free download | Yaakinge m </p> 
-                    <p class="lang"> Labeled : <span> <u> hindi </u> </span></p>
+                    <img class="sbimg" src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
+                  </div>
+                  <div class="mytextbox">
+                    <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
+                    <!-- <p class="lang" style=""> Labeled : <span> <u> urdu </u> </span></p> -->
                   </div>
               </div>
 
-              <!-- Search Item Block -->
-              <div class="search-box">
-                  <a href="#" > Ok Bangaram Songs Free Download - Naa Songs</a>
-                  <p class="g-link" > https://naasongs.com/ok-bangaram.html </p>
-                  <div class="img-desc">
-                    <img src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
-                    <p class="desc"> Yaakinge songs free download | Yaakinge movie songs free downloadad | Yaakinge smovie asdsongs free download | Yaakinge smovie songs free download | Yaakinge smovie songs free download | Yaakinge s movie songs free download | Yaakinge s oangs asd downlaoad Yaakinasdge songs free download | Yaakinge m </p> 
-                    <p class="lang"> Labeled : <span> <u> hindi </u> </span></p>
-                  </div>
-              </div>
 
-              <!-- Search Item Block -->
-              <div class="search-box">
-                  <a href="#" > Ok Bangaram Songs Free Download - Naa Songs</a>
-                  <p class="g-link" > https://naasongs.com/ok-bangaram.html </p>
-                  <div class="img-desc">
-                    <img src="https://wsongs.com/wp-content/uploads/2018/10/Yaakinge-2018.jpg">
-                    <p class="desc"> Yaakinge songs free download | Yaakinge movie songs free downloadad | Yaakinge smovie asdsongs free download | Yaakinge smovie songs free download | Yaakinge smovie songs free download | Yaakinge s movie songs free download | Yaakinge s oangs asd downlaoad Yaakinasdge songs free download | Yaakinge m </p> 
-                    <p class="lang"> Labeled : <span> <u> hindi </u> </span></p>
-                  </div>
-              </div>
+            </div>
 
           </div>
 
@@ -225,8 +266,9 @@
 
     </div>
 
-    <script type="text/javascript">
-      
+    <script>
+      data = {};
+      data = <%- JSON.stringify(data) %>;
     </script>
 
     <!-- Optional JavaScript -->
@@ -240,12 +282,37 @@
 
       $(document).ready(function(){
 
-      
+      console.log(data);
 
 
-        // match url re 
-        // https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}
+       if( data != '' ) {
+          $('#append-results').empty();
+          // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        var i = 1;
+        // $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
 
+        $.each(data['hits']['hits'],function(index,value){
+          console.log(value['_source']);
+          // var dd = value['']
+          row = `<div class="col-md-7 search-box">
+                  <a href="#" > ${value['_source']['title']} xxx </a>
+                  <p class="g-link" > ${value['_source']['location']} </p>
+                  <div class="img-desc">
+                    <img class="sbimg" src="${value['_source']['image_link']}">
+                  </div>
+                  <div class="mytextbox">
+                    <p class="desc">aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee fffff ggggg aaaaa bbbbb ccccc ddddd eeeee <br> Labeled: <u> Urdu </u> </p> 
+                    <!-- <p class="lang" style=""> Labeled : <span> <u> urdu </u> </span></p> -->
+                  </div>
+              </div>`;
+
+          $('#append-results').append(row);
+          i++;
+        })
+        console.log(data['hits']['hits'][0]);
+        } else {
+          // $('#tableBody').append(`<tr> <td colspan="4"> <center> No Websites Found </center> </td> </tr>`);
+        } 
 
         // console.log(data);
         // if( data != '' ) {

@@ -276,3 +276,16 @@ GET mydocument/_search
           }
        }
 }
+
+
+
+// working query 
+GET /document_songs/_search
+{
+    "query": {
+        "query_string" : {
+            "query" : "*kat*",
+            "default_field" : "title"
+        }
+    }
+}

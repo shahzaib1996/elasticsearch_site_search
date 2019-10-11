@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<!-- Roboto font -->
+<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+
+    <title> Elastic </title>
+    <style>
+      .cb {
+        float:left;width: calc(100% - 100px);
+      }
+      .r-btn {
+        float:left;margin-top: 35px;margin-left:10px;
+      }
+      .r-btn a {
+        border-radius: 100%;height: 30px;width: 30px;
+      }
+
+      .sbox:focus {
+        outline:0 !important;
+        border:1px solid #91b029; 
+        box-shadow: none !important;
+      }
+      .sbox {
+        border:1px solid #91b029;
+        border-radius: 0px !important;margin-right: 0px !important;width: 500px !important;
+      }
+
+      .main-box {
+        background: green;
+        text-align: center;
+        position: relative;
+        top:30%;
+      }
+
+      .main-box .img-box{
+        background: grey;
+        text-align: center;
+      }
+
+      .main-box .img-box img {
+        height: 80px;
+        width: auto;
+      }
+
+      .main-box .form-box  {
+        text-align: center;
+        background: blue;
+        margin-top: 30px;
+      }
+
+      .main-box .form-box form {
+        background: red;
+        width: 575px;
+
+
+      }
+
+
+
+    </style>
+  </head>
+  <body>
+    <!-- As a link -->
+
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#" style="padding: 20px;"> <img src="https://arthurgreeno.com/wp-content/uploads/2016/07/arthur-logo-3.png" style="height: 30px;width: auto;"> </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    
+    <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:30px;">
+      <input class="form-control mr-sm-2 sbox" type="search" name="q" placeholder="Search" aria-label="Search" >
+      <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
+    </form>
+  </div>
+</nav> -->
+
+    
+<div class="container-fluid">
+
+  <div class="row"> 
+        
+
+    <div class="col-md-12" style="height: 100vh;background: hotpink;">
+
+      <div class="main-box mx-auto">
+          
+          <div class="img-box">
+            <img src="https://arthurgreeno.com/wp-content/uploads/2016/07/arthur-logo-3.png">
+          </div>
+
+          <div class="form-box">
+            <form action="" method="GET" class="form-inline my-2 my-lg-0 mx-auto" onsubmit="return checkField();">
+              <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" placeholder="Search" aria-label="Search" >
+              <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
+            </form>
+          </div>
+
+      </div>
+      
+    </div>
+          
+        
+
+  </div>
+
+
+</div>
+
+    <script>
+      data = {};
+      data = <%- JSON.stringify(data) %>;
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+      function checkField() {
+        var q = $('#q').val();
+        if( q == '' || q == null) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+
+      $(document).ready(function(){
+
+      console.log("Search Main Page");
+      console.log(data);
+
+
+        // match url re 
+        // https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}
+
+
+        // console.log(data);
+        // if( data != '' ) {
+        //   $('#tableBody').empty();
+        //   // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        // var i = 1;
+        // $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
+
+        // $.each(data['hits']['hits'],function(index,value){
+        //   console.log(value['_source']);
+        //   row = `<tr> <td> ${i} </td>`;
+        //   row += `<td>${value['_source']['website_name']}</td>`
+        //   row += `<td>${value['_source']['language']}</td>` 
+        //   row += `<td> `;
+        //   row += `<form action="/website/delete" method="POST" style="float:right;"> <input type="hidden" name="del_id" value="${value['_id']}" > <input type="submit" name="submit" value="Delete" class="btn btn-danger btn-sm" > </form>`;
+        //   row += `<form action="/website/view" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="update_id" value="${value['_id']}" > <input type="submit" name="submit" value="Update" class="btn btn-info btn-sm" > </form>`;
+        //   row += `<form action="/website/sitemaps" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="website_id" value="${value['_id']}" > <input type="submit" name="submit" value="Sitemaps" class="btn btn-warning btn-sm" > </form>`;
+        //   row += `</td> `;
+        //   row += `</tr>`;
+        //   $('#tableBody').append(row);
+        //   i++;
+        // })
+        // console.log(data['hits']['hits'][0]);
+        // } else {
+        //   $('#tableBody').append(`<tr> <td colspan="4"> <center> No Websites Found </center> </td> </tr>`);
+        // } 
+
+
+      }); 
+    </script>
+
+  </body>
+</html>
