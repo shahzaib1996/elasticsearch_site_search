@@ -563,13 +563,26 @@ await client.get({
 app.get('/searchpage', async function(req,res){
 
 	var q = req.query.q;
-	var label = req.query.label;	
+	var label = req.query.label;
+	var length = req.query.length;
+	var size = 10;
+	
+	if( length == 2 ) {
+		length_str = 2;
+		size = 20
+	} else if( length == 3 ) {
+		length_str = 3;
+		size = 30
+	} else {
+		length_str = 1;
+		size = 10
+	}
 	
 	if( q ) {
 
 	searchBody = {
 		"from" : 0,
-		"size" : 10,
+		"size" : size,
 	  	"query": { 
 		    "bool": { 
 		      "must": [
@@ -595,7 +608,7 @@ app.get('/searchpage', async function(req,res){
 	var search_results = await search('document_songs', searchBody)
 	  .then(results => {
 	    
-	    res.status(200).render('search_page', { data:results,q:q,label:label } );
+	    res.status(200).render('search_page', { data:results,q:q,label:label,length_str:length_str } );
 	    
 	  })
 	  .catch(console.error);
@@ -612,6 +625,7 @@ app.post('/search_page_ajax', async function(req,res){
 	var q = req.body.q;
 	var label = req.body.label;	
 	var page = req.body.page;
+	var length = req.body.length;
 
 	
 

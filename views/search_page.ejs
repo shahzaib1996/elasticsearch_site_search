@@ -184,6 +184,14 @@
         display: none;
       }
 
+      .c-pd {
+        padding: 6px 15px 6px 15px;
+      }
+      .c-bg-c {
+        color: #fff;
+        background-color: #6c757d;
+        border-color: #6c757d;
+      }
     </style>
   </head>
   <body>
@@ -202,6 +210,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     
     <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;" id="search-form" >
+      <input type="hidden" name="length" value="1" id="length">
       <input type="hidden" name="label" value="<%= label%>" id="input-lang">
       <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
       <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
@@ -219,22 +228,41 @@
 
         <div class="col-md-10" style="background: ; border-left:1px solid #eee;">
 
-          <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <label class="btn btn-secondary active">
-              <input type="radio" class="cb-lang" name="language" value="" id="" checked> All
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" class="cb-lang" name="language" value="english" id="english" > English
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" class="cb-lang" name="language" value="hindi" id="hindi" > Hindi
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" class="cb-lang" name="language" value="urdu" id="urdu" > Urdu
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" class="cb-lang" name="language" value="bengali" id="bengali" > Bengali
-            </label>
+          <div class="row">
+            <div class="col-md-3">
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-secondary c-pd active" >
+                <input type="radio" class="cb-lang" name="language" value="" id="" checked> All
+              </label>
+              <label class="btn btn-secondary c-pd " >
+                <input type="radio" class="cb-lang" name="language" value="english" id="english" > English
+              </label>
+              <label class="btn btn-secondary c-pd ">
+                <input type="radio" class="cb-lang" name="language" value="hindi" id="hindi" > Hindi
+              </label>
+              <label class="btn btn-secondary c-pd " >
+                <input type="radio" class="cb-lang" name="language" value="urdu" id="urdu" > Urdu
+              </label>
+              <label class="btn btn-secondary c-pd " >
+                <input type="radio" class="cb-lang" name="language" value="bengali" id="bengali" > Bengali
+              </label>
+            </div>
+            </div>
+
+            <div class="col-md-2" style="padding-right: 80px;padding-left: 0px;">
+              
+            <div class="input-group mb-3" style="">
+              <div class="input-group-prepend">
+                <label class="input-group-text c-bg-c">Length</label>
+              </div>
+              <select class="custom-select" id="select-length">
+                <option value="1" >10 Items</option>
+                <option value="2" >20 Items</option>
+                <option value="3" >30 Items</option>
+              </select>
+            </div>
+            </div>
+          
           </div>
 
           <div class="search-result-main-box">
@@ -323,9 +351,7 @@
 
           var label = $('.cb-lang[name="language"]:checked').val();
           $('#input-lang').val(label);
-
           $('#search-form').submit();
-
           // $(".cb-lang[name='language'][value='<%= label%>']").prop("checked",true);
           // $(".cb-lang[name='language']").parent().each(function(){
           //   $(this).removeClass('active');
@@ -334,6 +360,14 @@
           // $(".cb-lang[name='language'][value='<%= label%>']").parent().addClass('active');
 
         });
+
+        $('#select-length').change(function(){
+          var select_length = $(this).val();
+          $('#length').val(select_length);
+
+          $('#search-form').submit();
+
+        })
 
 
         $(window).scroll(function() {
@@ -351,7 +385,8 @@
                     page:aj_page
                   }
 
-                  if( data_status != 0 ) {
+                  if( false) { //close ajax call
+                  // if( data_status != 0 ) {
 
                     if( aj_q == '' ) {
                       $('#small-loader-div').hide();
@@ -419,7 +454,7 @@
 
                   } else {
                     
-                              $('#small-loader-div').hide();
+                    $('#small-loader-div').hide();
                             
                   }
 
@@ -429,6 +464,8 @@
       console.log("test");
 
       console.log(data);
+
+      $('#select-length option[value="<%= length_str%>"]').attr('selected',true);
 
       $(".cb-lang[name='language']").parent().each(function(){
         $(this).removeClass('active');
@@ -449,7 +486,7 @@
           var tt = '';
           var cap = '';
           if( value['_source']['title'] ) {
-            var tt = value['_source']['title'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "");
+            var tt = value['_source']['title'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "").replace("-"," ").replace("-"," ");
           } else {
             return;
           }
