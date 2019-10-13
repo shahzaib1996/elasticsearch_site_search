@@ -89,6 +89,52 @@ var getResults = async (scrapURL) => {
   };
 };
 
+
+//Scrap Single url
+var fetchData_single = async (scrapURL) => {
+  // const result = await axios.get(scrapURL);
+  // return cheerio.load(result.data);
+  
+  	try {
+    var result = await axios.get(scrapURL);
+    // Success
+    // console.log(result);
+  	return cheerio.load(result.data);
+	} catch (error) {
+		console.log("INVALID URL!");
+		return cheerio.load('<invalid>invalid</invalid>');
+	}
+
+};
+
+//Scrap Sitemap
+var getResults_single = async (scrapURL) => {
+  var block_single = new Set();
+  
+  var $ = await fetchData_single(scrapURL);
+
+  var invalid = $("invalid").html();
+  console.log($("invalid").html());
+  
+  // image\\:image
+  $("url").each((index, element) => {
+    // tags.add($(element).text());
+    block_single.add( { 
+    	loc:$(element).find('loc').text(),
+    	title:$(element).find('image\\:title').html(),
+    	image_link:$(element).find('image\\:loc').html(),
+    	caption:$(element).find('image\\:caption').html() 
+    } );
+    // image_link.add( $(element).find('image\\:loc').html() );
+  });
+
+  return {
+    block_single: [...block_single].sort(),
+    invalid:invalid
+  };
+};
+
+
 app.get("/testscrap", async function(req, res, next) {
   const result = await getResults('https://naasongs.com/post-sitemap.xml');
   res.send( result);
@@ -566,7 +612,7 @@ app.get('/searchpage', async function(req,res){
 	var label = req.query.label;
 	var length = req.query.length;
 	var size = 10;
-	
+
 	if( length == 2 ) {
 		length_str = 2;
 		size = 20
