@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Font awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <title> Elastic </title>
+    <style>
+      .cb {
+        float:left;width: calc(100% - 100px);
+      }
+      .r-btn {
+        float:left;margin-top: 35px;margin-left:10px;
+      }
+      .r-btn a {
+        border-radius: 100%;height: 30px;width: 30px;
+      }
+      .op6 {
+        opacity: 0.6;
+      }
+      input:focus { outline:0 !important; }
+      div.loader-div {
+        display: none;
+        position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
+        text-align: center;
+      }
+      div.loader-div img {
+        top:30%;
+        position: relative;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="loader-div" id="loader-div">
+      <!-- <img src="https://icon-library.net/images/spinner-icon-gif/spinner-icon-gif-15.jpg"> -->
+      <img src="https://jeobi.com/images/loading.gif">
+    </div>
+    <!-- As a link -->
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">ELASTIC SEARCH</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/">Search</a>
+      <a class="nav-item nav-link" href="/insert">Insert</a>
+    </div>
+  </div>
+    </nav>
+    <br>
+    <div class="container">
+      <center>
+        <h1> Website Sitemaps </h1>
+      </center>
+
+      <script>
+            var status = "";
+      </script>
+
+      <div class="alert" id="alert-box">
+        
+      </div>
+
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="javascript:void(0)" method="POST" id="sitemap-form" >
+            
+            <div class="row" >
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="op6"> <h2> Add a new sitemap </h2> </label>
+                  <div class="row" style="padding-left: 20px; padding-right: 20px;">
+                    <span style="line-height: 40px;">
+                      aaa 
+                    </span>
+                    <input type="text" name="sitemap_ep" id="sitemap_ep" class="col-md-6" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
+                    <input type="submit" class="btn btn-success col-md-2" name="submit" value="ADD" style="margin-left: 10px;border-radius:0px;">  
+                  </div> 
+                  <!-- <input type="text" class="form-control" name="website_name" id="website_name" placeholder="e.g https://www.example.com" required> -->
+                </div>
+              </div>
+                           
+            </div>
+           <!--    
+            <div class="row">
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-success" name="submit" value="Add" style="width: 100%;">
+              </div>
+            </div> -->
+          </form>
+        </div>
+
+        
+
+      </div>
+
+      <br><br>
+      <div class="table-div">
+        <h3 class="op6">  Single Entries  </h3>
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <td>Sno</td>
+              <td>Sitemap</td>
+              <td>Submitted</td>
+              <td>Last Read</td>
+              <td>Success</td>
+              <td>Discovered URLs</td>
+              <td>Resubmit</td>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+              
+              
+
+          </tbody>
+        </table>
+      </div>
+
+
+
+    </div>
+
+    <script type="text/javascript">
+      data = {};
+      // data = <%- JSON.stringify() %>;
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+      function checkURL() {
+        var wn = $('#website_name').val();
+        // var url_re = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g;
+        // var wn_check = wn.match(url_re);
+
+        var expression = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}/g;
+        var regex = new RegExp(expression);
+        var t = 'www.google.com';
+
+        if (wn.match(regex)) {
+          console.log("Successful match");
+          return true;
+        } else {
+          console.log("No match");
+          alert("Please Enter valid url!");
+          return false;
+        }
+
+      }
+
+      $(document).ready(function(){
+
+        // match url re 
+        // https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}
+
+
+        console.log(data);
+        if( data != '' ) {
+          $('#tableBody').empty();
+          // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        var i = 1;
+        $('#r-s').html("Result ("+data['hits']['total']['value']+" records found)");
+
+        $.each(data['hits']['hits'],function(index,value){
+          console.log(value);
+          row = `<tr> <td> ${i} </td>`;
+          row += `<td>${value['_source']['sm_endpoint']}</td>`
+          row += `<td>${value['_source']['date_inserted']}</td>` 
+          row += `<td>${value['_source']['last_read']}</td>` 
+          row += `<td> <span style="color:green;">Success</span> </td>` 
+          row += `<td> ${value['_source']['items_discovered']} </td>` 
+          row += `<td> `;
+
+          
+          row += `</td>`; 
+          
+          row += `</tr>`;
+          $('#tableBody').append(row);
+          i++;
+        })
+        
+        } else {
+          $('#tableBody').append(`<tr> <td colspan="7"> <center> No Sitemaps Found </center> </td> </tr>`);
+        }   
+
+
+        const insertSitemap = () =>{
+        
+            let website_id = $('#website_id').val();
+            let sitemap_ep = $('#sitemap_ep').val();
+            let website_name = $('#website_name').val();
+            let language = $('#language').val();
+              
+            let filter = {
+              website_id:website_id,
+              sitemap_ep:sitemap_ep,
+              website_name:website_name,
+              language:language
+            }
+
+            if( sitemap_ep == '' ) {
+              alert('Please! enter sitemap');
+              $('#loader-div').hide();
+            } else {
+
+              $.ajax({
+                  url: '/website/add/sitemap', data:filter,
+                  method:'POST', success: result => {
+
+                    // var data = JSON.parse(result);
+                    console.log("result yahan par aya ha!");
+                    console.log(result);
+                    $('#loader-div').hide();
+                    if( result == "2" ) {
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Sitemap already exists!</center>')
+                    }else if( result == "3" ) {
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Invalid Sitemap!</center>')
+                    } else if( result == "1") {
+                      $('#alert-box').addClass('alert-success');
+                      $('#alert-box').html('<center>Sitemap Successfully Crawled!</center>')
+                    }
+                    setTimeout(function(){
+                      location.reload();
+                    },3000);
+                  },
+                  error: e => {
+                    console.log("");
+                    $('#loader-div').hide();
+                    $('#alert-box').addClass('alert-danger');
+                    $('#alert-box').html('<center>Something went wrong!</center>')
+                  }
+                });
+
+            }
+
+          }
+
+
+
+          $('.click-reindex').click(function(){
+
+            $('#loader-div').show();
+            console.log('Insert sitemap initiated!');
+
+            let sitemap_id = $(this).data('sitemap-id');
+            let websitename = $(this).data('websitename');
+            let weblanguage = $(this).data('weblanguage');
+              
+            let filter = {
+              sitemap_id:sitemap_id,
+              websitename:websitename,
+              weblanguage:weblanguage
+            }
+
+            if( sitemap_ep == '' ) {
+              alert('Please! enter sitemap');
+              $('#loader-div').hide();
+            } else {
+
+              $.ajax({
+                  url: '/sitemap/reindex', data:filter,
+                  method:'POST', success: result => {
+
+                    // var data = JSON.parse(result);
+                    console.log("result yahan par aya ha!");
+                    console.log(result);
+                    $('#loader-div').hide();
+                    if( result == "2" ) {
+                      $('#alert-box').removeClass('alert-success');
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Sitemap already exists!</center>')
+                    }else if( result == "3" ) {
+                      $('#alert-box').removeClass('alert-success');
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Invalid Sitemap!</center>')
+                    } else if( result == "1") {
+                      $('#alert-box').removeClass('alert-danger');
+                      $('#alert-box').addClass('alert-success');
+                      $('#alert-box').html('<center>Sitemap Successfully Reindex/Recrawled!</center>')
+                    }
+                    setTimeout(function(){
+                      location.reload();
+                    },3000);
+                  },
+                  error: e => {
+                    console.log("");
+                    $('#loader-div').hide();
+                    $('#alert-box').addClass('alert-danger');
+                    $('#alert-box').html('<center>Something went wrong!</center>')
+                  }
+                });
+
+            }
+
+          });
+
+
+
+          $('#sitemap-form').on('submit', () => {
+            $('#loader-div').show();
+              console.log('Insert sitemap initiated!');
+              insertSitemap();
+          })
+
+          
+
+
+      }); 
+    </script>
+
+  </body>
+</html>

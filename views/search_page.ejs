@@ -192,6 +192,11 @@
         background-color: #6c757d;
         border-color: #6c757d;
       }
+      
+      .search-box span {
+        font-weight: 1000;
+      }
+
     </style>
   </head>
   <body>
@@ -483,6 +488,9 @@
         $.each(data['hits']['hits'],function(index,value){
           console.log(value['_source']);
           
+          // Title + Caption description 
+          //<p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+
           var tt = '';
           var cap = '';
           if( value['_source']['title'] ) {
@@ -496,15 +504,16 @@
 
           var dd = tt+" - "+cap;
 
+
           row = `<div class="col-md-7 search-box">
                   <a href="${value['_source']['location']}" target="_blank">  ${tt} </a>
                   <p class="g-link" > ${value['_source']['location']} </p>
                   <div class="newbox">
                     <div class="img-desc">
-                      <img class="sbimg" src="${value['_source']['image_link']}">
+                      <img class="sbimg" src="${value['_source']['image_link']}" title="${cap}">
                     </div>
                     <div class="mytextbox">
-                      <p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+                      <p class="desc"> ${ value['_source']['description'].replace("-"," ").slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
                       
                     </div>
                   </div>

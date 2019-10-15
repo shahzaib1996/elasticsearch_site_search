@@ -115,10 +115,11 @@ var getResults_single = async (scrapURL) => {
   var $ = await fetchData_single(scrapURL);
 
   var invalid = $("invalid").html();
-  console.log($("invalid").html());
+
+  // console.log($("invalid").html());
   
   // find('div[itemprop=articleBody]').text();
-  articleBody = $('body').find('div[itemprop=articleBody]').text());
+  articleBody = $('body').find('div[itemprop=articleBody]').text();
   // image\\:image
   // $("div").each((index, element) => {
   //   // tags.add($(element).text());
@@ -139,7 +140,7 @@ var getResults_single = async (scrapURL) => {
 
 
 app.get("/testscrap", async function(req, res, next) {
-  const result = await getResults_single('https://naasongs.com/subrahmanyapuram-2018.html');
+  const result = await getResults_single('https://naasongs.com');
   res.send( result);
 });
 
@@ -413,7 +414,7 @@ app.post('/website/add/sitemap', async function(req,res){
 	} else {
 
 		//scrap sitemap
-		const result = await getResults(complete_url);
+		var result = await getResults(complete_url);
 	  	// res.send( result['blocks'] );
 	  	
 		// var website = req.body.website_name;
@@ -425,15 +426,28 @@ app.post('/website/add/sitemap', async function(req,res){
 			res.send("3"); // 3 = URL is invalid
 		}else if( result ) {
 			for(i=0; i<result['blocks'].length;i++) {
-				docBody = {}
-				docBody['websitename'] = website_name;
-				docBody['websitemap'] = complete_url;
-				docBody['weblanguage'] = weblanguage;
-				docBody['location'] = result['blocks'][i]['loc'];
-				docBody['title'] = result['blocks'][i]['title'];
-				docBody['image_link'] = result['blocks'][i]['image_link'];
-				docBody['caption'] = result['blocks'][i]['caption'];
-				bulkArray.push(docBody);
+
+				// articleBody
+				//scrap single url
+				var description = await getResults_single(result['blocks'][i]['loc']);
+
+				if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
+					
+				} else {
+
+					docBody = {}
+					docBody['websitename'] = website_name;
+					docBody['websitemap'] = complete_url;
+					docBody['weblanguage'] = weblanguage;
+					docBody['location'] = result['blocks'][i]['loc'];
+					docBody['title'] = result['blocks'][i]['title'];
+					docBody['image_link'] = result['blocks'][i]['image_link'];
+					docBody['caption'] = result['blocks'][i]['caption'];
+					docBody['description'] = description['articleBody'];
+					bulkArray.push(docBody);
+					
+				}
+
 			}
 
 			//Insert Blocks
@@ -524,15 +538,25 @@ if( result['invalid'] == 'invalid' ) {
 }else if( result ) {
 
 	for(i=0; i<result['blocks'].length;i++) {
-		docBody1 = {}
-		docBody1['websitename'] = websitename;
-		docBody1['websitemap'] = sitemap_id;
-		docBody1['weblanguage'] = weblanguage;
-		docBody1['location'] = result['blocks'][i]['loc'];
-		docBody1['title'] = result['blocks'][i]['title'];
-		docBody1['image_link'] = result['blocks'][i]['image_link'];
-		docBody1['caption'] = result['blocks'][i]['caption'];
-		bulkArray.push(docBody1);
+
+		var description = await getResults_single(result['blocks'][i]['loc']);
+
+		if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
+					
+		} else {
+
+			docBody1 = {}
+			docBody1['websitename'] = websitename;
+			docBody1['websitemap'] = sitemap_id;
+			docBody1['weblanguage'] = weblanguage;
+			docBody1['location'] = result['blocks'][i]['loc'];
+			docBody1['title'] = result['blocks'][i]['title'];
+			docBody1['image_link'] = result['blocks'][i]['image_link'];
+			docBody1['caption'] = result['blocks'][i]['caption'];
+			docBody1['description'] = description['articleBody'];
+			bulkArray.push(docBody1);
+
+		}
 	}
 
 			//Insert Blocks
@@ -726,6 +750,16 @@ app.post('/search_page_ajax', async function(req,res){
 })
 
 
+
+// =SITEMAP Search Page END====================================================================
+
+// =SITEMAP Search Page END====================================================================
+
+app.get('/single_entry',function(req,res){
+
+	res.render('single_entry');
+
+})
 
 // =SITEMAP Search Page END====================================================================
 
