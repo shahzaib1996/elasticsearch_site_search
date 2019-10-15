@@ -109,34 +109,37 @@ var fetchData_single = async (scrapURL) => {
 
 //Scrap Sitemap
 var getResults_single = async (scrapURL) => {
-  var block_single = new Set();
+  // var block_single = new Set();\
+  var articleBody = '';
   
   var $ = await fetchData_single(scrapURL);
 
   var invalid = $("invalid").html();
   console.log($("invalid").html());
   
+  // find('div[itemprop=articleBody]').text();
+  articleBody = $('body').find('div[itemprop=articleBody]').text());
   // image\\:image
-  $("url").each((index, element) => {
-    // tags.add($(element).text());
-    block_single.add( { 
-    	loc:$(element).find('loc').text(),
-    	title:$(element).find('image\\:title').html(),
-    	image_link:$(element).find('image\\:loc').html(),
-    	caption:$(element).find('image\\:caption').html() 
-    } );
-    // image_link.add( $(element).find('image\\:loc').html() );
-  });
+  // $("div").each((index, element) => {
+  //   // tags.add($(element).text());
+  //   block_single.add( { 
+  //   	desc:$(element).find('loc').text(),
+  //   	title:$(element).find('image\\:title').html(),
+  //   	image_link:$(element).find('image\\:loc').html(),
+  //   	caption:$(element).find('image\\:caption').html() 
+  //   } );
+  //   // image_link.add( $(element).find('image\\:loc').html() );
+  // });
 
   return {
-    block_single: [...block_single].sort(),
+    articleBody: articleBody,
     invalid:invalid
   };
 };
 
 
 app.get("/testscrap", async function(req, res, next) {
-  const result = await getResults('https://naasongs.com/post-sitemap.xml');
+  const result = await getResults_single('https://naasongs.com/subrahmanyapuram-2018.html');
   res.send( result);
 });
 
