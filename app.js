@@ -138,6 +138,51 @@ var getResults_single = async (scrapURL) => {
   };
 };
 
+//Scrap Single url
+var fetchData_single_scrap = async (scrapURL) => {
+  // const result = await axios.get(scrapURL);
+  // return cheerio.load(result.data);
+  
+  	try {
+    var result = await axios.get(scrapURL);
+    // Success
+    // console.log(result);
+  	return cheerio.load(result.data);
+	} catch (error) {
+		console.log("INVALID URL!");
+		return cheerio.load('<invalid>invalid</invalid>');
+	}
+
+};
+
+//Scrap Sitemap
+var getResults_single_scrap = async (scrapURL) => {
+  // var block_single = new Set();\
+  var articleBody = '';
+  var title = '';
+  var caption = '';
+  var image_link = '';
+
+  
+  var $ = await fetchData_single_scrap(scrapURL);
+
+  var invalid = $("invalid").html();
+
+  articleBody = $('body').find('div[itemprop=articleBody]').text();
+  image_link = $('body').find('img[itemprop=image]').attr('src');
+  title = $('body').find('h1[itemprop=headline][class=page-title]').text();
+  caption = $('body').find('img[itemprop=image]').attr('alt');
+ 
+
+  return {
+  	title:title,
+  	caption:caption,
+    articleBody: articleBody,
+    image_link:image_link,
+    invalid:invalid
+  };
+};
+
 
 app.get("/testscrap", async function(req, res, next) {
   const result = await getResults_single('https://naasongs.com');
@@ -753,15 +798,132 @@ app.post('/search_page_ajax', async function(req,res){
 
 // =SITEMAP Search Page END====================================================================
 
-// =SITEMAP Search Page END====================================================================
+// =SITEMAP Single Entry END====================================================================
 
-app.get('/single_entry',function(req,res){
+app.get('/single_entry',async function(req,res){
 
-	res.render('single_entry');
+
+	let searchBody = {
+		"query" : {
+		    "term" : {
+		      "websitemap.keyword" : {
+		        "value" : "manual"
+		      }
+		    }
+		}
+	};
+
+	var check_sitemap_data = [];
+	var check_sitemap = '';
+	check_sitemap = await search('website_sitemaps', searchBody)
+	  .then(results => {
+	    
+	    res.render('single_entry',{results:results});
+	    
+	  })
+	  .catch(console.error);
+
 
 })
 
-// =SITEMAP Search Page END====================================================================
+
+
+app.post('/single/site/add', async function(req,res){
+
+	var website_url = req.body.website_url;
+	var weblanguage = req.body.language;
+
+	var complete_url = website_url;
+
+	let searchBody = {
+		"size" : 10,
+		"query" : {
+		    "term" : {
+		      "websitemap.keyword" : {
+		        "value" : "manual"
+		      },
+		      "location.keyword" : {
+		        "value" : complete_url
+		      }
+		    }
+		}
+	};
+
+	var check_sitemap_data = 0;
+	var check_sitemap = '';
+	check_sitemap = await search('document_songs', searchBody)
+	  .then(results => {
+	    
+	    check_sitemap_data = results['hits']['hits'].length;
+	    res.send(results);
+
+	    
+	  })
+	  .catch(console.error);
+
+	if( check_sitemap_data != 0 ) {
+		res.send("2"); //2 = sitemap already exists
+	} else {
+
+		//scrap sitemap
+		var result = await getResults_single_scrap(complete_url);
+	  	// res.send( result['blocks'] );
+	  	
+		// var website = req.body.website_name;
+		// var language = req.body.language;
+		console.log(result);
+		if( result['invalid'] == 'invalid' ) {
+			res.send("3"); // 3 = URL is invalid
+		}else if( result ) {
+			
+
+		// docBody['websitename'] = website_name;
+		// 			docBody['websitemap'] = complete_url;
+		// 			docBody['weblanguage'] = weblanguage;
+		// 			docBody['location'] = result['blocks'][i]['loc'];
+		// 			docBody['title'] = result['blocks'][i]['title'];
+		// 			docBody['image_link'] = result['blocks'][i]['image_link'];
+		// 			docBody['caption'] = result['blocks'][i]['caption'];
+		// 			docBody['description'] = description['articleBody'];
+			
+
+		let date_ob = new Date();
+		smBody = {};
+		smBody['websitemap'] = "manual";
+		smBody['location'] = complete_url;
+		smBody['weblanguage'] = weblanguage; 
+		smBody['title'] = result['title']; 
+		smBody['image_link'] = result['image_link'];
+		smBody['description'] = result['articleBody']; 
+		smBody['caption'] = result['caption']; 
+		smBody['date_inserted'] = date_ob;
+		smBody['last_read'] = date_ob;
+
+		var sm_summ = await client.index({
+			index: 'document_songs',
+			type: 'song_block',
+			// id: uuidv1(),	
+			// id: ,	
+			body: smBody
+		}, function(err) {
+			if( err ) {
+				console.log(err);
+			} else {
+				console.log("Web URL : "+complete_url+" has been crawled and added.");
+				res.send("1");
+			}
+		});
+
+		} //end of invalid sitemap url check
+
+
+	} // end od else of check sitemap exist or not
+
+})
+
+
+
+// =SITEMAP Single Entry END====================================================================
 
 
 app.get('/', function(req, res){

@@ -27,7 +27,10 @@
       .op6 {
         opacity: 0.6;
       }
-      input:focus { outline:0 !important; }
+      input:focus,select:focus{ outline:0 !important;box-shadow: none !important; }
+      .no-b-r {
+        border-radius: 0px !important;
+      }
       div.loader-div {
         display: none;
         position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
@@ -61,7 +64,7 @@
     <br>
     <div class="container">
       <center>
-        <h1> Website Sitemaps </h1>
+        <h1> Manual Entries </h1>
       </center>
 
       <script>
@@ -81,7 +84,26 @@
                 <div class="form-group">
                   <label class="op6"> <h2> Add URL </h2> </label>
                   <div class="row" style="padding-left: 20px; padding-right: 20px;">
-                    <input type="text" name="add_new" id="add_new" class="col-md-9" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
+                    
+
+                    <div class="col-md-9">
+                      <div class="input-group">
+                        <input type="text" name="add_new" id="add_new" class="form-control no-b-r" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
+
+                        <div class="input-group-append">
+                          <select class="custom-select no-b-r" id="language" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
+                            <option value="">Language</option>
+                            <option value="english">English</option>
+                            <option value="hindi">Hindi</option>
+                            <option value="urdu">Urdu</option>
+                            <option value="bengali">Bengali</option>
+                          </select>
+                        </div>
+                      </div>
+
+                    </div>
+                    <!-- <input type="text" name="add_new" id="add_new" class="col-md-9" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;"> -->
+
                     <input type="submit" class="btn btn-success col-md-2" name="submit" value="ADD" style="margin-left: 10px;border-radius:0px;">  
                   </div> 
                 </div>
@@ -131,7 +153,7 @@
 
       <br><br>
       <div class="table-div">
-        <h3 class="op6">  Single Entries  </h3>
+        <h3 class="op6"> Entries  </h3>
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
@@ -158,7 +180,7 @@
 
     <script type="text/javascript">
       data = {};
-      // data = <%- JSON.stringify() %>;
+      data = <%- JSON.stringify(results) %>;
     </script>
 
     <!-- Optional JavaScript -->
@@ -224,27 +246,23 @@
         }   
 
 
-        const insertSitemap = () =>{
+        const insertWeb = () =>{
         
-            let website_id = $('#website_id').val();
-            let sitemap_ep = $('#sitemap_ep').val();
-            let website_name = $('#website_name').val();
+            let website_url = $('#add_new').val();
             let language = $('#language').val();
               
             let filter = {
-              website_id:website_id,
-              sitemap_ep:sitemap_ep,
-              website_name:website_name,
+              website_url:website_url,
               language:language
             }
 
-            if( sitemap_ep == '' ) {
-              alert('Please! enter sitemap');
+            if( website_url == '' || language == '' ) {
+              alert('Please! enter/select value.');
               $('#loader-div').hide();
             } else {
 
               $.ajax({
-                  url: '/website/add/sitemap', data:filter,
+                  url: '/single/site/add', data:filter,
                   method:'POST', success: result => {
 
                     // var data = JSON.parse(result);
@@ -338,10 +356,10 @@
 
 
 
-          $('#sitemap-form').on('submit', () => {
+          $('#add_new_form').on('submit', () => {
             $('#loader-div').show();
-              console.log('Insert sitemap initiated!');
-              insertSitemap();
+              console.log('Insert Website initiated!');
+              insertWeb();
           })
 
           
