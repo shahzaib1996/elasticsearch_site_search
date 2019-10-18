@@ -813,9 +813,7 @@ app.get('/single_entry',async function(req,res){
 		}
 	};
 
-	var check_sitemap_data = [];
-	var check_sitemap = '';
-	check_sitemap = await search('website_sitemaps', searchBody)
+	check_sitemap = await search('document_songs', searchBody)
 	  .then(results => {
 	    
 	    res.render('single_entry',{results:results});
@@ -838,13 +836,23 @@ app.post('/single/site/add', async function(req,res){
 	let searchBody = {
 		"size" : 10,
 		"query" : {
-		    "term" : {
-		      "websitemap.keyword" : {
-		        "value" : "manual"
-		      },
-		      "location.keyword" : {
-		        "value" : complete_url
-		      }
+		    "bool" : {
+		      "must" : [
+		        {
+		          "term" : {
+		            "websitemap.keyword" : {
+		              "value" : "manual"
+		            }
+		          }
+		        },
+		        {
+		          "term" : {
+		            "location.keyword" : {
+		              "value" : complete_url
+		            }
+		          }
+		        }
+		      ]
 		    }
 		}
 	};
@@ -855,7 +863,7 @@ app.post('/single/site/add', async function(req,res){
 	  .then(results => {
 	    
 	    check_sitemap_data = results['hits']['hits'].length;
-	    res.send(results);
+	    // res.send(results);
 
 	    
 	  })
@@ -921,6 +929,93 @@ app.post('/single/site/add', async function(req,res){
 
 })
 
+app.post('/single/site/reindex', async function(req,res){
+
+var singleid = req.body.singleid;
+var location = req.body.location;
+var weblanguage = req.body.weblanguage;
+var submitted = req.body.submitted;
+
+
+//scrap sitemap
+		var result = await getResults_single_scrap(location);
+	  	// res.send( result['blocks'] );
+	  	
+		// var website = req.body.website_name;
+		// var language = req.body.language;
+		console.log(result);
+		if( result['invalid'] == 'invalid' ) {
+			res.send("3"); // 3 = URL is invalid
+		}else if( result ) {
+				
+
+		let date_ob = new Date();
+		smBody = {};
+		smBody['websitemap'] = "manual";
+		smBody['location'] = location;
+		smBody['weblanguage'] = weblanguage; 
+		smBody['title'] = result['title']; 
+		smBody['image_link'] = result['image_link'];
+		smBody['description'] = result['articleBody']; 
+		smBody['caption'] = result['caption'];
+		smBody['date_inserted'] = submitted;
+		smBody['last_read'] = date_ob;
+
+		var sm_summ = await client.index({
+			index: 'document_songs',
+			type: 'song_block',
+			// id: uuidv1(),
+			id: singleid,	
+			body: smBody
+		}, function(err) {
+			if( err ) {
+				console.log(err);
+			} else {
+				console.log("Web URL : "+location+" has been crawled and added.");
+				res.send("1");
+			}
+		});
+
+		} //end of invalid sitemap url check
+
+	
+})
+
+app.post('/single/web/delete', async function(req,res){
+
+	var singleid = req.body.singleid;
+
+	// delete old songs blocks
+  var checkdel = await client.deleteByQuery({
+	  index: 'document_songs',
+	  type: 'song_block',
+	  body: {
+	    "query" : {
+		    "bool" : {
+		      "must" : [
+		        {
+		          "term" : {
+		            "websitemap.keyword" : {
+		              "value" : "manual"
+		            }
+		          }
+		        },
+		        {
+		          "term" : {
+		            "_id" : {
+		              "value" : singleid
+		            }
+		          }
+		        }
+		      ]
+		    }
+		  }   
+	  }
+	});
+
+  res.send('1');
+
+})
 
 
 // =SITEMAP Single Entry END====================================================================

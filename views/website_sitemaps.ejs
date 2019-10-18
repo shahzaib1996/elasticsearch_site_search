@@ -192,7 +192,7 @@
           row += `<td> ${value['_source']['items_discovered']} </td>` 
           row += `<td> `;
 
-          row += `<form action="/sitemap/reindex" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="button" name="submit" class="btn btn-info btn-sm click-reindex" data-sitemap-id="${value['_id']}" data-websitename="<%= wn%>" data-weblanguage="<%= lang%>" > <i class="fa fa-refresh"></i> </button </form>`;
+          row += `<form action="/sitemap/reindex" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="sitemap_id" value="${value['_id']}" > <button type="button" name="submit" class="btn btn-info btn-sm click-reindex" data-sitemap-id="${value['_id']}" data-websitename="<%= wn%>" data-weblanguage="<%= lang%>" > <i class="fa fa-refresh"></i> </button> </form>`;
 
           row += `</td>`; 
           
