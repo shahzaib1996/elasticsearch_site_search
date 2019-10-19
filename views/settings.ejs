@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Font awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <title> Elastic </title>
+    <style>
+      .cb {
+        float:left;width: calc(100% - 100px);
+      }
+      .r-btn {
+        float:left;margin-top: 35px;margin-left:10px;
+      }
+      .r-btn a {
+        border-radius: 100%;height: 30px;width: 30px;
+      }
+      .op6 {
+        opacity: 0.6;
+      }
+      input:focus { outline:0 !important; }
+      div.loader-div {
+        display: none;
+        position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
+        text-align: center;
+      }
+      div.loader-div img {
+        top:30%;
+        position: relative;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="loader-div" id="loader-div">
+      <!-- <img src="https://icon-library.net/images/spinner-icon-gif/spinner-icon-gif-15.jpg"> -->
+      <img src="https://jeobi.com/images/loading.gif">
+    </div>
+    <!-- As a link -->
+    <nav class="navbar navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">ELASTIC SEARCH</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+      <a class="nav-item nav-link" href="/">Search Page</a>
+      <a class="nav-item nav-link" href="/webinsert">Websites</a>
+      <a class="nav-item nav-link" href="/settings">Settings</a>
+      <a class="nav-item nav-link" href="/logout">Logout</a>
+    </div>
+  </div>
+    </nav>
+    <br>
+    <div class="container">
+      <center>
+        <h1> Settings </h1>
+      </center>
+
+      <script>
+            var status = "<%= status%>";
+      </script>
+
+      <div class="alert <%= cc%>">
+        <center>
+          <script type="text/javascript">
+            if(status == "1") {
+              document.write('<%= message%>');
+            }
+          </script>
+        </center>
+      </div>
+
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/changepassword" method="POST" onsubmit="return checkPM();">
+            <input type="hidden" name="l" value="<%= length%>">
+            <div class="row" >
+              <h3 class="op6"> Change Password </h3>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Current Password</label>
+                  <input type="password" class="form-control" name="o_p" id="o_p" placeholder="Enter current password..." required>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>New Password</label>
+                  <input type="password" class="form-control" name="n_p" id="n_p" placeholder="Enter new password..." required>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Confirm Password</label>
+                  <input type="password" class="form-control" name="c_p" id="c_p" placeholder="Enter new password again..." required>
+                </div>
+              </div>
+              
+            </div>
+              
+            <div class="row">
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-success" name="submit" value="Update" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <br><br>
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/updatelength" method="POST" onsubmit="return checkURL();">
+            <div class="row" >
+              <h3 class="op6"> Change Length </h3>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Length</label>
+                  <select class="form-control" name="length" id="length" required>
+                    <option hidden selected><%= length%></option>
+                    <option>10</option>
+                    <option>20</option>
+                    <option>30</option>
+                    <option>50</option>
+                  </select>
+                </div>
+              </div>
+              
+              
+            </div>
+              
+            <div class="row">
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-info" name="submit" value="Update" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <br><br>
+
+
+
+    </div>
+
+    
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <script>
+      function checkPM() {
+        var np = $('#n_p').val();
+        var cp = $('#c_p').val();
+        if( np == cp ) {
+          return true;
+        } else {
+          alert('Password Not Matched!');
+          return false;
+        }
+
+      }
+      
+
+      $(document).ready(function(){
+
+
+          
+
+
+      }); 
+    </script>
+
+  </body>
+</html>

@@ -8,9 +8,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
 const uuidv1 = require('uuid/v1');
+var session = require('express-session')
 const app = express();
 var path = require('path');
-
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
 	host: 'localhost:9200'
@@ -19,6 +19,8 @@ require('array.prototype.flatmap').shim();
 // const getResults = require("scraper");
 const port = 3000;
 
+const config = require('./config.json');
+var fs = require('fs');
 // app.get('/', function (req, res) {
 //   res.send('Hello World')
 // })
@@ -34,12 +36,20 @@ app.use( (req, res, next) => {
 	next();
 } )
 
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {  }
+}))
+
 app.listen(port, () => console.log('App Listening on port '+port) );
 
 
 const cheerio = require("cheerio");
 const axios = require("axios");
-
+var app_init = false;
 // const siteUrl = "https://remoteok.io/";
 
 let siteName = "";
@@ -190,12 +200,238 @@ app.get("/testscrap", async function(req, res, next) {
 });
 
 
+app.get('/app/init', async function(req,res){
+
+	var docBody = {};
+	var length = {};
+
+	if(app_init == false) {
+		app_init = true;
+		docBody['email'] = config['email'];
+		docBody['username'] = config['username'];
+		docBody['password'] = config['password'];
+		length['length'] = 10;
+
+		await client.index({
+			index: 'app_config',
+			type: 'config',
+			id: 'search_length',	
+			body: length
+		}, function(err) {
+			
+			console.log("search length init...");
+
+		});
+
+		await client.index({
+			index: 'app_config',
+			type: 'config',
+			id: 'admin',	
+			body: docBody
+		}, function(err) {
+			if( err ) {
+				console.log(err);
+				res.redirect('/login');
+
+			} else {
+				res.redirect('/login');
+			}
+		});
+
+	} else {
+		console.log("Already app init!")
+		res.redirect('/login');
+	}
+
+});
+
+
 app.get('/login',function(req,res){
-	res.render('login');
+	if(req.session.username) {
+    	res.redirect('/webinsert');
+  	} else {
+		res.render('login',{ status:'' });
+  	}
 })
 
-app.get('/web-insert',function(req,res){
-	//timeout start
+app.post('/login',function(req,res){
+	
+	var username = req.body.username;
+	var password = req.body.password;
+
+	client.get({
+	  index: 'app_config',
+	  type: 'config',
+	  id: 'admin'
+	}, function (error, response) {
+		if( error ) {
+			console.log(error);
+	  		res.status(200).send("error- "+error);
+		} else {
+			console.log(response);
+			var un = response['_source']['username'];
+			var pass = response['_source']['password'];
+			if( un == username ) {
+				if( pass == password ) { 
+
+				req.session.username = response['_source']['username'];
+				console.log(req.session.username);
+				res.redirect('/webinsert'); 
+
+				}
+				else { res.render('login',{ status:'0' }); }
+			} else { res.render('login',{ status:'0' }); }
+
+	  		// res.status(200).render( 'update_web' ,{doc_id: doc_id,wn:wn,lang:lang,response:response,status:'',cc:''});
+		}
+
+	});
+
+
+})
+
+app.get('/logout', function (req, res) {
+
+	req.session.destroy(function(){
+	  res.redirect('/login');
+	});
+
+})
+
+
+app.get('/settings',function(req,res){
+	if(req.session.username) {
+
+		var ll = require('./length.json');
+
+		client.get({
+		  index: 'app_config',
+		  type: 'config',
+		  id: 'search_length'
+		}, function (error, response) {
+			if( error ) {
+				console.log(error);
+		  		res.status(200).send("error-"+error);
+			} else {
+				var l = response['_source']['length'];
+				console.log(l)
+		  		res.status(200).render( 'settings' ,{status:'',cc:'',message:'',length:ll['length']});
+			}
+
+		});
+
+  	} else {
+		res.render('login',{ status:'' });
+  	}
+})
+
+app.post('/changepassword', async function(req,res){
+	if(req.session.username) {
+		var l = req.body.l;
+		var op = req.body.o_p;
+		var np = req.body.n_p;
+		await client.get({
+		  index: 'app_config',
+		  type: 'config',
+		  id: 'admin'
+		}, function (error, response) {
+			if( error ) {
+				console.log(error);
+		  		res.status(200).send("error-"+error);
+			} else {
+				var  dBody = {};
+				dBody['email'] = response['_source']['email'];
+				dBody['username'] = response['_source']['username'];
+				var pp = response['_source']['password'];
+				if( op == pp ) {
+					dBody['password'] = np;
+					console.log(dBody);
+					client.index({
+						index: 'app_config',
+						type: 'config',
+						id: 'admin',	
+						body: dBody
+					}, function(err) {
+						if( err ) {
+							console.log(err);
+							res.status(200).render( 'settings' ,{status:'1',cc:'alert-danger',message:'Something Went Wrong!',length:l});
+
+						} else {
+							res.status(200).render( 'settings' ,{status:'1',cc:'alert-success',message:'Password Changed!',length:l});
+						}
+					});
+
+				} else {
+			  		res.status(200).render( 'settings' ,{status:'1',cc:'alert-danger',message:'Wrong Password!',length:l});
+				}
+			}
+
+		});
+
+    	// res.render('settings',{status:'',cc:'',message:''});
+  	} else {
+		res.render('login',{ status:'',message:'' });
+  	}
+})
+
+app.get('/tul', function(req,res){
+
+	json = '{ "length":34545 }';
+	var jsonObj = JSON.parse(json);
+	// stringify JSON Object
+	var jsonContent = JSON.stringify(jsonObj);
+	var fs = require('fs');
+	fs.writeFile('length.json', jsonContent, 'utf8', function(){
+		
+	});
+
+
+})
+
+app.post('/updatelength', async function(req,res){
+	if(req.session.username) {
+		var length = req.body.length;
+		var dBody = {};
+		dBody['length'] = length;
+		
+		json = '{ "length":'+length+' }';
+		var jsonObj = JSON.parse(json);
+		// stringify JSON Object
+		var jsonContent = JSON.stringify(jsonObj);
+		var fs = require('fs');
+		fs.writeFile('./length.json', jsonContent, 'utf8', function(){
+			res.redirect('/settings');
+		});
+				
+					// client.index({
+					// 	index: 'app_config',
+					// 	type: 'config',
+					// 	id: 'search_length',	
+					// 	body: dBody
+					// }, function(err) {
+					// 	if( err ) {
+					// 		console.log(err);
+					// 		res.redirect('/settings');
+
+					// 	} else {
+					// 		res.redirect('/settings');
+					// 	}
+					// });
+		
+
+  	} else {
+		res.render('login',{ status:'',message:'' });
+  	}
+})
+
+
+app.get('/webinsert',function(req,res){
+	console.log(req.session.username);
+	if(!(req.session.username)) {
+    	res.redirect('/login');
+  	} else {
+
+
 	setTimeout(function(){
 
 		searchBody = {
@@ -216,6 +452,7 @@ app.get('/web-insert',function(req,res){
 
 	}, 1000); //timeout end
 
+  	}
 
 
 })
@@ -237,10 +474,10 @@ app.post('/insertweb',function(req,res){
 	}, function(err) {
 		if( err ) {
 			console.log(err);
-			res.redirect('/web-insert');
+			res.redirect('/webinsert');
 
 		} else {
-			res.redirect('/web-insert');
+			res.redirect('/webinsert');
 		}
 	});
 
@@ -313,7 +550,7 @@ app.post( '/website/delete' , function(req,res){
 	})
 
 	// res.status(200).send("Deleting Document : "+del_id);
-	res.redirect('/web-insert');
+	res.redirect('/webinsert');
 
 })
 
@@ -676,27 +913,53 @@ await client.get({
 
 // =SITEMAP Reindex END====================================================================
 
+//
+// get Length function
+async function getlength() {
+	var l = 10;
+	await client.get({
+	  index: 'app_config',
+	  type: 'config',
+	  id: 'search_length'
+	}, function (error, response) {
+		if( error ) {
+			console.log(error);
+		} else {
+			console.log("response++");
+			console.log(response);
+			var l = response['_source']['length'];
+			// return l;
+		}
+
+	});
+
+}
+
 // =SITEMAP Search Page START====================================================================
 
-app.get('/searchpage', async function(req,res){
+app.get('/', async function(req,res){
 
+	// var length = await getlength();
+	var dt = require('./length.json');
+
+	console.log(dt);
+
+	var length = dt['length'];
+	
+
+	console.log("This is length:"+length);
 	var q = req.query.q;
 	var label = req.query.label;
-	var length = req.query.length;
+	// var length = req.query.length;
 	var size = 10;
 
-	if( length == 2 ) {
-		length_str = 2;
-		size = 20
-	} else if( length == 3 ) {
-		length_str = 3;
-		size = 30
-	} else {
-		length_str = 1;
-		size = 10
-	}
+	
+	length_str = 1;
+	size = length
+	
 	
 	if( q ) {
+	console.log("This is size:"+size);
 
 	searchBody = {
 		"from" : 0,
@@ -1021,29 +1284,29 @@ app.post('/single/web/delete', async function(req,res){
 // =SITEMAP Single Entry END====================================================================
 
 
-app.get('/', function(req, res){
-		// res.status(200).render('index',{results:'',search_str:'', message:''});
-	searchBody = {
-		"size" : 1000,
-	  	"query": {
-	         "match_all" : {}
-	       	}
-		};
-	search('websites', searchBody)
-	  .then(results => {
-	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
-	    // console.log(`returned article titles:`);
-	    // console.log(results);
-	    res.render('index', {results:results, search_str:req.body.search, message:'All Documents'} );
-	    // res.send(results['hits']['hits'][0]);
-	    // results.hits.hits.forEach(
-	    //   (hit, index) => console.log(
-	    //     `\t${body.from + ++index} - ${hit._source.id}`
-	    //   )
-	    // )
-	  })
-	  .catch(console.error);
-})
+// app.get('/', function(req, res){
+// 		// res.status(200).render('index',{results:'',search_str:'', message:''});
+// 	searchBody = {
+// 		"size" : 1000,
+// 	  	"query": {
+// 	         "match_all" : {}
+// 	       	}
+// 		};
+// 	search('websites', searchBody)
+// 	  .then(results => {
+// 	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
+// 	    // console.log(`returned article titles:`);
+// 	    // console.log(results);
+// 	    res.render('index', {results:results, search_str:req.body.search, message:'All Documents'} );
+// 	    // res.send(results['hits']['hits'][0]);
+// 	    // results.hits.hits.forEach(
+// 	    //   (hit, index) => console.log(
+// 	    //     `\t${body.from + ++index} - ${hit._source.id}`
+// 	    //   )
+// 	    // )
+// 	  })
+// 	  .catch(console.error);
+// })
 
 app.get('/insert', function(req, res){
 		res.status(200).render('insert',{status: '2',cc:''});

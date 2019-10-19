@@ -207,7 +207,7 @@
     <!-- As a link -->
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand col-md-2" href="#" style="padding: 20px;margin-right: 0px; "> <img src="https://arthurgreeno.com/wp-content/uploads/2016/07/arthur-logo-3.png" style="height: 30px;width: auto;"> </a>
+  <a class="navbar-brand col-md-2" href="/" style="padding: 20px;margin-right: 0px; "> <img src="https://arthurgreeno.com/wp-content/uploads/2016/07/arthur-logo-3.png" style="height: 30px;width: auto;"> </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -215,7 +215,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     
     <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;" id="search-form" >
-      <input type="hidden" name="length" value="1" id="length">
+      <!-- <input type="hidden" name="length" value="1" id="length"> -->
       <input type="hidden" name="label" value="<%= label%>" id="input-lang">
       <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
       <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
@@ -348,6 +348,10 @@
       
 
       $(document).ready(function(){
+
+        $(this).bind("contextmenu", function(e) {
+          e.preventDefault();
+        });
 
         var aj_page = 1;
         var data_status = 1;
