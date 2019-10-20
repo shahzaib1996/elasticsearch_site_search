@@ -10,6 +10,10 @@
     <!-- Font awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <!-- datatables -->
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+
+
     <!-- Jquery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -65,96 +69,46 @@
     <br>
     <div class="container">
       <center>
-        <h1> Settings </h1>
+        <h1> Search Stats </h1>
       </center>
 
-      <script>
-            var status = "<%= status%>";
-      </script>
-
-      <div class="alert <%= cc%>">
-        <center>
-          <script type="text/javascript">
-            if(status == "1") {
-              document.write('<%= message%>');
-            }
-          </script>
-        </center>
-      </div>
 
       <div class="row"> 
         <div class="col-md-12">
-          <form class="form" action="/changepassword" method="POST" onsubmit="return checkPM();">
-            <input type="hidden" name="l" value="<%= length%>">
-            <div class="row" >
-              <h3 class="op6"> Change Password </h3>
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>Current Password</label>
-                  <input type="password" class="form-control" name="o_p" id="o_p" placeholder="Enter current password..." required>
-                </div>
-              </div>
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>New Password</label>
-                  <input type="password" class="form-control" name="n_p" id="n_p" placeholder="Enter new password..." required>
-                </div>
-              </div>
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>Confirm Password</label>
-                  <input type="password" class="form-control" name="c_p" id="c_p" placeholder="Enter new password again..." required>
-                </div>
-              </div>
-              
-            </div>
-              
-            <div class="row">
-              <div class="col-md-2 ">
-                <input type="submit" class="btn btn-success" name="submit" value="Update" style="width: 100%;">
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-      <br><br>
-      <div class="row"> 
-        <div class="col-md-12">
-          <form class="form" action="/updatelength" method="POST" onsubmit="return checkURL();">
-            <div class="row" >
-              <h3 class="op6"> Change Length </h3>
-              <div class="col-md-12">
-                <div class="form-group">
-                  <label>Length</label>
-                  <select class="form-control" name="length" id="length" required>
-                    <option hidden selected><%= length%></option>
-                    <option>10</option>
-                    <option>20</option>
-                    <option>30</option>
-                    <option>50</option>
-                  </select>
-                </div>
-              </div>
-              
-              
-            </div>
-              
-            <div class="row">
-              <div class="col-md-2 ">
-                <input type="submit" class="btn btn-info" name="submit" value="Update" style="width: 100%;">
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
+
+
+          
+        
 
       <br><br>
+      <div class="table-div">
+        <h3 class="op6">  Stats  </h3>
+        <table class="table table-bordered table-hover" id="searchStats">
+          <thead>
+            <tr>
+              <td>Sno</td>
+              <td>Search Terms</td>
+              <td>Result Counts</td>
+              <td>Search On <span class="op6"> (DD/MM/YYYY h:mm a) </span> </td>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+              
+              
 
+          </tbody>
+        </table>
+      </div>
 
+      </div>
+      </div>
 
     </div>
 
-    
+    <script type="text/javascript">
+      data = {};
+      data = <%- JSON.stringify(results) %>;
+    </script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -162,24 +116,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-    <script>
-      function checkPM() {
-        var np = $('#n_p').val();
-        var cp = $('#c_p').val();
-        if( np == cp ) {
-          return true;
-        } else {
-          alert('Password Not Matched!');
-          return false;
-        }
+    <!-- Datatables -->
+    <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" ></script>
 
-      }
+    <!-- https://momentjs.com/downloads/moment.js -->
+    <script src="https://momentjs.com/downloads/moment.js" ></script>
+
+
+    <script>
       
 
       $(document).ready(function(){
 
+ 
+        console.log(data);
+        if( data != '' ) {
+          $('#tableBody').empty();
+          // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        var i = 1;
+        $.each(data['hits']['hits'],function(index,value){
+          console.log(value);
+          row = `<tr> <td> ${i} </td>`;
+          row += `<td>${value['_source']['search_term']}</td>`
+          row += `<td>${value['_source']['result_count']}</td>` 
+          row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
+          // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
+          row += `</tr>`;
+          $('#tableBody').append(row);
+          i++;
+        })
+        
+        } else {
+          $('#tableBody').append(`<tr> <td colspan="4"> <center> No Search Stats Found </center> </td> </tr>`);
+        }   
 
-          
+        
+        $('#searchStats').DataTable();
 
 
       }); 

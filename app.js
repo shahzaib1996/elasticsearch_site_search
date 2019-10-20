@@ -4,6 +4,8 @@
 // const request = require('request');
 // var routes = require('./routes');
 
+const cron = require("node-cron");
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
@@ -54,6 +56,194 @@ var app_init = false;
 
 let siteName = "";
 // var blocks = new Set();
+
+async function automatic_sitemap_reindex() {
+  
+  searchBody = {
+	"size" : 1000,
+  	"query": {
+         "match_all" : {}
+       	}
+	};
+	await search('website_sitemaps', searchBody)
+	  .then(results_main => {
+
+	  	//Reindex Start 
+
+	  	for( i=0;i<results_main['hits']['hits'].length;i++ ) {
+
+	  		// console.log("start");
+	  		// console.log(results_main['hits']['hits'][i]);
+	  		// console.log("end");
+
+	  		console.log('Start Sitemap Reindex '+results_main['hits']['hits'][i]['_id']);
+	  	
+
+
+		// var sitemap_id = req.body.sitemap_id;
+		// var websitename = req.body.websitename;
+		// var weblanguage = req.body.weblanguage;
+
+		
+
+		var sitemap_id = results_main['hits']['hits'][i]['_id'];
+		var websitename = results_main['hits']['hits'][i]['_source']['websitename'];
+		var weblanguage = results_main['hits']['hits'][i]['_source']['weblanguage'];
+
+
+		// delete old songs blocks
+		  var checkdel = client.deleteByQuery({
+		  index: 'document_songs',
+		  type: 'song_block',
+		  body: {
+		    query: {
+		    	term : {
+				      "websitemap.keyword" : {
+				        "value" : sitemap_id
+				      }
+				    }
+		    }   
+		  }
+		});
+
+		// res.send(checkdel);
+		console.log("========");
+		console.log(checkdel);
+		console.log("========");
+
+
+		setTimeout( async function(){
+
+		// }, 2000 );
+
+		//Web crawling / reindex start
+
+		//scrap sitemap
+		var result = await getResults(sitemap_id);
+			  	// res.send( result['blocks'] );
+			  	
+				// var website = req.body.website_name;
+				// var language = req.body.language;
+		var docBody1 = {};
+				// elasticStore(inputArray);
+		var bulkArray  = [];
+		if( result['invalid'] == 'invalid' ) {
+			// res.send("3"); // 3 = URL is invalid
+			console.log("Sitemap Invalid");
+		}else if( result ) {
+
+			for(i=0; i<result['blocks'].length;i++) {
+
+				var description = await getResults_single(result['blocks'][i]['loc']);
+
+				if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
+							
+				} else {
+
+					docBody1 = {}
+					docBody1['websitename'] = websitename;
+					docBody1['websitemap'] = sitemap_id;
+					docBody1['weblanguage'] = weblanguage;
+					docBody1['location'] = result['blocks'][i]['loc'];
+					docBody1['title'] = result['blocks'][i]['title'];
+					docBody1['image_link'] = result['blocks'][i]['image_link'];
+					docBody1['caption'] = result['blocks'][i]['caption'];
+					docBody1['description'] = description['articleBody'];
+					bulkArray.push(docBody1);
+
+				}
+			}
+
+					//Insert Blocks
+		runInsertSitemapScrap(bulkArray).catch(console.log);
+					
+		var itemsInserted = bulkArray.length;
+
+		  console.log("***************");
+		  console.log(itemsInserted+" --- "+bulkArray.length);
+		  console.log("***************");
+
+
+		// Web crawling / reindex end
+
+
+		//Website sitemap summary updating
+		var docBody = {};
+		var website_id = ''; 
+		var websitename = ''; 
+		var websitemap = '';
+		var sm_endpoint = '';
+		var language = '';
+		var date_inserted = '';
+
+		//getting sitemap summary from sitemap
+		await client.get({
+			  index: 'website_sitemaps',
+			  type: 'sitemaps_summary',
+			  id: sitemap_id
+			}, function (error, response) {
+				if( error ) {
+					console.log(error);
+
+				} else {
+					// var doc_id = response['_id'];
+					console.log("Updating sitemap summary");
+					
+					docBody['websitemap']= sitemap_id; //complete url
+					docBody['sm_endpoint']= response['_source']['sm_endpoint'];
+					docBody['website_id']= response['_source']['website_id'];
+					docBody['websitename']= response['_source']['websitename'];
+					docBody['weblanguage']= response['_source']['weblanguage'];
+					docBody['date_inserted']= response['_source']['date_inserted'];
+					docBody['last_read']= new Date();
+					docBody['items_discovered']= itemsInserted;
+
+					client.index({
+							index: 'website_sitemaps',
+							type: 'sitemaps_summary',
+							id: sitemap_id,	
+							body: docBody
+						}, function(err) {
+							if( err ) {
+								console.log("Error in sitemap summary update.");
+								console.log(err);
+
+							} else {
+								console.log("Sitemap Reindex Successfully. "+sitemap_id);
+							}
+						});
+
+				}
+
+			});
+
+		} //end of invalid sitemap url check
+
+		console.log("*End of sitemap reindex*");
+
+		}, 2000 );
+		
+		
+		}
+	  	//reindex End
+	    
+
+	  })
+  .catch(error => {
+
+  });
+
+}
+
+// f().then(alert); // 1
+
+//Cron job Function
+ // cron.schedule("*/5 * * * *", async function() {
+
+ // 		automatic_sitemap_reindex().then(console.log); // 1
+ //      	console.log("running a task every 5 minute(s)");
+    
+ //  });
 
 
 var fetchData = async (scrapURL) => {
@@ -121,7 +311,8 @@ var fetchData_single = async (scrapURL) => {
 var getResults_single = async (scrapURL) => {
   // var block_single = new Set();\
   var articleBody = '';
-  
+  var title = '';
+
   var $ = await fetchData_single(scrapURL);
 
   var invalid = $("invalid").html();
@@ -130,6 +321,7 @@ var getResults_single = async (scrapURL) => {
   
   // find('div[itemprop=articleBody]').text();
   articleBody = $('body').find('div[itemprop=articleBody]').text();
+  title = $('head').find('title').text();
   // image\\:image
   // $("div").each((index, element) => {
   //   // tags.add($(element).text());
@@ -144,6 +336,7 @@ var getResults_single = async (scrapURL) => {
 
   return {
     articleBody: articleBody,
+    title: title,
     invalid:invalid
   };
 };
@@ -180,7 +373,8 @@ var getResults_single_scrap = async (scrapURL) => {
 
   articleBody = $('body').find('div[itemprop=articleBody]').text();
   image_link = $('body').find('img[itemprop=image]').attr('src');
-  title = $('body').find('h1[itemprop=headline][class=page-title]').text();
+  // title = $('body').find('h1[itemprop=headline][class=page-title]').text();
+  title = $('head').find('title').text();
   caption = $('body').find('img[itemprop=image]').attr('alt');
  
 
@@ -722,7 +916,8 @@ app.post('/website/add/sitemap', async function(req,res){
 					docBody['websitemap'] = complete_url;
 					docBody['weblanguage'] = weblanguage;
 					docBody['location'] = result['blocks'][i]['loc'];
-					docBody['title'] = result['blocks'][i]['title'];
+					// docBody['title'] = result['blocks'][i]['title']; //old
+					docBody['title'] = description['title']; //new
 					docBody['image_link'] = result['blocks'][i]['image_link'];
 					docBody['caption'] = result['blocks'][i]['caption'];
 					docBody['description'] = description['articleBody'];
@@ -774,6 +969,7 @@ app.post('/website/add/sitemap', async function(req,res){
 // =SITEMAP Reindex Start====================================================================
 
 app.post('/sitemap/reindex', async function(req,res){
+
 
 var sitemap_id = req.body.sitemap_id;
 var websitename = req.body.websitename;
@@ -832,7 +1028,8 @@ if( result['invalid'] == 'invalid' ) {
 			docBody1['websitemap'] = sitemap_id;
 			docBody1['weblanguage'] = weblanguage;
 			docBody1['location'] = result['blocks'][i]['loc'];
-			docBody1['title'] = result['blocks'][i]['title'];
+			// docBody1['title'] = result['blocks'][i]['title']; //old
+			docBody1['title'] = description['title']; //new
 			docBody1['image_link'] = result['blocks'][i]['image_link'];
 			docBody1['caption'] = result['blocks'][i]['caption'];
 			docBody1['description'] = description['articleBody'];
@@ -942,12 +1139,11 @@ app.get('/', async function(req,res){
 	// var length = await getlength();
 	var dt = require('./length.json');
 
-	console.log(dt);
+	// console.log(dt);
 
 	var length = dt['length'];
 	
-
-	console.log("This is length:"+length);
+	// console.log("This is length:"+length);
 	var q = req.query.q;
 	var label = req.query.label;
 	// var length = req.query.length;
@@ -959,7 +1155,7 @@ app.get('/', async function(req,res){
 	
 	
 	if( q ) {
-	console.log("This is size:"+size);
+	// console.log("This is size:"+size);
 
 	searchBody = {
 		"from" : 0,
@@ -988,7 +1184,9 @@ app.get('/', async function(req,res){
 
 	var search_results = await search('document_songs', searchBody)
 	  .then(results => {
-	    
+
+
+	    save_search_stats(q,results['hits']['total']['value']	)
 	    res.status(200).render('search_page', { data:results,q:q,label:label,length_str:length_str } );
 	    
 	  })
@@ -1000,6 +1198,31 @@ app.get('/', async function(req,res){
 	// res.status(200).render('search_page');
 
 })
+
+function save_search_stats(q,result_count) {
+
+	console.log("Search stats");
+	console.log(q+" -- "+result_count);
+	console.log(result_count);
+	var docBody = {};
+	docBody['search_term'] = q;
+	docBody['result_count'] = result_count;
+	docBody['date_searched'] = new Date();
+
+	client.index({
+		index: 'search_stats',
+		type: 'stats',	
+		body: docBody
+	}, function(err) {
+		if( err ) {
+			console.log(err);
+
+		} else {
+			console.log("Search stats Saved!");
+		}
+	});
+
+}
 
 app.post('/search_page_ajax', async function(req,res){
 
@@ -1282,6 +1505,32 @@ app.post('/single/web/delete', async function(req,res){
 
 
 // =SITEMAP Single Entry END====================================================================
+
+// =Search Stats  Start====================================================================
+
+app.get('/stats', function(req,res){
+
+	searchBody = {
+		"size" : 1000,
+	  	"query": {
+	         "match_all" : {}
+	       	}
+		};
+	search('search_stats', searchBody)
+	  .then(results => {
+
+	    res.render('search_stats', {results:results } );
+
+	  })
+	  .catch(error => {
+	  	res.render('search_stats', {results:results } );
+	  });
+
+	
+
+})
+
+// =Search Stats END====================================================================
 
 
 // app.get('/', function(req, res){

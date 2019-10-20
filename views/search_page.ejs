@@ -498,7 +498,7 @@
           var tt = '';
           var cap = '';
           if( value['_source']['title'] ) {
-            var tt = value['_source']['title'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "").replace("-"," ").replace("-"," ");
+            var tt = value['_source']['title'].replace("<!--[CDATA[", "").replace("]]-->", "").replace("<![CDATA[", "").replace("]]>", "");
           } else {
             return;
           }
