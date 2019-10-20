@@ -238,12 +238,12 @@ async function automatic_sitemap_reindex() {
 // f().then(alert); // 1
 
 //Cron job Function
- // cron.schedule("*/5 * * * *", async function() {
+ cron.schedule("0 5 * * *", async function() {
 
- // 		automatic_sitemap_reindex().then(console.log); // 1
- //      	console.log("running a task every 5 minute(s)");
+ 		automatic_sitemap_reindex().then(console.log); // 1
+      	console.log("Running a task every day 5 AM");
     
- //  });
+  });
 
 
 var fetchData = async (scrapURL) => {
