@@ -88,6 +88,7 @@
             <tr>
               <td>Sno</td>
               <td>Search Terms</td>
+              <td>Language</td>
               <td>Result Counts</td>
               <td>Search On <span class="op6"> (DD/MM/YYYY h:mm a) </span> </td>
             </tr>
@@ -138,6 +139,7 @@
           console.log(value);
           row = `<tr> <td> ${i} </td>`;
           row += `<td>${value['_source']['search_term']}</td>`
+          row += `<td>${value['_source']['language']}</td>`
           row += `<td>${value['_source']['result_count']}</td>` 
           row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
           // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
@@ -147,7 +149,7 @@
         })
         
         } else {
-          $('#tableBody').append(`<tr> <td colspan="4"> <center> No Search Stats Found </center> </td> </tr>`);
+
         }   
 
         

@@ -568,19 +568,6 @@ app.post('/changepassword', async function(req,res){
   	}
 })
 
-app.get('/tul', function(req,res){
-
-	json = '{ "length":34545 }';
-	var jsonObj = JSON.parse(json);
-	// stringify JSON Object
-	var jsonContent = JSON.stringify(jsonObj);
-	var fs = require('fs');
-	fs.writeFile('length.json', jsonContent, 'utf8', function(){
-		
-	});
-
-
-})
 
 app.post('/updatelength', async function(req,res){
 	if(req.session.username) {
@@ -1186,7 +1173,7 @@ app.get('/', async function(req,res){
 	  .then(results => {
 
 
-	    save_search_stats(q,results['hits']['total']['value']	)
+	    save_search_stats(q,results['hits']['total']['value'],label	)
 	    res.status(200).render('search_page', { data:results,q:q,label:label,length_str:length_str } );
 	    
 	  })
@@ -1199,7 +1186,11 @@ app.get('/', async function(req,res){
 
 })
 
-function save_search_stats(q,result_count) {
+function save_search_stats(q,result_count,lang) {
+
+	if( lang == '' ) {
+		lang = 'all';
+	}
 
 	console.log("Search stats");
 	console.log(q+" -- "+result_count);
@@ -1207,6 +1198,7 @@ function save_search_stats(q,result_count) {
 	var docBody = {};
 	docBody['search_term'] = q;
 	docBody['result_count'] = result_count;
+	docBody['language'] = lang;
 	docBody['date_searched'] = new Date();
 
 	client.index({
@@ -1523,6 +1515,7 @@ app.get('/stats', function(req,res){
 
 	  })
 	  .catch(error => {
+	  	var results = [];
 	  	res.render('search_stats', {results:results } );
 	  });
 

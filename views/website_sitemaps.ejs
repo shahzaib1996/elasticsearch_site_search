@@ -152,6 +152,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
+    <!-- https://momentjs.com/downloads/moment.js -->
+    <script src="https://momentjs.com/downloads/moment.js" ></script>
+    
     <script>
       function checkURL() {
         var wn = $('#website_name').val();
@@ -190,8 +193,10 @@
           console.log(value);
           row = `<tr> <td> ${i} </td>`;
           row += `<td>${value['_source']['sm_endpoint']}</td>`
-          row += `<td>${value['_source']['date_inserted']}</td>` 
-          row += `<td>${value['_source']['last_read']}</td>` 
+          // row += `<td>${value['_source']['date_inserted']}</td>` 
+          row += `<td>${moment(value['_source']['date_inserted']).format('DD/MM/YYYY h:mm a')}</td>` 
+          // row += `<td>${value['_source']['last_read']}</td>` 
+          row += `<td>${moment(value['_source']['last_read']).format('DD/MM/YYYY h:mm a')}</td>` 
           row += `<td> <span style="color:green;">Success</span> </td>` 
           row += `<td> ${value['_source']['items_discovered']} </td>` 
           row += `<td> `;

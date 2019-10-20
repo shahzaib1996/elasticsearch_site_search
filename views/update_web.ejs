@@ -80,7 +80,7 @@
               <div class="col-md-12">
                 <div class="form-group">
                   <label>Website Name</label>
-                  <input type="text" class="form-control" name="website_name" value="<%= wn%>" id="website_name" placeholder="e.g https://www.example.com" required>
+                  <input type="text" class="form-control" name="website_name" value="<%= wn%>" id="website_name" placeholder="e.g https://www.example.com" required readOnly>
                 </div>
               </div>
               <div class="col-md-12">
@@ -89,11 +89,17 @@
                   <select class="form-control" name="language" required>
                     <option hidden value="<%= lang%>"><%= lang%></option>
                     <option value="">Select Language</option>
-                    <option value="english">English</option>
                     <option value="hindi">Hindi</option>
-                    <option value="urdu">Urdu</option>
-                    <option value="bengali">Bengali</option>
+                    <option value="telugu">Telugu</option>
+                    <option value="tamil">Tamil</option>
+                    <option value="kannada">Kannada</option>
+                    <option value="others">Others</option>
                   </select>
+                  <!-- Hindi
+                Telugu
+                Tamil
+                Kannada
+                Others -->
                 </div>
               </div>
               
