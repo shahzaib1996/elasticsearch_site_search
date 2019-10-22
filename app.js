@@ -1502,6 +1502,12 @@ app.post('/single/web/delete', async function(req,res){
 
 app.get('/stats', function(req,res){
 
+	res.render('search_stats');
+	  
+})
+
+app.post('/stats/fetch', function(req,res){
+
 	searchBody = {
 		"size" : 1000,
 	  	"query": {
@@ -1511,16 +1517,33 @@ app.get('/stats', function(req,res){
 	search('search_stats', searchBody)
 	  .then(results => {
 
-	    res.render('search_stats', {results:results } );
+	    res.send( results );
 
 	  })
 	  .catch(error => {
 	  	var results = [];
-	  	res.render('search_stats', {results:results } );
+	  	res.send( [] );
 	  });
 
 })
 
+//stats delete
+app.post('/stats/delete', async function(req,res){
+
+	// delete old songs blocks
+  var checkdel = await client.deleteByQuery({
+	  index: 'search_stats',
+	  type: 'stats',
+	  body: {
+	    "query": {
+	        "match_all" : {}
+	    }  
+	  }
+	});
+
+  res.send('1');
+
+})
 
 // Delete Single URl 
 app.post('/url/delete/entry', async function(req,res){

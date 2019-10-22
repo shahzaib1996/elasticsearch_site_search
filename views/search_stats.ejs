@@ -10,14 +10,15 @@
     <!-- Font awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <!-- Jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    
     <!-- datatables -->
     <link rel="stylesheet" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
 
 
-    <!-- Jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-    <title> Elastic </title>
+    <title> Search Stats </title>
     <style>
       .cb {
         float:left;width: calc(100% - 100px);
@@ -33,7 +34,7 @@
       }
       input:focus { outline:0 !important; }
       div.loader-div {
-        display: none;
+        display: block;
         position: absolute;width: 100%;height: 100vh;background: #dcdcdc78; z-index: 999;
         text-align: center;
       }
@@ -72,17 +73,19 @@
         <h1> Search Stats </h1>
       </center>
 
+      <div class="alert" id="alert-box">
+        
+      </div>
 
       <div class="row"> 
         <div class="col-md-12" style="background: #fff;padding-bottom: 20px;margin-bottom: 200px;border-radius: 10px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-
-
-          
-        
+ 
 
       <br><br>
       <div class="table-div">
-        <h3 class="op6">  Stats  </h3>
+        <h3> <span class="op6"> Stats </span> 
+        <button class="btn btn-danger delete-stats" style="float: right;">Delete Search Logs</button>
+        </h3>
         <table class="table table-bordered table-hover" id="searchStats">
           <thead style="background: #91b029;color: #fff; font-weight: bold;">
             <tr>
@@ -106,11 +109,6 @@
 
     </div>
 
-    <script type="text/javascript">
-      data = {};
-      data = <%- JSON.stringify(results) %>;
-    </script>
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
@@ -120,6 +118,21 @@
     <!-- Datatables -->
     <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" ></script>
 
+    <!-- https://cdn.datatables.net/buttons/1.6.0/js/dataTables.buttons.min.js -->
+    <script src="https://cdn.datatables.net/buttons/1.6.0/js/dataTables.buttons.min.js" ></script>
+<!-- https://cdn.datatables.net/buttons/1.6.0/js/buttons.flash.min.js -->
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.flash.min.js" ></script>
+<!-- https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" ></script>
+<!-- https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js" ></script>
+<!-- https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js" ></script>
+<!-- https://cdn.datatables.net/buttons/1.6.0/js/buttons.html5.min.js -->
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.html5.min.js" ></script>
+<!-- https://cdn.datatables.net/buttons/1.6.0/js/buttons.print.min.js -->
+<script src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.print.min.js" ></script>
+
     <!-- https://momentjs.com/downloads/moment.js -->
     <script src="https://momentjs.com/downloads/moment.js" ></script>
 
@@ -128,32 +141,111 @@
       
 
       $(document).ready(function(){
+        $('#loader-div').show();
 
- 
-        console.log(data);
-        if( data != '' ) {
-          $('#tableBody').empty();
-          // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
-        var i = 1;
-        $.each(data['hits']['hits'],function(index,value){
-          console.log(value);
-          row = `<tr> <td> ${i} </td>`;
-          row += `<td>${value['_source']['search_term']}</td>`
-          row += `<td>${value['_source']['language']}</td>`
-          row += `<td>${value['_source']['result_count']}</td>` 
-          row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
-          // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
-          row += `</tr>`;
-          $('#tableBody').append(row);
-          i++;
+        $('.delete-stats').click(function(){
+
+        var r = confirm("Are you sure you want to delete logs?");
+        if (r == true) {
+
+          $('#loader-div').show();
+          $.ajax({
+          url: '/stats/delete',
+          method:'POST', success: result => {
+
+            // var data = JSON.parse(result);
+            console.log(result);
+            if( result == '1' ) {
+               $('#alert-box').removeClass('alert-danger');
+              $('#alert-box').addClass('alert-success');
+              $('#alert-box').html('<center>Search Logs Deleted!</center>')
+            } else {
+              $('#alert-box').removeClass('alert-success');
+              $('#alert-box').addClass('alert-danger');
+              $('#alert-box').html('<center>Failed to Delete Search Logs !</center>')
+            }
+            setTimeout(function(){
+                      location.reload();
+                    },1000);
+            $('#loader-div').hide();
+            },
+            error: e => {
+              console.log("");
+              $('#loader-div').hide();
+              $('#alert-box').addClass('alert-danger');
+              $('#alert-box').html('<center>Something went wrong!</center>')
+            }
+          });
+
+          } 
+
         })
-        
-        } else {
 
-        }   
+        $.ajax({
+          url: '/stats/fetch',
+          method:'POST', success: result => {
+
+            // var data = JSON.parse(result);
+            console.log("result yahan par aya ha!");
+            console.log(result);
+            var i=1;
+            $.each(result['hits']['hits'],function(index,value){
+              
+              row = `<tr> <td> ${i} </td>`;
+              row += `<td>${value['_source']['search_term']}</td>`
+              row += `<td>${value['_source']['language']}</td>`
+              row += `<td>${value['_source']['result_count']}</td>` 
+              row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
+              // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
+              row += `</tr>`;
+              $('#tableBody').append(row);
+              i++;
+            })
+              
+            $('#searchStats').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'excel', 'pdf'
+                ]
+            });
+
+            $('#loader-div').hide();
+
+
+
+          },
+          error: e => {
+            console.log("");
+            $('#loader-div').hide();
+            $('#alert-box').addClass('alert-danger');
+            $('#alert-box').html('<center>Something went wrong!</center>')
+          }
+        });
+ 
+        // console.log(data);
+        // if( data != '' ) {
+        //   $('#tableBody').empty();
+        //   // $('#tableBody').append(`<tr> <td colspan="3"> <center> No Websites Found </center> </td> </tr>`);
+        // var i = 1;
+        // $.each(data['hits']['hits'],function(index,value){
+        //   console.log(value);
+        //   row = `<tr> <td> ${i} </td>`;
+        //   row += `<td>${value['_source']['search_term']}</td>`
+        //   row += `<td>${value['_source']['language']}</td>`
+        //   row += `<td>${value['_source']['result_count']}</td>` 
+        //   row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
+        //   // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
+        //   row += `</tr>`;
+        //   $('#tableBody').append(row);
+        //   i++;
+        // })
+        
+        // } else {
+
+        // }   
 
         
-        $('#searchStats').DataTable();
+        
 
 
       }); 
