@@ -133,24 +133,24 @@
                            
             </div>
           </form>
-        </div>
+        </div>-->
 
         <div class="col-md-12">
-          <form class="form" action="javascript:void(0)" method="POST" id="add_new_form" >
+          <form class="form" action="javascript:void(0)" method="POST" id="delete_entry" >
             <div class="row" >
               <div class="col-md-12">
                 <div class="form-group">
                   <label class="op6"> <h2> Delete URL </h2> </label>
                   <div class="row" style="padding-left: 20px; padding-right: 20px;">
-                    <input type="text" name="add_new" id="add_new" class="col-md-9" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
-                    <input type="submit" class="btn btn-danger col-md-2" name="submit" value="DELETE" style="margin-left: 10px;border-radius:0px;">  
+                    <input type="text" name="delete_url" id="delete_url" class="col-md-9" style="padding-left: 5px;border: none;border-bottom: 1px solid #cccccc;">
+                    <input type="submit" class="btn btn-danger col-md-2 click-delete-url" name="submit" value="DELETE" style="margin-left: 10px;border-radius:0px;">  
                   </div> 
                 </div>
               </div>
                            
             </div>
           </form>
-        </div> -->
+        </div> 
 
         
 
@@ -399,6 +399,51 @@
 
           });
 
+
+          $('.click-delete-url').click(function(){
+
+            $('#loader-div').show();
+            console.log('Delete Url initiated');
+
+            let delete_url = $('#delete_url').val();
+              
+            let filter = {
+              delete_url:delete_url
+            }
+
+
+              $.ajax({
+                  url: 'url/delete/entry', data:filter,
+                  method:'POST', success: result => {
+
+                    // var data = JSON.parse(result);
+                    console.log("result");
+                    console.log(result);
+                    $('#loader-div').hide();
+                    if( result == "3" ) {
+                      $('#alert-box').removeClass('alert-success');
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Invalid Url!</center>')
+                    } else if( result == "1") {
+                      $('#alert-box').removeClass('alert-danger');
+                      $('#alert-box').addClass('alert-success');
+                      $('#alert-box').html('<center>Website Successfully Deleted!</center>')
+                    }
+                    setTimeout(function(){
+                      location.reload();
+                    },2000);
+                  },
+                  error: e => {
+                    console.log("");
+                    $('#loader-div').hide();
+                    $('#alert-box').addClass('alert-danger');
+                    $('#alert-box').html('<center>Something went wrong!</center>')
+                  }
+                });
+
+            
+
+          });
 
 
           $('#add_new_form').on('submit', () => {

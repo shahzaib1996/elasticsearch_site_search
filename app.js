@@ -1519,7 +1519,45 @@ app.get('/stats', function(req,res){
 	  	res.render('search_stats', {results:results } );
 	  });
 
-	
+})
+
+
+// Delete Single URl 
+app.post('/url/delete/entry', async function(req,res){
+
+	var delete_url = req.body.delete_url;
+
+	// delete old songs blocks
+  var checkdel = await client.deleteByQuery({
+	  index: 'document_songs',
+	  type: 'song_block',
+	  body: {
+	    "query" : {
+		    "bool" : {
+		      "must" : [
+		        {
+		          "term" : {
+		            "location.keyword" : {
+		              "value" : delete_url
+		            }
+		          }
+		        }
+		      ],
+		      "must_not" : [
+		        {
+		          "term" : {
+		            "websitemap.keyword" : {
+		              "value" : "manual"
+		            }
+		          }
+		        }
+		      ]
+		    }
+		  }   
+	  }
+	});
+
+  res.send('1');
 
 })
 

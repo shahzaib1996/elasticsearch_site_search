@@ -424,7 +424,7 @@
                             }
 
                             $.each(result['data'],function(index,value){
-                              console.log(value['_source']);
+                              // console.log(value['_source']);
                               
                               var tt = '';
                               var cap = '';
@@ -438,6 +438,7 @@
                               }
 
                               var dd = tt+" - "+cap;
+                              var dd =  dd.replace(q,"<b>xxx</b>")
 
                               row = `<div class="col-md-7 search-box">
                                       <a href="${value['_source']['location']}" target="_blank">  ${tt} </a>
@@ -447,7 +448,7 @@
                                           <img class="sbimg" src="${value['_source']['image_link']}">
                                         </div>
                                         <div class="mytextbox">
-                                          <p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+                                          <p class="desc"> ${ dd.slice(0,150)+"..." } <br> Language: <u> ${value['_source']['weblanguage']} </u> </p> 
                                           
                                         </div>
                                       </div>
