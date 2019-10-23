@@ -502,9 +502,7 @@
         
         $.each(data['hits']['hits'],function(index,value){
           console.log(value['_source']);
-          var pattern = new RegExp("<%= q%>", 'gi');
-          // Title + Caption description 
-          //<p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+          // var pattern = new RegExp("<%= q%>", 'gi'); // replace(pattern,`<span><%= q%></span>`)
 
           var tt = '';
           var cap = '';
@@ -527,7 +525,7 @@
                       <img class="sbimg" src="${value['_source']['image_link']}" title="${cap}">
                     </div>
                     <div class="mytextbox">
-                      <p class="desc"> ${ value['_source']['description'].replace(pattern,`<span><%= q%></span>`).slice(0,145)+"..." } <br> Language: <u> ${value['_source']['weblanguage']} </u> </p> 
+                      <p class="desc"> ${ value['_source']['description'].slice(0,145)+"..." } <br> Language: <u> ${value['_source']['weblanguage']} </u> </p> 
                       
                     </div>
                   </div>
