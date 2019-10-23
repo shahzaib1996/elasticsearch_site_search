@@ -1527,6 +1527,53 @@ app.post('/stats/fetch', function(req,res){
 
 })
 
+app.post('/stats/fetch/range', function(req,res){
+	var from = req.body.from;
+	var to = req.body.to;
+	var language = req.body.language;
+
+	searchBody = {
+		"size" : 1000,
+		"query": {
+		  	"bool": {
+			    "must": [
+			        {
+			          "range" : {
+				            "date_searched" : {
+				                "gte" : from,
+				                "lte" : to
+				            }
+				        }
+			        }
+			        
+			    ]
+			}
+		}
+	  	
+	};
+
+	if( language != '' ) {
+		searchBody['query']['bool']['must'].push( {
+										          "term": {
+										            "language": language
+										          }
+										        });
+	}
+
+
+	search('search_stats', searchBody)
+	  .then(results => {
+
+	    res.send( results );
+
+	  })
+	  .catch(error => {
+	  	var results = [];
+	  	res.send( [] );
+	  });
+
+})
+
 //stats delete
 app.post('/stats/delete', async function(req,res){
 

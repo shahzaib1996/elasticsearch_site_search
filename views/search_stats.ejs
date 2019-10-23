@@ -32,6 +32,12 @@
       .op6 {
         opacity: 0.6;
       }
+      .w100p {
+        width: 100%;
+      }
+      .mt10 {
+        margin-top: 10px;
+      }
       input:focus { outline:0 !important; }
       div.loader-div {
         display: block;
@@ -83,8 +89,42 @@
 
       <br><br>
       <div class="table-div">
+        <div class="row">
+
+          <div class="col-md-4">
+            <label>Language</label>
+            <select class="form-control" name="language" id="language" required>
+              <option value="">All</option>
+              <option value="hindi">Hindi</option>
+              <option value="telugu">Telugu</option>
+              <option value="tamil">Tamil</option>
+              <option value="kannada">Kannada</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label>Date From <span style="color:red;">*</span> </label>
+            <input type="date" name="from" id="from" class="form-control">
+          </div>
+
+          <div class="col-md-4">
+            <label>Date To<span style="color:red;">*</span></label>
+            <input type="date" name="to" id="to" class="form-control">
+          </div>
+
+          <div class="col-md-4  text-center mt10" >
+            <button id="filter" class="btn btn-success w100p" >Filter</button>
+          </div>
+
+          <div class="col-md-4 offset-md-4 text-center mt10" >
+            <button class="btn btn-danger delete-stats w100p" >Delete Entire Search Logs</button>
+          </div>
+
+
+        </div>
         <h3> <span class="op6"> Stats </span> 
-        <button class="btn btn-danger delete-stats" style="float: right;">Delete Search Logs</button>
+        <!-- <button class="btn btn-danger delete-stats" style="float: right;">Delete Search Logs</button> -->
         </h3>
         <table class="table table-bordered table-hover" id="searchStats">
           <thead style="background: #91b029;color: #fff; font-weight: bold;">
@@ -189,39 +229,108 @@
             console.log("result yahan par aya ha!");
             console.log(result);
             var i=1;
-            $.each(result['hits']['hits'],function(index,value){
-              
-              row = `<tr> <td> ${i} </td>`;
-              row += `<td>${value['_source']['search_term']}</td>`
-              row += `<td>${value['_source']['language']}</td>`
-              row += `<td>${value['_source']['result_count']}</td>` 
-              row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
-              // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
-              row += `</tr>`;
-              $('#tableBody').append(row);
-              i++;
-            })
-              
-            $('#searchStats').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'excel', 'pdf'
-                ]
+            if( result['hits']['hits'].length != 0 ) {
+
+              $.each(result['hits']['hits'],function(index,value){
+                
+                row = `<tr> <td> ${i} </td>`;
+                row += `<td>${value['_source']['search_term']}</td>`
+                row += `<td>${value['_source']['language']}</td>`
+                row += `<td>${value['_source']['result_count']}</td>` 
+                row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
+                // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
+                row += `</tr>`;
+                $('#tableBody').append(row);
+                i++;
+              })
+                
+              $('#searchStats').DataTable({
+                  dom: 'Bfrtip',
+                  buttons: [
+                      'copy', 'excel', 'pdf'
+                  ]
+              });
+
+              $('#loader-div').hide();
+
+            }
+
+            },
+            error: e => {
+              console.log("");
+              $('#loader-div').hide();
+              $('#alert-box').addClass('alert-danger');
+              $('#alert-box').html('<center>Something went wrong!</center>')
+            }
+          });
+    
+        
+        
+        $('#filter').click(function(){
+
+          var from = moment($('#from').val()).format();
+          var to = moment($('#to').val()).format();
+          var language = $('#language').val()
+
+          var test = moment(from).format('Y-M-D');
+          console.log(test)
+
+          let filter = {
+            from:from,
+            to:to,
+            language:language
+          }
+
+          if( from != 'Invalid date' && to != 'Invalid date' ) {
+
+              $.ajax({
+              url: '/stats/fetch/range',data:filter,
+              method:'POST', success: result => {
+                if($.fn.DataTable.isDataTable('#searchStats')) $('#searchStats').DataTable().destroy();
+                $('#tableBody').empty();
+                // var data = JSON.parse(result);
+                console.log("result yahan par aya ha!");
+                console.log(result);
+                var i=1;
+                $.each(result['hits']['hits'],function(index,value){
+                  
+                  row = `<tr> <td> ${i} </td>`;
+                  row += `<td>${value['_source']['search_term']}</td>`
+                  row += `<td>${value['_source']['language']}</td>`
+                  row += `<td>${value['_source']['result_count']}</td>` 
+                  row += `<td>${moment(value['_source']['date_searched']).format('DD/MM/YYYY h:mm a')}</td>` 
+                  // console.log(moment(value['_source']['date_searched']).format('MM/DD/YYYY h:mm a'));
+                  row += `</tr>`;
+                  $('#tableBody').append(row);
+                  i++;
+                })
+                  
+                $('#searchStats').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'excel', 'pdf'
+                    ]
+                });
+
+                $('#loader-div').hide();
+
+
+
+              },
+              error: e => {
+                console.log("");
+                $('#loader-div').hide();
+                $('#alert-box').addClass('alert-danger');
+                $('#alert-box').html('<center>Something went wrong!</center>')
+              }
             });
 
-            $('#loader-div').hide();
-
-
-
-          },
-          error: e => {
-            console.log("");
-            $('#loader-div').hide();
-            $('#alert-box').addClass('alert-danger');
-            $('#alert-box').html('<center>Something went wrong!</center>')
+          } else {
+            alert("Select Required Filters")
           }
-        });
- 
+
+        })
+
         // console.log(data);
         // if( data != '' ) {
         //   $('#tableBody').empty();

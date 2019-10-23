@@ -344,3 +344,29 @@ GET   document_songs/_search
   //      }
   //  }
   // };
+
+
+
+  GET /search_stats/_search
+{
+    "size" : 1000,
+      "query": {
+        "bool": {
+      "should": [
+        {
+          "term": {
+            "language": "telugu"
+          }
+        },
+        {
+          "range" : {
+            "date_searched" : {
+                "gte" : "2019-10-23",
+                "lte" : "2019-10-24"
+            }
+        }
+        }
+      ]
+    }
+          }
+}
