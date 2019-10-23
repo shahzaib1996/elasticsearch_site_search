@@ -394,7 +394,7 @@
                   
                   $('#small-loader-div').show();
 
-                  var aj_q = $('#q').val();
+                  var aj_q = $('#q').val().toLowerCase();
                   var aj_label = $('#input-lang').val();
                   
 
@@ -502,7 +502,7 @@
         
         $.each(data['hits']['hits'],function(index,value){
           console.log(value['_source']);
-          
+          var pattern = new RegExp("<%= q%>", 'gi');
           // Title + Caption description 
           //<p class="desc"> ${ dd.slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
 
@@ -519,7 +519,6 @@
 
           var dd = tt+" - "+cap;
 
-
           row = `<div class="col-md-7 search-box">
                   <a href="${value['_source']['location']}" target="_blank">  ${tt} </a>
                   <p class="g-link" > ${value['_source']['location']} </p>
@@ -528,7 +527,7 @@
                       <img class="sbimg" src="${value['_source']['image_link']}" title="${cap}">
                     </div>
                     <div class="mytextbox">
-                      <p class="desc"> ${ value['_source']['description'].replace("-"," ").slice(0,150)+"..." } <br> Labeled: <u> ${value['_source']['weblanguage']} </u> </p> 
+                      <p class="desc"> ${ value['_source']['description'].replace(pattern,`<span><%= q%></span>`).slice(0,145)+"..." } <br> Language: <u> ${value['_source']['weblanguage']} </u> </p> 
                       
                     </div>
                   </div>

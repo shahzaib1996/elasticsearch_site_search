@@ -1131,7 +1131,8 @@ app.get('/', async function(req,res){
 	var length = dt['length'];
 	
 	// console.log("This is length:"+length);
-	var q = req.query.q;
+	var q_ori = req.query.q;
+	var q = req.query.q.toLowerCase();
 	var label = req.query.label;
 	// var length = req.query.length;
 	var size = 10;
@@ -1174,7 +1175,7 @@ app.get('/', async function(req,res){
 
 
 	    save_search_stats(q,results['hits']['total']['value'],label	)
-	    res.status(200).render('search_page', { data:results,q:q,label:label,length_str:length_str } );
+	    res.status(200).render('search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 	    
 	  })
 	  .catch(console.error);
