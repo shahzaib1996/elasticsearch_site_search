@@ -30,7 +30,7 @@
       }
       .sbox {
         border:1px solid #91b029;
-        border-radius: 0px !important;margin-right: 0px !important;width: 500px !important;
+        border-radius: 0px !important;margin-right: 0px !important;width: 80% !important;
       }
 
       .main-box {
@@ -58,12 +58,16 @@
 
       .main-box .form-box form {
         background: ;
-        width: 575px;
-
+        /*width: 575px;*/
 
       }
 
-
+      @media(min-width: 700px) {
+        .main-box .form-box form {
+          background: ;
+          width: 575px;
+        }
+      }
 
     </style>
   </head>
@@ -104,7 +108,15 @@
             <form action="" method="GET" class="form-inline my-2 my-lg-0 mx-auto" onsubmit="return checkField();">
               <input type="hidden" name="label" value="">
               <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" placeholder="Search" aria-label="Search" >
-              <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
+              <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;width: 20% !important;" >Search</button>
+
+              <!-- <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="inputGroup-sizing-default">Default</span>
+                </div>
+                <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+              </div> -->
+
             </form>
           </div>
 

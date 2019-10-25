@@ -275,6 +275,7 @@
             $('#loader-div').show();
             console.log('Insert sitemap initiated!');
 
+            let website_id = $('#website_id').val();
             let sitemap_id = $(this).data('sitemap-id');
             let websitename = $(this).data('websitename');
             let weblanguage = $(this).data('weblanguage');
@@ -282,7 +283,8 @@
             let filter = {
               sitemap_id:sitemap_id,
               websitename:websitename,
-              weblanguage:weblanguage
+              weblanguage:weblanguage,
+              website_id:website_id
             }
 
             if( sitemap_ep == '' ) {

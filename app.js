@@ -252,6 +252,19 @@ var getResults = async (scrapURL) => {
 
   });
 
+  $("tr").each((index, element) => {
+    // tags.add($(element).text());
+    blocks.add( { 
+    	loc:$(element).find('a').attr('href'),
+    	title:'',
+    	image_link:'',
+    	caption:''
+    } );
+
+  });
+
+
+
   return {
     blocks: [...blocks].sort(),
     invalid:invalid
@@ -654,7 +667,7 @@ app.post('/updatewebsite', function(req, res){
 
 
 
-app.post( '/website/delete' , function(req,res){
+app.post( '/website/delete' , async function(req,res){
 	var del_id = req.body.del_id;
 	console.log("Deleting document ID: "+del_id);
 	client.delete({
@@ -662,6 +675,34 @@ app.post( '/website/delete' , function(req,res){
 	  type: 'url',
 	  id: del_id,
 	})
+
+	var checkdel = await client.deleteByQuery({
+	  index: 'website_sitemaps',
+	  type: 'sitemaps_summary',
+	  body: {
+	    query: {
+	    	term : {
+			      "website_id.keyword" : {
+			        "value" : del_id
+			      }
+			    }
+	    }   
+	  }
+	});
+
+	var checkdel = await client.deleteByQuery({
+	  index: 'document_songs',
+	  type: 'song_block',
+	  body: {
+	    query: {
+	    	term : {
+			      "website_id.keyword" : {
+			        "value" : del_id
+			      }
+			    }
+	    }   
+	  }
+	});
 
 	res.redirect('/webinsert');
 
@@ -770,6 +811,8 @@ app.post('/website/add/sitemap', async function(req,res){
 	var sitemap_ep = req.body.sitemap_ep;
 	var weblanguage = req.body.language;
 
+	console.log("WEbsite ID:"+ website_id);
+
 	var complete_url = website_name+sitemap_ep;
 
 	let searchBody = {
@@ -818,6 +861,7 @@ app.post('/website/add/sitemap', async function(req,res){
 				} else {
 
 					docBody = {}
+					docBody['website_id'] = website_id;
 					docBody['websitename'] = website_name;
 					docBody['websitemap'] = complete_url;
 					docBody['weblanguage'] = weblanguage;
@@ -880,6 +924,9 @@ app.post('/sitemap/reindex', async function(req,res){
 var sitemap_id = req.body.sitemap_id;
 var websitename = req.body.websitename;
 var weblanguage = req.body.weblanguage;
+var website_id = req.body.website_id;
+	
+console.log("WEbsite ID:"+ website_id);
 
 // delete old songs blocks
   var checkdel = await client.deleteByQuery({
@@ -926,6 +973,7 @@ if( result['invalid'] == 'invalid' ) {
 		} else {
 
 			docBody1 = {}
+			docBody1['website_id'] = website_id;
 			docBody1['websitename'] = websitename;
 			docBody1['websitemap'] = sitemap_id;
 			docBody1['weblanguage'] = weblanguage;
@@ -1087,9 +1135,15 @@ app.get('/', async function(req,res){
 	var search_results = await search('document_songs', searchBody)
 	  .then(results => {
 
+	  	for(i=0;i<results['hits']['hits'].length;i++) {
+	  		delete results['hits']['hits'][i]['_source']['website_id'];
+	  		delete results['hits']['hits'][i]['_source']['websitemap'];
+	  	}
+
 
 	    save_search_stats(q,results['hits']['total']['value'],label	)
 	    res.status(200).render('search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
+	    // res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 	    
 	  })
 	  .catch(console.error);

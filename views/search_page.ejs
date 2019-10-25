@@ -197,6 +197,38 @@
         font-weight: 1000;
       }
 
+      .mk-res {
+        height: 60px;width: auto;
+      }
+
+      .form-sa {
+
+      }
+      .sbtn {
+
+      }
+      .sitebarc {
+        height: 100vh;
+      }
+
+      @media(max-width: 1400px) {
+          img.mk-res {
+            height: 40px;
+          }
+          .form-sa {
+            padding-left: 20px;
+            padding-right: 20px;      
+          }
+          .sbox {
+            width: 80% !important;
+          }
+          .sbtn {
+            width: 20%;
+          }
+      }
+
+      
+
     </style>
   </head>
   <body>
@@ -206,19 +238,21 @@
     </div>
     <!-- As a link -->
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand col-md-2 hidden-sm" href="/" style="padding: ;margin-right: 0px; text-align: center;"> <img src="/images/logo2.png" style="height: 60px;width: auto;"> </a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="min-width: 600px;">
+  <a class="navbar-brand col-md-2" href="/" style="padding: ;margin-right: 0px; text-align: center;"> <img src="/images/logo2.png" class="mk-res" > </a>
   <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button> -->
 
-  <div class="" id="">
+  <div class="" style="background:;width: 100% !important;text-align: center;">
     
-    <form action="" method="GET" class="form-inline my-2 my-lg-0" style="margin-left:0px;" id="search-form" >
+    <form action="" method="GET" class="form-inline my-2 my-lg-0" style="" id="search-form" >
       <!-- <input type="hidden" name="length" value="1" id="length"> -->
-      <input type="hidden" name="label" value="<%= label%>" id="input-lang">
-      <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
-      <button class="btn btn-success my-2 my-sm-0" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
+        <input type="hidden" name="label" value="<%= label%>" id="input-lang">
+
+        <input class="form-control mr-sm-2 sbox" type="search" name="q" id="q" value="<%= q%>" placeholder="Search" aria-label="Search" >
+        <button class="btn btn-success my-2 my-sm-0 sbtn" type="submit" style="border-radius: 0px !important;background: #91b029;border: 1px solid #91b029;" >Search</button>
+
     </form>
   </div>
 </nav>
@@ -227,7 +261,7 @@
     <div class="container-fluid">
 
       <div class="row"> 
-        <div class="col-md-2" style="background: ;height: 100vh">
+        <div class="col-md-2 sitebarc d-none d-md-block">
 
         </div>
 
