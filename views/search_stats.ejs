@@ -279,6 +279,14 @@
 
               $('#loader-div').hide();
 
+            } else {
+              $('#searchStats').DataTable({
+                  dom: 'Bfrtip',
+                  buttons: [
+                      'copy', 'excel', 'pdf'
+                  ]
+              });
+              $('#loader-div').hide();
             }
 
             },
@@ -362,6 +370,14 @@
 
                   $('#loader-div').hide();
 
+                } else {
+                  $('#searchStats').DataTable({
+                      dom: 'Bfrtip',
+                      buttons: [
+                          'copy', 'excel', 'pdf'
+                      ]
+                  });
+                  $('#loader-div').hide();
                 }
 
               },
