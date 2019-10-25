@@ -1146,7 +1146,9 @@ app.get('/', async function(req,res){
 	    // res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 	    
 	  })
-	  .catch(console.error);
+	  .catch(error => {
+	  	res.status(200).render('search_page', { data:[],q:q_ori,label:label,length_str:length_str } );
+	  });
 
 	} else {
 		res.status(200).render('search_page_main',{ data:[] });

@@ -321,7 +321,7 @@
             </div>
 
             <div id="noresult-box" class="noresult-box alert alert-warning">
-              Cant find the results ? no problem, just drop a mail to info@naasongs.com we will update ASAP.
+              Cant find the results ? no problem, just drop a mail to info@isongs.info we will update ASAP.
             </div>
 
 
@@ -519,6 +519,8 @@
 
       console.log(data);
 
+    if( data.length != 0 ) {
+
       $('#select-length option[value="<%= length_str%>"]').attr('selected',true);
 
       $(".cb-lang[name='language']").parent().each(function(){
@@ -575,6 +577,11 @@
           $('#loader-div').hide();
         } 
 
+      } else {
+        $('#append-results').empty();
+          $('#noresult-box').show();
+          $('#loader-div').hide();
+      }//data check condition 
 
       }); 
     </script>
