@@ -19,7 +19,7 @@ var client = new elasticsearch.Client({
 })
 require('array.prototype.flatmap').shim();
 // const getResults = require("scraper");
-const port = 3000;
+const port = 80;
 
 const config = require('./config.json');
 var fs = require('fs');
@@ -1132,7 +1132,7 @@ app.get('/', async function(req,res){
 	
 	// console.log("This is length:"+length);
 	var q_ori = req.query.q;
-	var q = req.query.q.toLowerCase();
+	var q = req.query.q;
 	var label = req.query.label;
 	// var length = req.query.length;
 	var size = 10;
@@ -1144,7 +1144,7 @@ app.get('/', async function(req,res){
 	
 	if( q ) {
 	// console.log("This is size:"+size);
-
+	q = q.toLowerCase();
 	searchBody = {
 		"from" : 0,
 		"size" : size,
