@@ -1106,8 +1106,7 @@ function save_search_stats(q,result_count,lang) {
 	}
 
 	console.log("Search stats");
-	console.log(q+" -- "+result_count);
-	console.log(result_count);
+	
 	var docBody = {};
 	docBody['search_term'] = q;
 	docBody['result_count'] = result_count;
