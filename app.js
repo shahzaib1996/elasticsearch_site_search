@@ -1,9 +1,3 @@
-// var express = require('express');
-// var app = express();
-// var bodyParser = require('body-parser');
-// const request = require('request');
-// var routes = require('./routes');
-
 const cron = require("node-cron");
 
 const express = require('express');
@@ -18,20 +12,17 @@ var client = new elasticsearch.Client({
 	host: 'localhost:9200'
 })
 require('array.prototype.flatmap').shim();
-// const getResults = require("scraper");
 const port = 80;
 
 const config = require('./config.json');
 var fs = require('fs');
-// app.get('/', function (req, res) {
-//   res.send('Hello World')
-// })
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs')
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use( '/api', routes );
+
 
 app.use( (req, res, next) => {
 	console.log("Request -> "+req.method, req.url);
@@ -48,14 +39,11 @@ app.use(session({
 
 app.listen(port, () => console.log('App Listening on port '+port) );
 
-
 const cheerio = require("cheerio");
 const axios = require("axios");
 var app_init = false;
-// const siteUrl = "https://remoteok.io/";
 
 let siteName = "";
-// var blocks = new Set();
 
 async function automatic_sitemap_reindex() {
   
@@ -72,19 +60,8 @@ async function automatic_sitemap_reindex() {
 
 	  	for( i=0;i<results_main['hits']['hits'].length;i++ ) {
 
-	  		// console.log("start");
-	  		// console.log(results_main['hits']['hits'][i]);
-	  		// console.log("end");
-
 	  		console.log('Start Sitemap Reindex '+results_main['hits']['hits'][i]['_id']);
-	  	
 
-
-		// var sitemap_id = req.body.sitemap_id;
-		// var websitename = req.body.websitename;
-		// var weblanguage = req.body.weblanguage;
-
-		
 
 		var sitemap_id = results_main['hits']['hits'][i]['_id'];
 		var websitename = results_main['hits']['hits'][i]['_source']['websitename'];
@@ -111,19 +88,14 @@ async function automatic_sitemap_reindex() {
 		console.log(checkdel);
 		console.log("========");
 
-
 		setTimeout( async function(){
 
-		// }, 2000 );
 
 		//Web crawling / reindex start
 
 		//scrap sitemap
 		var result = await getResults(sitemap_id);
-			  	// res.send( result['blocks'] );
 			  	
-				// var website = req.body.website_name;
-				// var language = req.body.language;
 		var docBody1 = {};
 				// elasticStore(inputArray);
 		var bulkArray  = [];
@@ -235,20 +207,15 @@ async function automatic_sitemap_reindex() {
 
 }
 
-// f().then(alert); // 1
 
 //Cron job Function
  cron.schedule("0 5 * * *", async function() {
-
  		automatic_sitemap_reindex().then(console.log); // 1
-      	console.log("Running a task every day 5 AM");
-    
-  });
+      	console.log("Running a task every day 5 AM"); 
+ });
 
 
 var fetchData = async (scrapURL) => {
-  // const result = await axios.get(scrapURL);
-  // return cheerio.load(result.data);
   
   	try {
     var result = await axios.get(scrapURL);
@@ -280,7 +247,7 @@ var getResults = async (scrapURL) => {
     	image_link:$(element).find('image\\:loc').html(),
     	caption:$(element).find('image\\:caption').html() 
     } );
-    // image_link.add( $(element).find('image\\:loc').html() );
+
   });
 
   return {
@@ -292,8 +259,6 @@ var getResults = async (scrapURL) => {
 
 //Scrap Single url
 var fetchData_single = async (scrapURL) => {
-  // const result = await axios.get(scrapURL);
-  // return cheerio.load(result.data);
   
   	try {
     var result = await axios.get(scrapURL);
@@ -309,7 +274,7 @@ var fetchData_single = async (scrapURL) => {
 
 //Scrap Sitemap
 var getResults_single = async (scrapURL) => {
-  // var block_single = new Set();\
+
   var articleBody = '';
   var title = '';
 
@@ -317,22 +282,9 @@ var getResults_single = async (scrapURL) => {
 
   var invalid = $("invalid").html();
 
-  // console.log($("invalid").html());
-  
-  // find('div[itemprop=articleBody]').text();
   articleBody = $('body').find('div[itemprop=articleBody]').text();
   title = $('head').find('title').text();
-  // image\\:image
-  // $("div").each((index, element) => {
-  //   // tags.add($(element).text());
-  //   block_single.add( { 
-  //   	desc:$(element).find('loc').text(),
-  //   	title:$(element).find('image\\:title').html(),
-  //   	image_link:$(element).find('image\\:loc').html(),
-  //   	caption:$(element).find('image\\:caption').html() 
-  //   } );
-  //   // image_link.add( $(element).find('image\\:loc').html() );
-  // });
+  
 
   return {
     articleBody: articleBody,
@@ -343,9 +295,7 @@ var getResults_single = async (scrapURL) => {
 
 //Scrap Single url
 var fetchData_single_scrap = async (scrapURL) => {
-  // const result = await axios.get(scrapURL);
-  // return cheerio.load(result.data);
-  
+
   	try {
     var result = await axios.get(scrapURL);
     // Success
@@ -373,10 +323,8 @@ var getResults_single_scrap = async (scrapURL) => {
 
   articleBody = $('body').find('div[itemprop=articleBody]').text();
   image_link = $('body').find('img[itemprop=image]').attr('src');
-  // title = $('body').find('h1[itemprop=headline][class=page-title]').text();
   title = $('head').find('title').text();
   caption = $('body').find('img[itemprop=image]').attr('alt');
- 
 
   return {
   	title:title,
@@ -476,7 +424,6 @@ app.post('/login',function(req,res){
 				else { res.render('login',{ status:'0' }); }
 			} else { res.render('login',{ status:'0' }); }
 
-	  		// res.status(200).render( 'update_web' ,{doc_id: doc_id,wn:wn,lang:lang,response:response,status:'',cc:''});
 		}
 
 	});
@@ -562,7 +509,6 @@ app.post('/changepassword', async function(req,res){
 
 		});
 
-    	// res.render('settings',{status:'',cc:'',message:''});
   	} else {
 		res.render('login',{ status:'',message:'' });
   	}
@@ -584,21 +530,6 @@ app.post('/updatelength', async function(req,res){
 			res.redirect('/settings');
 		});
 				
-					// client.index({
-					// 	index: 'app_config',
-					// 	type: 'config',
-					// 	id: 'search_length',	
-					// 	body: dBody
-					// }, function(err) {
-					// 	if( err ) {
-					// 		console.log(err);
-					// 		res.redirect('/settings');
-
-					// 	} else {
-					// 		res.redirect('/settings');
-					// 	}
-					// });
-		
 
   	} else {
 		res.render('login',{ status:'',message:'' });
@@ -730,7 +661,6 @@ app.post( '/website/delete' , function(req,res){
 	  id: del_id,
 	})
 
-	// res.status(200).send("Deleting Document : "+del_id);
 	res.redirect('/webinsert');
 
 })
@@ -781,7 +711,6 @@ app.post('/website/sitemaps', async function(req,res){
 
 	});
 
-	// res.status(200).render( 'website_sitemaps' ,{wn:wn,lang:lang,sitemaps:sitemaps,status:'',cc:''});
 
 })
 
@@ -800,16 +729,12 @@ async function runInsertSitemapScrap (bulkArray) {
 
   if (bulkInsertResponse['errors']) {
     const erroredDocuments = []
-    // The items array has the same order of the dataset we just indexed.
-    // The presence of the `error` key indicates that the operation
-    // that we did for the document has failed.
+
     bulkResponse.items.forEach((action, i) => {
       var operation = Object.keys(action)[0]
       if (action[operation].error) {
         erroredDocuments.push({
-          // If the status is 429 it means that you can retry the document,
-          // otherwise it's very likely a mapping error, and you should
-          // fix the document before to try it again.
+
           status: action[operation].status,
           error: action[operation].error,
           operation: body[i * 2],
@@ -830,11 +755,6 @@ async function runInsertSitemapScrap (bulkArray) {
 
 app.post('/website/smtest', async function(req,res){
 
-	// var website_id = req.body.website_id;
-	// var website_name = req.body.website_name;
-	// var sitemap_ep = req.body.sitemap_ep;
-
-	// var complete_url = website_name+sitemap_ep;
 	var ddd = req.body
 	console.log(ddd['website_id']);
 	res.send(req.body);
@@ -878,10 +798,7 @@ app.post('/website/add/sitemap', async function(req,res){
 
 		//scrap sitemap
 		var result = await getResults(complete_url);
-	  	// res.send( result['blocks'] );
 	  	
-		// var website = req.body.website_name;
-		// var language = req.body.language;
 		var docBody = {};
 		// elasticStore(inputArray);
 		var bulkArray  = [];
@@ -985,16 +902,12 @@ console.log("========");
 
 setTimeout( async function(){
 
-// }, 2000 );
 
 //Web crawling / reindex start
 
 //scrap sitemap
 var result = await getResults(sitemap_id);
-	  	// res.send( result['blocks'] );
 	  	
-		// var website = req.body.website_name;
-		// var language = req.body.language;
 var docBody1 = {};
 		// elasticStore(inputArray);
 var bulkArray  = [];
@@ -1015,7 +928,6 @@ if( result['invalid'] == 'invalid' ) {
 			docBody1['websitemap'] = sitemap_id;
 			docBody1['weblanguage'] = weblanguage;
 			docBody1['location'] = result['blocks'][i]['loc'];
-			// docBody1['title'] = result['blocks'][i]['title']; //old
 			docBody1['title'] = description['title']; //new
 			docBody1['image_link'] = result['blocks'][i]['image_link'];
 			docBody1['caption'] = result['blocks'][i]['caption'];
@@ -1183,7 +1095,7 @@ app.get('/', async function(req,res){
 	} else {
 		res.status(200).render('search_page_main',{ data:[] });
 	}
-	// res.status(200).render('search_page');
+
 
 })
 
@@ -1300,7 +1212,6 @@ app.get('/single_entry',async function(req,res){
 	  })
 	  .catch(console.error);
 
-
 })
 
 
@@ -1355,23 +1266,11 @@ app.post('/single/site/add', async function(req,res){
 		//scrap sitemap
 		var result = await getResults_single_scrap(complete_url);
 	  	// res.send( result['blocks'] );
-	  	
-		// var website = req.body.website_name;
-		// var language = req.body.language;
+
 		console.log(result);
 		if( result['invalid'] == 'invalid' ) {
 			res.send("3"); // 3 = URL is invalid
 		}else if( result ) {
-			
-
-		// docBody['websitename'] = website_name;
-		// 			docBody['websitemap'] = complete_url;
-		// 			docBody['weblanguage'] = weblanguage;
-		// 			docBody['location'] = result['blocks'][i]['loc'];
-		// 			docBody['title'] = result['blocks'][i]['title'];
-		// 			docBody['image_link'] = result['blocks'][i]['image_link'];
-		// 			docBody['caption'] = result['blocks'][i]['caption'];
-		// 			docBody['description'] = description['articleBody'];
 			
 
 		let date_ob = new Date();
@@ -1418,10 +1317,7 @@ var submitted = req.body.submitted;
 
 //scrap sitemap
 		var result = await getResults_single_scrap(location);
-	  	// res.send( result['blocks'] );
-	  	
-		// var website = req.body.website_name;
-		// var language = req.body.language;
+
 		console.log(result);
 		if( result['invalid'] == 'invalid' ) {
 			res.send("3"); // 3 = URL is invalid
@@ -1634,212 +1530,6 @@ app.post('/url/delete/entry', async function(req,res){
 
 // =Search Stats END====================================================================
 
-
-// app.get('/', function(req, res){
-// 		// res.status(200).render('index',{results:'',search_str:'', message:''});
-// 	searchBody = {
-// 		"size" : 1000,
-// 	  	"query": {
-// 	         "match_all" : {}
-// 	       	}
-// 		};
-// 	search('websites', searchBody)
-// 	  .then(results => {
-// 	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
-// 	    // console.log(`returned article titles:`);
-// 	    // console.log(results);
-// 	    res.render('index', {results:results, search_str:req.body.search, message:'All Documents'} );
-// 	    // res.send(results['hits']['hits'][0]);
-// 	    // results.hits.hits.forEach(
-// 	    //   (hit, index) => console.log(
-// 	    //     `\t${body.from + ++index} - ${hit._source.id}`
-// 	    //   )
-// 	    // )
-// 	  })
-// 	  .catch(console.error);
-// })
-
-app.get('/insert', function(req, res){
-		res.status(200).render('insert',{status: '2',cc:''});
-})
-
-app.post('/insertdocument', function(req, res){
-	var df =  req.body.Docfields;
-
-	var docBody = {};
-
-	for(i=0;i<df.length;i++) {
-		docBody['d'+(i+1)] = df[i]; 
-	}
-
-	// res.status(200).send(docBody);
-
-	client.index({
-		index: 'mydocument',
-		type: 'mytype',
-		id: uuidv1(),
-		body: docBody
-	}, function(err) {
-		if( err ) {
-			console.log(err);
-			res.status(200).render('insert',{status: '0',cc: 'alert-danger'});
-		} else {
-			res.status(200).render('insert',{status: '1',cc: 'alert-success'});
-		}
-	});
-
-})
-
-app.post( '/document/view', function(req,res){
-
-	var doc_id = req.body.update_id;
-
-	client.get({
-	  index: 'mydocument',
-	  type: 'mytype',
-	  id: doc_id
-	}, function (error, response) {
-		if( error ) {
-			console.log(error);
-	  		res.status(200).send("error-"+error);
-		} else {
-			var doc_id = response['_id'];
-	  		res.status(200).render( 'update' ,{doc_id: doc_id ,response:response,status:'',cc:''});
-		}
-
-	});
-
-})
-
-
-app.post('/updatedocument', function(req, res){
-	var doc_id =  req.body.doc_id;
-	var df =  req.body.Docfields;
-
-	var docBody = {};
-
-	for(i=0;i<df.length;i++) {
-		docBody['d'+(i+1)] = df[i]; 
-	}
-
-	console.log(df);
-
-	client.index({
-		index: 'mydocument',
-		type: 'mytype',
-		id: doc_id,
-		body: docBody
-	}, function(err) {
-		if( err ) {
-			console.log(err);
-			res.status(200).send(err);
-		} else {
-
-				// request.post('/document/view', {
-				//   update_id: doc_id
-				// }, (error, res, body) => {
-				//   if (error) {
-				//     console.error(error);
-    // 				return
-				//   }
-				// })
-
-			res.status(200).send(" <form action='/document/view' method='POST'> <input type='hidden' value='"+doc_id+"' name='update_id'> <center> <input type='submit' value='Document Updated Go Back >> ' name='submit' style='font-size:14px;padding:10px;'> </center> </form> ");
-		}
-	});
-
-
-})
-
-
-app.post( '/document/delete' , function(req,res){
-	var del_id = req.body.del_id;
-	console.log("Deleting document ID: "+del_id);
-	client.delete({
-	  index: 'mydocument',
-	  type: 'mytype',
-	  id: del_id,
-	})
-
-	// res.status(200).send("Deleting Document : "+del_id);
-	res.status(200).render('index', {results:'',search_str:'', message: 'Successfully Deleted Document (ID:'+del_id+')' } );
-
-})
-
 const search = function search(index, body) {
   return client.search({index: index, body: body});
 };
-
-app.post('/general_search', function(req, res){
-
-	var search_arr = req.body.search.split(" ");
-
-	let searchBody = {
-		"size" : 10,
-		"min_score":0.5,
-  		"query": {
-         	"bool": {
-            	"should": [
-                	// {
-                 //   		"multi_match": {
-                 //      		"type": "best_fields",
-                 //      		"query": "ssss-wwww-ssdd-oo-pppd",
-                 //      		"operator": "and"
-                 //   		}
-                	// },
-                	// {
-                	// 	"multi_match": {
-                 //      		"type": "best_fields",
-                 //   			"query": "bbbb-qqqq-rrrr-eeee-ssss",
-                 //   			"operator": "and"
-                	// 	}
-                	// }
-  
-             	]
-
-          	}
-       	}
-	};
-
-	if( req.body.search != '' ){
-
-		if(search_arr) {
-			for(i=0; i<search_arr.length; i++) {
-		      // console.log(search_arr[i]);
-		      searchBody['query']['bool']['should'].push({
-								                		"multi_match": {
-								                   			"query": search_arr[i],
-								                      		"type": "best_fields",
-								                   			"operator": "and"
-								                		}
-								                	});
-		    }
-		}
-
-	} else {
-		searchBody = {
-		"size" : 1000,
-	  	"query": {
-	         "match_all" : {}
-	       	}
-		};
-	}
-	
-
-	search('mydocument', searchBody)
-	  .then(results => {
-	    // console.log(`found ${results.hits.total} items in ${results.took}ms`);
-	    // console.log(`returned article titles:`);
-	    // console.log(results);
-	    res.render('index', {results:results, search_str:req.body.search, message:''} );
-	    // res.send(results['hits']['hits'][0]);
-	    // results.hits.hits.forEach(
-	    //   (hit, index) => console.log(
-	    //     `\t${body.from + ++index} - ${hit._source.id}`
-	    //   )
-	    // )
-	  })
-	  .catch(console.error);
-
-})
- 
