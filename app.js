@@ -670,27 +670,8 @@ app.post('/updatewebsite', function(req, res){
 app.post( '/website/delete' , async function(req,res){
 	var del_id = req.body.del_id;
 	console.log("Deleting document ID: "+del_id);
-	client.delete({
-	  index: 'websites',
-	  type: 'url',
-	  id: del_id,
-	})
 
-	var checkdel = await client.deleteByQuery({
-	  index: 'website_sitemaps',
-	  type: 'sitemaps_summary',
-	  body: {
-	    query: {
-	    	term : {
-			      "website_id.keyword" : {
-			        "value" : del_id
-			      }
-			    }
-	    }   
-	  }
-	});
-
-	var checkdel = await client.deleteByQuery({
+	var checkdel1 = await client.deleteByQuery({
 	  index: 'document_songs',
 	  type: 'song_block',
 	  body: {
@@ -702,9 +683,56 @@ app.post( '/website/delete' , async function(req,res){
 			    }
 	    }   
 	  }
+	}, function (error, response) {
+	  	
+	  	if( error ) {
+	  		console.log("Website entries deleted failed !"+error)
+	  	} else {
+	  		console.log("Website entries deleted!")
+	  	}
+
 	});
 
-	res.redirect('/webinsert');
+
+	var checkdel2 = await client.deleteByQuery({
+	  index: 'website_sitemaps',
+	  type: 'sitemaps_summary',
+	  body: {
+	    query: {
+	    	term : {
+			      "website_id.keyword" : {
+			        "value" : del_id
+			      }
+			    }
+	    }   
+	  }
+	}, function (error, response) {
+	  		
+	  	if( error ) {
+	  		console.log("Website sitemap deleted failed !"+error)
+	  	} else {
+	  		console.log("Website sitemap deleted!")
+	  	}
+
+	});
+	
+	
+	var checkdel3 = await client.delete({
+	  index: 'websites',
+	  type: 'url',
+	  id: del_id,
+	}, function (error, response) {
+	  	if( error ) {
+	  		console.log("Website delete failed!")
+	  		res.redirect('/webinsert');
+	  	} else {
+	  		console.log("Website delete!")
+	  		res.redirect('/webinsert');
+	  	}
+	  	// res.redirect('/webinsert');
+
+	})
+
 
 })
 
