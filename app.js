@@ -9,8 +9,8 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	// host: 'localhost:9200'
-	host: 'http://51.158.104.138:9200/'
+	host: 'localhost:9200'
+	// host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
@@ -246,7 +246,7 @@ var getResults = async (scrapURL) => {
     blocks.add( { 
     	loc:$(element).find('loc').text(),
     	title:$(element).find('image\\:title').html(),
-    	image_link:$(element).find('image\\:loc').html(),
+    	// image_link:$(element).find('image\\:loc').html(),
     	caption:$(element).find('image\\:caption').html() 
     } );
 
@@ -298,12 +298,33 @@ var getResults_single = async (scrapURL) => {
   var invalid = $("invalid").html();
 
   articleBody = $('body').find('div[itemprop=articleBody]').text();
+  image_link = $('body').find('img[itemprop=image]').attr('src');
   title = $('head').find('title').text();
+
+  if( articleBody == '' || articleBody == null ) {
+  	articleBody = $('body').find('article').text();
+  }
   
+  if( articleBody == '' || articleBody == null ) {
+  	articleBody = $('body').text();
+  }
+
+  if( image_link == '' || image_link == null ) {
+  	image_link = $('body').find('article[itemprop=blogPost]').find('img').attr('src');
+  } 
+
+  if( image_link == '' || image_link == null ) {
+  	image_link = $('body').find('article').find('img').attr('src');
+  }
+
+  if( image_link == '' || image_link == null ) {
+  	image_link = $('body').find('img').attr('src');
+  }
 
   return {
     articleBody: articleBody,
     title: title,
+    image_link:image_link,
     invalid:invalid
   };
 };
@@ -340,6 +361,27 @@ var getResults_single_scrap = async (scrapURL) => {
   image_link = $('body').find('img[itemprop=image]').attr('src');
   title = $('head').find('title').text();
   caption = $('body').find('img[itemprop=image]').attr('alt');
+
+  if( articleBody == '' || articleBody == null ) {
+  	articleBody = $('body').find('article').text();
+  }
+
+  if( articleBody == '' || articleBody == null ) {
+  	articleBody = $('body').text();
+  }
+
+  if( image_link == '' || image_link == null ) {
+  	image_link = $('body').find('article[itemprop=blogPost]').find('img').attr('src');
+  }
+
+  if( image_link == '' || image_link == null ) {
+  	image_link = $('body').find('article').find('img').attr('src');
+  }
+
+  if( image_link == '' || image_link == null ) {
+  	image_link = $('body').find('img').attr('src');
+  }
+
 
   return {
   	title:title,
@@ -896,7 +938,8 @@ app.post('/website/add/sitemap', async function(req,res){
 					docBody['location'] = result['blocks'][i]['loc'];
 					// docBody['title'] = result['blocks'][i]['title']; //old
 					docBody['title'] = description['title']; //new
-					docBody['image_link'] = result['blocks'][i]['image_link'];
+					// docBody['image_link'] = result['blocks'][i]['image_link']; //old
+					docBody['image_link'] = description['image_link'];
 					docBody['caption'] = result['blocks'][i]['caption'];
 					docBody['description'] = description['articleBody'];
 					bulkArray.push(docBody);
@@ -1007,7 +1050,8 @@ if( result['invalid'] == 'invalid' ) {
 			docBody1['weblanguage'] = weblanguage;
 			docBody1['location'] = result['blocks'][i]['loc'];
 			docBody1['title'] = description['title']; //new
-			docBody1['image_link'] = result['blocks'][i]['image_link'];
+			// docBody1['image_link'] = result['blocks'][i]['image_link']; //old
+			docBody1['image_link'] = description['image_link'];
 			docBody1['caption'] = result['blocks'][i]['caption'];
 			docBody1['description'] = description['articleBody'];
 			bulkArray.push(docBody1);
@@ -1170,8 +1214,8 @@ app.get('/', async function(req,res){
 
 
 	    save_search_stats(q,results['hits']['total']['value'],label	)
-	    res.status(200).render('search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
-	    // res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
+	    // res.status(200).render('search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
+	    res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 	    
 	  })
 	  .catch(error => {
@@ -1618,3 +1662,44 @@ app.post('/url/delete/entry', async function(req,res){
 const search = function search(index, body) {
   return client.search({index: index, body: body});
 };
+
+
+// == Delete All indexes =====================================================================
+app.post('/delete/entire/data', async function(req,res){
+
+	await client.indices.delete({
+	  index: 'document_songs',
+	}).then(function(resp) {
+
+	  console.log("Successful deleted all entries!");
+
+	}, function(err) {
+
+
+	});
+
+	await client.indices.delete({
+	  index: 'website_sitemaps',
+	}).then(function(resp) {
+
+	  console.log("Successful deleted all Sitemaps!");
+
+	}, function(err) {
+
+
+	});
+
+	await client.indices.delete({
+	  index: 'websites',
+	}).then(function(resp) {
+
+	  console.log("Successful deleted all websites!");
+
+	}, function(err) {
+
+
+	});
+	console.log("Sending response!");
+	res.send('1');
+
+})

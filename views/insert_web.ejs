@@ -19,6 +19,10 @@
       .r-btn a {
         border-radius: 100%;height: 30px;width: 30px;
       }
+      .op8 {
+        opacity: 0.8;
+      }
+      .mt40 { margin-top: 40px; }
     </style>
   </head>
   <body>
@@ -40,11 +44,16 @@
   </div>
     </nav>
     <br>
+
+    
+
     <div class="container">
+
       <center>
         <h4> Add New Website </h4>
       </center>
 
+      
       <script>
             var status = "<%= status%>";
       </script>
@@ -97,9 +106,17 @@
         </div>
       </div>
 
+      <div class="row">
+        <h4 class="col-md-12 op8 mt40"> Delete All Indicies </h4>
+        <div class="alert col-md-12" id="alert-box">  </div>
+        <div class="col-md-2">
+          <input type="submit" class="btn btn-danger click-entire-delete" name="submit" value="Delete All Indices" style="width: 100%;">
+        </div>
+      </div>
+
       <br><br>
       <div class="table-div">
-        <h1> <center> Websites </center> </h1>
+        <h1 class="op8"> <center> Websites </center> </h1>
         <table class="table table-bordered table-hover">
           <thead>
             <tr>
@@ -128,7 +145,8 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
@@ -155,6 +173,47 @@
 
       $(document).ready(function(){
 
+        $('.click-entire-delete').click(function(){
+
+          var r = confirm("Are you sure you want to delete All Indices?");
+          if (r == true) {  
+
+            $('#loader-div').show();
+
+
+              $.ajax({
+                  url: '/delete/entire/data',
+                  method:'POST', success: result => {
+
+                    // var data = JSON.parse(result);
+                    console.log("result");
+                    console.log(result);
+                    $('#loader-div').hide();
+                    if( result == "0" ) {
+                      $('#alert-box').removeClass('alert-success');
+                      $('#alert-box').addClass('alert-danger');
+                      $('#alert-box').html('<center>Failed to Delete Data!</center>')
+                    } else if( result == "1") {
+                      $('#alert-box').removeClass('alert-danger');
+                      $('#alert-box').addClass('alert-success');
+                      $('#alert-box').html('<center>Data Successfully Deleted!</center>')
+                    }
+                    setTimeout(function(){
+                      location.reload();
+                    },2000);
+                  },
+                  error: e => {
+                    console.log("");
+                    $('#loader-div').hide();
+                    $('#alert-box').addClass('alert-danger');
+                    $('#alert-box').html('<center>Something went wrong!</center>')
+                  }
+                });
+
+            }
+
+          });
+
         // match url re 
         // https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}
 
@@ -173,8 +232,8 @@
           row += `<td>${value['_source']['language']}</td>` 
           row += `<td> `;
           row += `<form action="/website/delete" method="POST" style="float:right;"> <input type="hidden" name="del_id" value="${value['_id']}" > <input type="submit" name="submit" value="Delete" class="btn btn-danger btn-sm" > </form>`;
-          row += `<form action="/website/view" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="update_id" value="${value['_id']}" > <input type="submit" name="submit" value="Update" class="btn btn-info btn-sm" > </form>`;
-          row += `<form action="/website/sitemaps" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="website_id" value="${value['_id']}" > <input type="submit" name="submit" value="Sitemaps" class="btn btn-warning btn-sm" > </form>`;
+          // row += `<form action="/website/view" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="update_id" value="${value['_id']}" > <input type="submit" name="submit" value="Update" class="btn btn-warning btn-sm" > </form>`;
+          row += `<form action="/website/sitemaps" method="POST" style="float:right;margin-right:20px;"> <input type="hidden" name="website_id" value="${value['_id']}" > <input type="submit" name="submit" value="Sitemaps" class="btn btn-info btn-sm" > </form>`;
           row += `</td> `;
           row += `</tr>`;
           $('#tableBody').append(row);

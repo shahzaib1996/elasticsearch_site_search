@@ -291,9 +291,9 @@
               <label class="btn btn-secondary c-pd ">
                 <input type="radio" class="cb-lang" name="language" value="kannada" id="kannada" > Kannada
               </label>
-              <label class="btn btn-secondary c-pd ">
+              <!-- <label class="btn btn-secondary c-pd ">
                 <input type="radio" class="cb-lang" name="language" value="others" id="others" > Others
-              </label>
+              </label> -->
 
             </div>
             </div>
@@ -554,12 +554,18 @@
           var dd = tt+" - "+cap;
 
           row = `<div class="col-md-7 search-box">
-                  <a href="${value['_source']['location']}" target="_blank">  ${tt} </a>
+                  <a href="${value['_source']['location']}" target="_blank">  ${tt.slice(0,66)} </a>
                   <p class="g-link" > ${value['_source']['location']} </p>
                   <div class="newbox">
-                    <div class="img-desc">
-                      <img class="sbimg" src="${value['_source']['image_link']}" title="${cap}">
-                    </div>
+                    <div class="img-desc">`;
+                    if( value['_source']['image_link'] != null && value['_source']['image_link'] != '' ) {
+
+                      row += `<img class="sbimg" src="http://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=100&quality=50" onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" title="${cap}">`;
+                    } else {
+                      row += `<img class="sbimg" src="images/default.jpg" title="${cap}">`;
+                    }
+
+          row +=    `</div>
                     <div class="mytextbox">
                       <p class="desc"> ${ value['_source']['description'].slice(0,145)+"..." } <br> Language: <u> ${value['_source']['weblanguage']} </u> </p> 
                       
