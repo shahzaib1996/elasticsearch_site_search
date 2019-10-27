@@ -449,7 +449,7 @@ app.get('/i-login',function(req,res){
 	if(req.session.username) {
     	res.redirect('/webinsert');
   	} else {
-		res.render('/i-login',{ status:'' });
+		res.render('login',{ status:'' });
   	}
 })
 
@@ -478,8 +478,8 @@ app.post('/i-login',function(req,res){
 				res.redirect('/webinsert'); 
 
 				}
-				else { res.render('/i-login',{ status:'0' }); }
-			} else { res.render('/i-login',{ status:'0' }); }
+				else { res.render('login',{ status:'0' }); }
+			} else { res.render('login',{ status:'0' }); }
 
 		}
 
@@ -519,7 +519,7 @@ app.get('/settings',function(req,res){
 		});
 
   	} else {
-		res.render('/i-login',{ status:'' });
+		res.render('login',{ status:'' });
   	}
 })
 
@@ -567,7 +567,7 @@ app.post('/changepassword', async function(req,res){
 		});
 
   	} else {
-		res.render('/i-login',{ status:'',message:'' });
+		res.render('login',{ status:'',message:'' });
   	}
 })
 
@@ -589,7 +589,7 @@ app.post('/updatelength', async function(req,res){
 				
 
   	} else {
-		res.render('/i-login',{ status:'',message:'' });
+		res.render('login',{ status:'',message:'' });
   	}
 })
 
