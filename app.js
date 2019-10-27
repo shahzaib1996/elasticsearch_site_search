@@ -9,8 +9,8 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	// host: 'localhost:9200'
-	host: 'http://51.158.104.138:9200/'
+	host: 'localhost:9200'
+	// host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
@@ -18,7 +18,8 @@ const port = 80;
 
 const config = require('./config.json');
 var fs = require('fs');
-
+var lff = require('./length.json');
+var slength = lff['length'];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -500,7 +501,8 @@ app.get('/logout', function (req, res) {
 app.get('/settings',function(req,res){
 	if(req.session.username) {
 
-		var ll = require('./length.json');
+		// var ll = require('./length.json');
+		var ll = slength;
 
 		client.get({
 		  index: 'app_config',
@@ -513,7 +515,7 @@ app.get('/settings',function(req,res){
 			} else {
 				var l = response['_source']['length'];
 				console.log(l)
-		  		res.status(200).render( 'settings' ,{status:'',cc:'',message:'',length:ll['length']});
+		  		res.status(200).render( 'settings' ,{status:'',cc:'',message:'',length:ll});
 			}
 
 		});
@@ -573,7 +575,11 @@ app.post('/changepassword', async function(req,res){
 
 
 app.post('/updatelength', async function(req,res){
+	
 	if(req.session.username) {
+		slength = req.body.length;
+		console.log(slength)
+
 		var length = req.body.length;
 		var dBody = {};
 		dBody['length'] = length;
@@ -1158,11 +1164,12 @@ async function getlength() {
 app.get('/', async function(req,res){
 
 	// var length = await getlength();
-	var dt = require('./length.json');
+
+	// var dt = require('./length.json');
 
 	// console.log(dt);
 
-	var length = dt['length'];
+	var length = slength;
 	
 	// console.log("This is length:"+length);
 	var q_ori = req.query.q;
