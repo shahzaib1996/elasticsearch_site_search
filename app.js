@@ -465,7 +465,7 @@ app.post('/i-login',function(req,res){
 	}, function (error, response) {
 		if( error ) {
 			console.log(error);
-	  		res.status(200).send("error- "+error);
+	  		res.status(200).send("Error - "+error);
 		} else {
 			console.log(response);
 			var un = response['_source']['username'];
