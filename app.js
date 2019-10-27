@@ -430,30 +430,30 @@ app.get('/app/init', async function(req,res){
 		}, function(err) {
 			if( err ) {
 				console.log(err);
-				res.redirect('/login');
+				res.redirect('/i-login');
 
 			} else {
-				res.redirect('/login');
+				res.redirect('/i-login');
 			}
 		});
 
 	} else {
 		console.log("Already app init!")
-		res.redirect('/login');
+		res.redirect('/i-login');
 	}
 
 });
 
 
-app.get('/login',function(req,res){
+app.get('/i-login',function(req,res){
 	if(req.session.username) {
     	res.redirect('/webinsert');
   	} else {
-		res.render('login',{ status:'' });
+		res.render('/i-login',{ status:'' });
   	}
 })
 
-app.post('/login',function(req,res){
+app.post('/i-login',function(req,res){
 	
 	var username = req.body.username;
 	var password = req.body.password;
@@ -478,8 +478,8 @@ app.post('/login',function(req,res){
 				res.redirect('/webinsert'); 
 
 				}
-				else { res.render('login',{ status:'0' }); }
-			} else { res.render('login',{ status:'0' }); }
+				else { res.render('/i-login',{ status:'0' }); }
+			} else { res.render('/i-login',{ status:'0' }); }
 
 		}
 
@@ -491,7 +491,7 @@ app.post('/login',function(req,res){
 app.get('/logout', function (req, res) {
 
 	req.session.destroy(function(){
-	  res.redirect('/login');
+	  res.redirect('/i-login');
 	});
 
 })
@@ -519,7 +519,7 @@ app.get('/settings',function(req,res){
 		});
 
   	} else {
-		res.render('login',{ status:'' });
+		res.render('/i-login',{ status:'' });
   	}
 })
 
@@ -567,7 +567,7 @@ app.post('/changepassword', async function(req,res){
 		});
 
   	} else {
-		res.render('login',{ status:'',message:'' });
+		res.render('/i-login',{ status:'',message:'' });
   	}
 })
 
@@ -589,7 +589,7 @@ app.post('/updatelength', async function(req,res){
 				
 
   	} else {
-		res.render('login',{ status:'',message:'' });
+		res.render('/i-login',{ status:'',message:'' });
   	}
 })
 
@@ -597,7 +597,7 @@ app.post('/updatelength', async function(req,res){
 app.get('/webinsert',function(req,res){
 	console.log(req.session.username);
 	if(!(req.session.username)) {
-    	res.redirect('/login');
+    	res.redirect('/i-login');
   	} else {
 
 
@@ -1528,8 +1528,13 @@ app.post('/single/web/delete', async function(req,res){
 
 app.get('/stats', function(req,res){
 
-	res.render('search_stats');
-	  
+	if(!(req.session.username)) {
+    	res.redirect('/i-login');
+  	} else {
+
+		res.render('search_stats');
+	
+	}
 })
 
 app.post('/stats/fetch', function(req,res){
