@@ -217,9 +217,9 @@ async function automatic_sitemap_reindex() {
 
 
 //Cron job Function
- cron.schedule("0 5 * * *", async function() {
+ cron.schedule("0 0 0 * * *", async function() {
  		automatic_sitemap_reindex().then(console.log); // 1
-      	console.log("Running a task every day 5 AM"); 
+      	console.log("Running a task every day 12 AM"); 
  });
 
 
