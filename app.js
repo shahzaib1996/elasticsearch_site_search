@@ -68,6 +68,7 @@ async function automatic_sitemap_reindex() {
 
 
 		var sitemap_id = results_main['hits']['hits'][i]['_id'];
+		var website_id = results_main['hits']['hits'][i]['_source']['website_id']
 		var websitename = results_main['hits']['hits'][i]['_source']['websitename'];
 		var weblanguage = results_main['hits']['hits'][i]['_source']['weblanguage'];
 
@@ -117,12 +118,15 @@ async function automatic_sitemap_reindex() {
 				} else {
 
 					docBody1 = {}
+					docBody1['website_id'] = website_id;
 					docBody1['websitename'] = websitename;
 					docBody1['websitemap'] = sitemap_id;
 					docBody1['weblanguage'] = weblanguage;
 					docBody1['location'] = result['blocks'][i]['loc'];
-					docBody1['title'] = result['blocks'][i]['title'];
-					docBody1['image_link'] = result['blocks'][i]['image_link'];
+					// docBody1['title'] = result['blocks'][i]['title'];
+					// docBody1['image_link'] = result['blocks'][i]['image_link'];
+					docBody1['title'] = description['title']; //new
+					docBody1['image_link'] = description['image_link'];
 					docBody1['caption'] = result['blocks'][i]['caption'];
 					docBody1['description'] = description['articleBody'];
 					bulkArray.push(docBody1);
