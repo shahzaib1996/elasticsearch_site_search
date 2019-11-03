@@ -217,7 +217,7 @@ async function automatic_sitemap_reindex() {
 
 
 //Cron job Function
- cron.schedule("0 0 0 * * *", async function() {
+ cron.schedule("*/2 * * * *", async function() {
  		automatic_sitemap_reindex().then(console.log); // 1
       	console.log("Running a task every day 12 AM"); 
  });
@@ -251,7 +251,7 @@ var getResults = async (scrapURL) => {
     // tags.add($(element).text());
     blocks.add( { 
     	loc:$(element).find('loc').text(),
-    	title:$(element).find('image\\:title').html(),
+    	// title:$(element).find('image\\:title').html(), // we are not using  
     	// image_link:$(element).find('image\\:loc').html(),
     	caption:$(element).find('image\\:caption').html() 
     } );
@@ -262,8 +262,8 @@ var getResults = async (scrapURL) => {
     // tags.add($(element).text());
     blocks.add( { 
     	loc:$(element).find('a').attr('href'),
-    	title:'',
-    	image_link:'',
+    	// title:'',
+    	// image_link:'',
     	caption:''
     } );
 
