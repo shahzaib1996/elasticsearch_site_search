@@ -66,7 +66,6 @@ async function automatic_sitemap_reindex() {
 
 	  		console.log('Start Sitemap Reindex '+results_main['hits']['hits'][i]['_id']);
 
-
 		var sitemap_id = results_main['hits']['hits'][i]['_id'];
 		var website_id = results_main['hits']['hits'][i]['_source']['website_id']
 		var websitename = results_main['hits']['hits'][i]['_source']['websitename'];
@@ -94,7 +93,6 @@ async function automatic_sitemap_reindex() {
 		console.log("========");
 
 		setTimeout( async function(){
-
 
 		//Web crawling / reindex start
 
@@ -145,7 +143,6 @@ async function automatic_sitemap_reindex() {
 
 
 		// Web crawling / reindex end
-
 
 		//Website sitemap summary updating
 		var docBody = {};
@@ -207,7 +204,6 @@ async function automatic_sitemap_reindex() {
 		}
 	  	//reindex End
 	    
-
 	  })
   .catch(error => {
 
@@ -218,7 +214,7 @@ async function automatic_sitemap_reindex() {
 
 //Cron job Function
  cron.schedule("0 0 0 * * *", async function() {
- 		automatic_sitemap_reindex().then(console.log); // 1
+ 		// automatic_sitemap_reindex().then(console.log); // 1
       	console.log("Running a task every day 12 AM"); 
  });
 
@@ -268,7 +264,6 @@ var getResults = async (scrapURL) => {
     } );
 
   });
-
 
 
   return {
@@ -388,7 +383,6 @@ var getResults_single_scrap = async (scrapURL) => {
   	image_link = $('body').find('img').attr('src');
   }
 
-
   return {
   	title:title,
   	caption:caption,
@@ -490,7 +484,6 @@ app.post('/i-login',function(req,res){
 		}
 
 	});
-
 
 })
 
@@ -947,9 +940,7 @@ app.post('/website/add/sitemap', async function(req,res){
 					docBody['websitemap'] = complete_url;
 					docBody['weblanguage'] = weblanguage;
 					docBody['location'] = result['blocks'][i]['loc'];
-					// docBody['title'] = result['blocks'][i]['title']; //old
 					docBody['title'] = description['title']; //new
-					// docBody['image_link'] = result['blocks'][i]['image_link']; //old
 					docBody['image_link'] = description['image_link'];
 					docBody['caption'] = result['blocks'][i]['caption'];
 					docBody['description'] = description['articleBody'];
@@ -1061,7 +1052,6 @@ if( result['invalid'] == 'invalid' ) {
 			docBody1['weblanguage'] = weblanguage;
 			docBody1['location'] = result['blocks'][i]['loc'];
 			docBody1['title'] = description['title']; //new
-			// docBody1['image_link'] = result['blocks'][i]['image_link']; //old
 			docBody1['image_link'] = description['image_link'];
 			docBody1['caption'] = result['blocks'][i]['caption'];
 			docBody1['description'] = description['articleBody'];
@@ -1224,9 +1214,7 @@ app.get('/', async function(req,res){
 	  		delete results['hits']['hits'][i]['_source']['websitemap'];
 	  	}
 
-
 	    save_search_stats(q,results['hits']['total']['value'],label	)
-	    // res.status(200).render('search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 	    res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 	    
 	  })
@@ -1277,8 +1265,6 @@ app.post('/search_page_ajax', async function(req,res){
 	var page = req.body.page;
 	var length = req.body.length;
 
-	
-
 	searchBody = {
 		"from" : 0,
 		"size" : 10,
@@ -1318,8 +1304,7 @@ app.post('/search_page_ajax', async function(req,res){
 	  .then(results => {
 	    
 	    res.status(200).send({ data:results['hits']['hits'],page:p_no });
-	    // res.status(200).send({ data:results,page:p_no });
-	    
+
 	  })
 	  .catch(console.error);
 
@@ -1406,7 +1391,6 @@ app.post('/single/site/add', async function(req,res){
 
 		//scrap sitemap
 		var result = await getResults_single_scrap(complete_url);
-	  	// res.send( result['blocks'] );
 
 		console.log(result);
 		if( result['invalid'] == 'invalid' ) {
@@ -1429,8 +1413,7 @@ app.post('/single/site/add', async function(req,res){
 		var sm_summ = await client.index({
 			index: 'document_songs',
 			type: 'song_block',
-			// id: uuidv1(),	
-			// id: ,	
+			// id: uuidv1(),		
 			body: smBody
 		}, function(err) {
 			if( err ) {
@@ -1442,7 +1425,6 @@ app.post('/single/site/add', async function(req,res){
 		});
 
 		} //end of invalid sitemap url check
-
 
 	} // end od else of check sitemap exist or not
 
