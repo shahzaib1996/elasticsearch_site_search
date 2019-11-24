@@ -93,7 +93,7 @@
 </nav>
 </div>
 <div id=mainColumn>
-<div class="main-loader-div" style="height: 100vh;width: 100%; position: absolute;z-index: 9999;background: #ffffffe8;text-align: center;">
+<div class="main-loader-div" style="height: 100vh;width: 100%; position: absolute;z-index: 9999;background: #ffffff;text-align: center;padding-top: 10%;">
 <img src="https://jeobi.com/images/loading.gif">
 </div>
 <div class=resultsMainRegion>
@@ -245,7 +245,7 @@ row+=`</a>
                               
                             </div>
           `;$('#append-results').append(row);})
-setTimeout(function(){ $('.main-loader-div').addClass('hide'); }, 1000 ); }else{$('#append-results').empty();$('#noresult-box').show(); $('.main-loader-div').addClass('hide'); }}else{$('#re-sum').show();$('#re-sum').html(" About 0 results (0 milliseconds) ");$('#append-results').empty();$('#noresult-box').show();$('.main-loader-div').addClass('hide');}});
+setTimeout(function(){ $('.main-loader-div').addClass('hide'); }, 100 ); }else{$('#append-results').empty();$('#noresult-box').show(); $('.main-loader-div').addClass('hide'); }}else{$('#re-sum').show();$('#re-sum').html(" About 0 results (0 milliseconds) ");$('#append-results').empty();$('#noresult-box').show();$('.main-loader-div').addClass('hide');}});
 </script>
 </body>
 </html>

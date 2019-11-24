@@ -15,7 +15,7 @@ var client = new elasticsearch.Client({
 
 })
 require('array.prototype.flatmap').shim();
-const port = 80;
+const port = 807;
 
 const config = require('./config.json');
 var fs = require('fs');
