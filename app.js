@@ -1185,7 +1185,11 @@ app.get('/', async function(req,res){
 		"from" : 0,
 		"size" : size,
 	  	"query": { 
-		    "bool": { 
+		    "bool": {
+		    "should" : [
+	            { "term" : { "location" : q } },
+	            { "term" : { "title" : q } }
+	          ],
 		      "must": [
 		        { 
 		          "query_string" : {
