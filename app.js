@@ -1187,8 +1187,22 @@ app.get('/', async function(req,res){
 	  	"query": { 
 		    "bool": {
 		    "should" : [
-	            { "term" : { "location" : q } },
-	            { "term" : { "title" : q } }
+	            {
+	              "match": {
+	                "location": {
+	                  "query": q,
+	                  "boost": 10 
+	                }
+	              }
+		        },
+		        {
+	              "match": {
+	                "title": {
+	                  "query": q,
+	                  "boost": 5 
+	                }
+	              }
+	            }
 	          ],
 		      "must": [
 		        { 
