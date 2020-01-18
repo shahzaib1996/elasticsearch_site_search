@@ -248,12 +248,15 @@ var getResults = async (scrapURL) => {
   // image\\:image
   $("url").each((index, element) => {
     // tags.add($(element).text());
-    blocks.add( { 
-    	loc:$(element).find('loc').text(),
-    	// title:$(element).find('image\\:title').html(), // we are not using  
-    	// image_link:$(element).find('image\\:loc').html(),
-    	caption:$(element).find('image\\:caption').html() 
-    } );
+    console.log("Loc Loc Loc Loc Loc Loc -> "+ $(element).find('loc').text());
+    if( $(element).find('loc').text() != '' && $(element).find('loc').text() != null ) {
+	    blocks.add( { 
+	    	loc:$(element).find('loc').text(),
+	    	// title:$(element).find('image\\:title').html(), // we are not using  
+	    	// image_link:$(element).find('image\\:loc').html(),
+	    	caption:$(element).find('image\\:caption').html() 
+	    } );
+    }
 
   });
 
@@ -404,8 +407,8 @@ app.get("/testscrap", async function(req, res, next) {
 
 app.get('/app/init', async function(req,res){
 
-	var docBody = {};
-	var length = {};
+	let docBody = {};
+	let length = {};
 
 	if(app_init == false) {
 		app_init = true;
@@ -948,6 +951,8 @@ app.post('/website/add/sitemap', async function(req,res){
 						new_docBody['websitemap'] = complete_url;
 						new_docBody['weblanguage'] = req.body.language;
 
+						console.log("url number count --++--++ "+i);
+
 						new_docBody['location'] = result['blocks'][i]['loc'];
 						new_docBody['title'] = description['title']; //new
 						// docBody['image_link'] = description['image_link'];
@@ -1057,7 +1062,7 @@ if( result['invalid'] == 'invalid' ) {
 			if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
 						
 			} else {
-				console.log(description);
+				// console.log(description);
 				let reindex_docBody1 = {}
 				// docBody1['website_id'] = website_id;
 				// docBody1['websitename'] = websitename;
@@ -1067,6 +1072,9 @@ if( result['invalid'] == 'invalid' ) {
 				reindex_docBody1['websitename'] = req.body.websitename;
 				reindex_docBody1['websitemap'] = req.body.sitemap_id;
 				reindex_docBody1['weblanguage'] = req.body.weblanguage;
+
+				console.log("url number count --++--++ "+i);
+
 				reindex_docBody1['location'] = result['blocks'][i]['loc'];
 				reindex_docBody1['title'] = description['title']; //new
 				// docBody1['image_link'] = description['image_link'];
@@ -1182,7 +1190,7 @@ async function getlength() {
 
 // =SITEMAP Search Page START====================================================================
 
-app.get('/', async function(req,res){
+app.get('/x', async function(req,res){
 
 	// var length = await getlength();
 
