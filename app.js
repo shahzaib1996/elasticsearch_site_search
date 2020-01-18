@@ -15,6 +15,7 @@ var client = new elasticsearch.Client({
 
 })
 require('array.prototype.flatmap').shim();
+// const port = 807;
 const port = 80;
 
 const config = require('./config.json');
@@ -1042,14 +1043,14 @@ setTimeout( async function(){
 //scrap sitemap
 let result = await getResults(req.body.sitemap_id);
 	  	
-let docBody1 = {};
+// let docBody1 = {};
 		// elasticStore(inputArray);
 let bulkArray  = [];
 if( result['invalid'] == 'invalid' ) {
 	res.send("3"); // 3 = URL is invalid
 }else if( result ) {
 
-	for(i=0; i<result['blocks'].length;i++) {
+	for(var i=0; i<result['blocks'].length;i++) {
 
 		if( result['blocks'][i]['loc'] ){
 			let description = await getResults_single(result['blocks'][i]['loc']);
@@ -1057,22 +1058,22 @@ if( result['invalid'] == 'invalid' ) {
 						
 			} else {
 				console.log(description);
-				docBody1 = {}
+				let reindex_docBody1 = {}
 				// docBody1['website_id'] = website_id;
 				// docBody1['websitename'] = websitename;
 				// docBody1['websitemap'] = sitemap_id;
 				// docBody1['weblanguage'] = weblanguage;
-				docBody1['website_id'] = req.body.website_id;
-				docBody1['websitename'] = req.body.websitename;
-				docBody1['websitemap'] = req.body.sitemap_id;
-				docBody1['weblanguage'] = req.body.weblanguage;
-				docBody1['location'] = result['blocks'][i]['loc'];
-				docBody1['title'] = description['title']; //new
+				reindex_docBody1['website_id'] = req.body.website_id;
+				reindex_docBody1['websitename'] = req.body.websitename;
+				reindex_docBody1['websitemap'] = req.body.sitemap_id;
+				reindex_docBody1['weblanguage'] = req.body.weblanguage;
+				reindex_docBody1['location'] = result['blocks'][i]['loc'];
+				reindex_docBody1['title'] = description['title']; //new
 				// docBody1['image_link'] = description['image_link'];
-				docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
-				docBody1['caption'] = result['blocks'][i]['caption'];
-				docBody1['description'] = description['articleBody'];
-				bulkArray.push(docBody1);
+				reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+				reindex_docBody1['caption'] = result['blocks'][i]['caption'];
+				reindex_docBody1['description'] = description['articleBody'];
+				bulkArray.push(reindex_docBody1);
 
 			}
 		}
