@@ -10,13 +10,12 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	// host: 'localhost:9200'
-	host: 'http://51.158.104.138:9200/'
+	host: 'localhost:9200'
+	// host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
-// const port = 807;
-const port = 80;
+const port = 807;
 
 const config = require('./config.json');
 var fs = require('fs');
@@ -937,24 +936,24 @@ app.post('/website/add/sitemap', async function(req,res){
 						
 					} else {
 
-						let docBody = {}
+						let new_docBody = {}
 						// docBody['website_id'] = website_id;
 						// docBody['websitename'] = website_name;
 						// docBody['websitemap'] = complete_url;
 						// docBody['weblanguage'] = weblanguage;
 
-						docBody['website_id'] = req.body.website_id;
-						docBody['websitename'] = req.body.website_name;
-						docBody['websitemap'] = complete_url;
-						docBody['weblanguage'] = req.body.language;
+						new_docBody['website_id'] = req.body.website_id;
+						new_docBody['websitename'] = req.body.website_name;
+						new_docBody['websitemap'] = complete_url;
+						new_docBody['weblanguage'] = req.body.language;
 
-						docBody['location'] = result['blocks'][i]['loc'];
-						docBody['title'] = description['title']; //new
+						new_docBody['location'] = result['blocks'][i]['loc'];
+						new_docBody['title'] = description['title']; //new
 						// docBody['image_link'] = description['image_link'];
-						docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
-						docBody['caption'] = result['blocks'][i]['caption'];
-						docBody['description'] = description['articleBody'];
-						bulkArray.push(docBody);
+						new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+						new_docBody['caption'] = result['blocks'][i]['caption'];
+						new_docBody['description'] = description['articleBody'];
+						bulkArray.push(new_docBody);
 						
 					}
 				}
@@ -1015,7 +1014,7 @@ console.log(req.body);
 // console.log("WEbsite ID:"+ website_id);
 
 // delete old songs blocks
-  var checkdel = await client.deleteByQuery({
+  let checkdel = await client.deleteByQuery({
   index: 'document_songs',
   type: 'song_block',
   body: {
@@ -1190,14 +1189,14 @@ app.get('/', async function(req,res){
 
 	// console.log(dt);
 
-	var length = slength;
+	let length = slength;
 	
 	// console.log("This is length:"+length);
-	var q_ori = req.query.q;
-	var q = req.query.q;
-	var label = req.query.label;
+	let q_ori = req.query.q;
+	let q = req.query.q;
+	let label = req.query.label;
 	// var length = req.query.length;
-	var size = 10;
+	let size = 10;
 
 	
 	length_str = 1;
@@ -1250,7 +1249,7 @@ app.get('/', async function(req,res){
 	console.log(searchBody['query']['bool']['filter']);
 	
 
-	var search_results = await search('document_songs', searchBody)
+	let search_results = await search('document_songs', searchBody)
 	  .then(results => {
 
 	  	for(i=0;i<results['hits']['hits'].length;i++) {
@@ -1281,16 +1280,16 @@ function save_search_stats(q,result_count,lang) {
 
 	console.log("Search stats");
 	
-	var docBody = {};
-	docBody['search_term'] = q;
-	docBody['result_count'] = result_count;
-	docBody['language'] = lang;
-	docBody['date_searched'] = new Date();
+	let statsDocBody = {};
+	statsDocBody['search_term'] = q;
+	statsDocBody['result_count'] = result_count;
+	statsDocBody['language'] = lang;
+	statsDocBody['date_searched'] = new Date();
 
 	client.index({
 		index: 'search_stats',
 		type: 'stats',	
-		body: docBody
+		body: statsDocBody
 	}, function(err) {
 		if( err ) {
 			console.log(err);
@@ -1388,10 +1387,10 @@ app.get('/single_entry',async function(req,res){
 
 app.post('/single/site/add', async function(req,res){
 
-	// var website_url = req.body.website_url;
-	var weblanguage = req.body.language;
+	// let website_url = req.body.website_url;
+	// let weblanguage = req.body.language;
 
-	let complete_url = req.body.website_url;
+	let single_complete_url = req.body.website_url;
 
 	let searchBody = {
 		"size" : 10,
@@ -1408,7 +1407,7 @@ app.post('/single/site/add', async function(req,res){
 		        {
 		          "term" : {
 		            "location.keyword" : {
-		              "value" : complete_url
+		              "value" : single_complete_url
 		            }
 		          }
 		        }
@@ -1434,7 +1433,7 @@ app.post('/single/site/add', async function(req,res){
 	} else {
 
 		//scrap sitemap
-		let result = await getResults_single_scrap(complete_url);
+		let result = await getResults_single_scrap(single_complete_url);
 
 		console.log(result);
 		if( result['invalid'] == 'invalid' ) {
@@ -1445,12 +1444,12 @@ app.post('/single/site/add', async function(req,res){
 		let date_ob = new Date();
 		let smBody = {};
 		smBody['websitemap'] = "manual";
-		smBody['location'] = complete_url;
+		smBody['location'] = single_complete_url;
 		// smBody['weblanguage'] = weblanguage; 
 		smBody['weblanguage'] = req.body.language; 
 		smBody['title'] = result['title']; 
 		// smBody['image_link'] = result['image_link'];
-		smBody['image_link'] = complete_url.split('/')[2]+result['image_link'];
+		smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
 		smBody['description'] = result['articleBody']; 
 		smBody['caption'] = result['caption']; 
 		smBody['date_inserted'] = date_ob;
@@ -1465,7 +1464,7 @@ app.post('/single/site/add', async function(req,res){
 			if( err ) {
 				console.log(err);
 			} else {
-				console.log("Web URL : "+complete_url+" has been crawled and added.");
+				console.log("Web URL : "+single_complete_url+" has been crawled and added.");
 				res.send("1");
 			}
 		});
@@ -1478,14 +1477,14 @@ app.post('/single/site/add', async function(req,res){
 
 app.post('/single/site/reindex', async function(req,res){
 
-var singleid = req.body.singleid;
-var location = req.body.location;
-var weblanguage = req.body.weblanguage;
-var submitted = req.body.submitted;
+// let singleid = req.body.singleid;
+// let location = req.body.location;
+// let weblanguage = req.body.weblanguage;
+// let submitted = req.body.submitted;
 
 
 //scrap sitemap
-		var result = await getResults_single_scrap(location);
+		let result = await getResults_single_scrap(req.body.location);
 
 		console.log(result);
 		if( result['invalid'] == 'invalid' ) {
@@ -1494,28 +1493,28 @@ var submitted = req.body.submitted;
 				
 
 		let date_ob = new Date();
-		smBody = {};
-		smBody['websitemap'] = "manual";
-		smBody['location'] = location;
-		smBody['weblanguage'] = weblanguage; 
-		smBody['title'] = result['title']; 
-		smBody['image_link'] = result['image_link'];
-		smBody['description'] = result['articleBody']; 
-		smBody['caption'] = result['caption'];
-		smBody['date_inserted'] = submitted;
-		smBody['last_read'] = date_ob;
+		let single_sm_body = {};
+		single_sm_body['websitemap'] = "manual";
+		single_sm_body['location'] = req.body.location;
+		single_sm_body['weblanguage'] = req.body.weblanguage; 
+		single_sm_body['title'] = result['title']; 
+		single_sm_body['image_link'] = result['image_link'];
+		single_sm_body['description'] = result['articleBody']; 
+		single_sm_body['caption'] = result['caption'];
+		single_sm_body['date_inserted'] = req.body.submitted;
+		single_sm_body['last_read'] = date_ob;
 
-		var sm_summ = await client.index({
+		let sm_summ = await client.index({
 			index: 'document_songs',
 			type: 'song_block',
 			// id: uuidv1(),
-			id: singleid,	
-			body: smBody
+			id: req.body.singleid,	
+			body: single_sm_body
 		}, function(err) {
 			if( err ) {
 				console.log(err);
 			} else {
-				console.log("Web URL : "+location+" has been crawled and added.");
+				console.log("Web URL : "+req.body.location+" has been crawled and added.");
 				res.send("1");
 			}
 		});
@@ -1527,10 +1526,10 @@ var submitted = req.body.submitted;
 
 app.post('/single/web/delete', async function(req,res){
 
-	var singleid = req.body.singleid;
+	let singleid = req.body.singleid;
 
 	// delete old songs blocks
-  var checkdel = await client.deleteByQuery({
+  let checkdel = await client.deleteByQuery({
 	  index: 'document_songs',
 	  type: 'song_block',
 	  body: {
