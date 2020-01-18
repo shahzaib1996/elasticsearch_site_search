@@ -10,12 +10,12 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	host: 'localhost:9200'
-	// host: 'http://51.158.104.138:9200/'
+	// host: 'localhost:9200'
+	host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
-const port = 807;
+const port = 80;
 
 const config = require('./config.json');
 var fs = require('fs');
