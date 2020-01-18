@@ -15,8 +15,7 @@ var client = new elasticsearch.Client({
 
 })
 require('array.prototype.flatmap').shim();
-// const port = 807;
-const port = 80;
+const port = 807;
 
 const config = require('./config.json');
 var fs = require('fs');
@@ -42,8 +41,7 @@ app.use(session({
   cookie: {  }
 }))
 
-var server = app.listen(port, () => console.log('App Listening on port '+port) );
-server.timeout = 1000 * 60 * 10;
+app.listen(port, () => console.log('App Listening on port '+port) );
 
 const cheerio = require("cheerio");
 const axios = require("axios");
@@ -68,14 +66,14 @@ async function automatic_sitemap_reindex() {
 
 	  		console.log('Start Sitemap Reindex '+results_main['hits']['hits'][i]['_id']);
 
-		let sitemap_id = results_main['hits']['hits'][i]['_id'];
-		let website_id = results_main['hits']['hits'][i]['_source']['website_id']
-		let websitename = results_main['hits']['hits'][i]['_source']['websitename'];
-		let weblanguage = results_main['hits']['hits'][i]['_source']['weblanguage'];
+		var sitemap_id = results_main['hits']['hits'][i]['_id'];
+		var website_id = results_main['hits']['hits'][i]['_source']['website_id']
+		var websitename = results_main['hits']['hits'][i]['_source']['websitename'];
+		var weblanguage = results_main['hits']['hits'][i]['_source']['weblanguage'];
 
 
 		// delete old songs blocks
-		  let checkdel = client.deleteByQuery({
+		  var checkdel = client.deleteByQuery({
 		  index: 'document_songs',
 		  type: 'song_block',
 		  body: {
@@ -99,11 +97,11 @@ async function automatic_sitemap_reindex() {
 		//Web crawling / reindex start
 
 		//scrap sitemap
-		let result = await getResults(sitemap_id);
+		var result = await getResults(sitemap_id);
 			  	
-		let docBody1 = {};
+		var docBody1 = {};
 				// elasticStore(inputArray);
-		let bulkArray  = [];
+		var bulkArray  = [];
 		if( result['invalid'] == 'invalid' ) {
 			// res.send("3"); // 3 = URL is invalid
 			console.log("Sitemap Invalid");
@@ -117,7 +115,7 @@ async function automatic_sitemap_reindex() {
 							
 				} else {
 
-					let docBody1 = {}
+					docBody1 = {}
 					docBody1['website_id'] = website_id;
 					docBody1['websitename'] = websitename;
 					docBody1['websitemap'] = sitemap_id;
@@ -126,8 +124,7 @@ async function automatic_sitemap_reindex() {
 					// docBody1['title'] = result['blocks'][i]['title'];
 					// docBody1['image_link'] = result['blocks'][i]['image_link'];
 					docBody1['title'] = description['title']; //new
-					// docBody1['image_link'] = description['image_link'];
-					docBody1['image_link'] = sitemap_id.split('/')[2]+description['image_link'];
+					docBody1['image_link'] = description['image_link'];
 					docBody1['caption'] = result['blocks'][i]['caption'];
 					docBody1['description'] = description['articleBody'];
 					bulkArray.push(docBody1);
@@ -138,7 +135,7 @@ async function automatic_sitemap_reindex() {
 					//Insert Blocks
 		runInsertSitemapScrap(bulkArray).catch(console.log);
 					
-		let itemsInserted = bulkArray.length;
+		var itemsInserted = bulkArray.length;
 
 		  console.log("***************");
 		  console.log(itemsInserted+" --- "+bulkArray.length);
@@ -148,13 +145,13 @@ async function automatic_sitemap_reindex() {
 		// Web crawling / reindex end
 
 		//Website sitemap summary updating
-		let docBody = {};
-		// let website_id = ''; 
-		// let websitename = ''; 
-		// let websitemap = '';
-		// let sm_endpoint = '';
-		// let language = '';
-		// let date_inserted = '';
+		var docBody = {};
+		var website_id = ''; 
+		var websitename = ''; 
+		var websitemap = '';
+		var sm_endpoint = '';
+		var language = '';
+		var date_inserted = '';
 
 		//getting sitemap summary from sitemap
 		await client.get({
@@ -225,7 +222,7 @@ async function automatic_sitemap_reindex() {
 var fetchData = async (scrapURL) => {
   
   	try {
-    let result = await axios.get(scrapURL);
+    var result = await axios.get(scrapURL);
     // Success
     // console.log(result);
   	return cheerio.load(result.data);
@@ -238,11 +235,11 @@ var fetchData = async (scrapURL) => {
 
 //Scrap Sitemap
 var getResults = async (scrapURL) => {
-  let blocks = new Set();
+  var blocks = new Set();
   
-  let $ = await fetchData(scrapURL);
+  var $ = await fetchData(scrapURL);
 
-  let invalid = $("invalid").html();
+  var invalid = $("invalid").html();
   console.log($("invalid").html());
   
   // image\\:image
@@ -257,16 +254,16 @@ var getResults = async (scrapURL) => {
 
   });
 
-  // $("tr").each((index, element) => {
-  //   // tags.add($(element).text());
-  //   blocks.add( { 
-  //   	loc:$(element).find('a').attr('href'),
-  //   	// title:'',
-  //   	// image_link:'',
-  //   	caption:''
-  //   } );
+  $("tr").each((index, element) => {
+    // tags.add($(element).text());
+    blocks.add( { 
+    	loc:$(element).find('a').attr('href'),
+    	// title:'',
+    	// image_link:'',
+    	caption:''
+    } );
 
-  // });
+  });
 
 
   return {
@@ -280,7 +277,7 @@ var getResults = async (scrapURL) => {
 var fetchData_single = async (scrapURL) => {
   
   	try {
-    let result = await axios.get(scrapURL);
+    var result = await axios.get(scrapURL);
     // Success
     // console.log(result);
   	return cheerio.load(result.data);
@@ -294,12 +291,12 @@ var fetchData_single = async (scrapURL) => {
 //Scrap Sitemap
 var getResults_single = async (scrapURL) => {
 
-  let articleBody = '';
-  let title = '';
+  var articleBody = '';
+  var title = '';
 
-  let $ = await fetchData_single(scrapURL);
+  var $ = await fetchData_single(scrapURL);
 
-  let invalid = $("invalid").html();
+  var invalid = $("invalid").html();
 
   articleBody = $('body').find('div[itemprop=articleBody]').text();
   image_link = $('body').find('img[itemprop=image]').attr('src');
@@ -337,7 +334,7 @@ var getResults_single = async (scrapURL) => {
 var fetchData_single_scrap = async (scrapURL) => {
 
   	try {
-    let result = await axios.get(scrapURL);
+    var result = await axios.get(scrapURL);
     // Success
     // console.log(result);
   	return cheerio.load(result.data);
@@ -351,15 +348,15 @@ var fetchData_single_scrap = async (scrapURL) => {
 //Scrap Sitemap
 var getResults_single_scrap = async (scrapURL) => {
   // var block_single = new Set();\
-  let articleBody = '';
-  let title = '';
-  let caption = '';
-  let image_link = '';
+  var articleBody = '';
+  var title = '';
+  var caption = '';
+  var image_link = '';
 
   
-  let $ = await fetchData_single_scrap(scrapURL);
+  var $ = await fetchData_single_scrap(scrapURL);
 
-  let invalid = $("invalid").html();
+  var invalid = $("invalid").html();
 
   articleBody = $('body').find('div[itemprop=articleBody]').text();
   image_link = $('body').find('img[itemprop=image]').attr('src');
@@ -837,13 +834,13 @@ app.post('/website/sitemaps', async function(req,res){
 
 async function runInsertSitemapScrap (bulkArray) {
 
-  let dataset = bulkArray;
+  var dataset = bulkArray;
 
-  let body = dataset.flatMap(doc => [{ index: { _index: 'document_songs', _type: 'song_block' } }, doc])
+  var body = dataset.flatMap(doc => [{ index: { _index: 'document_songs', _type: 'song_block' } }, doc])
   // const body = dataset;
 
   // const { body: bulkResponse } = await client.bulk({ refresh: true, body })
-  let bulkInsertResponse = await client.bulk({ refresh: true, body })
+  var bulkInsertResponse = await client.bulk({ refresh: true, body })
 
   console.log(bulkInsertResponse['items'].length);
 
@@ -883,14 +880,14 @@ app.post('/website/smtest', async function(req,res){
 
 app.post('/website/add/sitemap', async function(req,res){
 
-	// var website_id = req.body.website_id;
-	// var website_name = req.body.website_name;
-	// var sitemap_ep = req.body.sitemap_ep;
-	// var weblanguage = req.body.language;
+	var website_id = req.body.website_id;
+	var website_name = req.body.website_name;
+	var sitemap_ep = req.body.sitemap_ep;
+	var weblanguage = req.body.language;
 
-	console.log("WEbsite ID:"+ req.body.website_id);
+	console.log("WEbsite ID:"+ website_id);
 
-	let complete_url = req.body.website_name+req.body.sitemap_ep;
+	var complete_url = website_name+sitemap_ep;
 
 	let searchBody = {
 		"size" : 10,
@@ -903,8 +900,8 @@ app.post('/website/add/sitemap', async function(req,res){
 		}
 	};
 
-	let check_sitemap_data = [];
-	let check_sitemap = '';
+	var check_sitemap_data = [];
+	var check_sitemap = '';
 	check_sitemap = await search('website_sitemaps', searchBody)
 	  .then(results => {
 	    
@@ -919,11 +916,11 @@ app.post('/website/add/sitemap', async function(req,res){
 	} else {
 
 		//scrap sitemap
-		let result = await getResults(complete_url);
+		var result = await getResults(complete_url);
 	  	
-		let docBody = {};
+		var docBody = {};
 		// elasticStore(inputArray);
-		let bulkArray  = [];
+		var bulkArray  = [];
 		if( result['invalid'] == 'invalid' ) {
 			res.send("3"); // 3 = URL is invalid
 		}else if( result ) {
@@ -931,32 +928,24 @@ app.post('/website/add/sitemap', async function(req,res){
 
 				// articleBody
 				//scrap single url
-				if(result['blocks'][i]['loc']){
-					let description = await getResults_single(result['blocks'][i]['loc']);
-					if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
-						
-					} else {
+				var description = await getResults_single(result['blocks'][i]['loc']);
 
-						let docBody = {}
-						// docBody['website_id'] = website_id;
-						// docBody['websitename'] = website_name;
-						// docBody['websitemap'] = complete_url;
-						// docBody['weblanguage'] = weblanguage;
+				if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
+					
+				} else {
 
-						docBody['website_id'] = req.body.website_id;
-						docBody['websitename'] = req.body.website_name;
-						docBody['websitemap'] = complete_url;
-						docBody['weblanguage'] = req.body.language;
-
-						docBody['location'] = result['blocks'][i]['loc'];
-						docBody['title'] = description['title']; //new
-						// docBody['image_link'] = description['image_link'];
-						docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
-						docBody['caption'] = result['blocks'][i]['caption'];
-						docBody['description'] = description['articleBody'];
-						bulkArray.push(docBody);
-						
-					}
+					docBody = {}
+					docBody['website_id'] = website_id;
+					docBody['websitename'] = website_name;
+					docBody['websitemap'] = complete_url;
+					docBody['weblanguage'] = weblanguage;
+					docBody['location'] = result['blocks'][i]['loc'];
+					docBody['title'] = description['title']; //new
+					docBody['image_link'] = description['image_link'];
+					docBody['caption'] = result['blocks'][i]['caption'];
+					docBody['description'] = description['articleBody'];
+					bulkArray.push(docBody);
+					
 				}
 
 			}
@@ -964,19 +953,19 @@ app.post('/website/add/sitemap', async function(req,res){
 			//Insert Blocks
 			runInsertSitemapScrap(bulkArray).catch(console.log);
 			
-		let itemsInserted = bulkArray.length;
+		var itemsInserted = bulkArray.length;
 		let date_ob = new Date();
-		let smBody = {};
-		smBody['website_id'] = req.body.website_id;
-		smBody['websitename'] = req.body.website_name; 
+		smBody = {};
+		smBody['website_id'] = website_id;
+		smBody['websitename'] = website_name; 
 		smBody['websitemap'] = complete_url; 
-		smBody['sm_endpoint'] = req.body.sitemap_ep;
-		smBody['weblanguage'] = req.body.language;
+		smBody['sm_endpoint'] = sitemap_ep;
+		smBody['weblanguage'] = weblanguage;
 		smBody['items_discovered'] = itemsInserted; 
 		smBody['date_inserted'] = date_ob;
 		smBody['last_read'] = date_ob;
 
-		let sm_summ = await client.index({
+		var sm_summ = await client.index({
 			index: 'website_sitemaps',
 			type: 'sitemaps_summary',
 			// id: uuidv1(),	
@@ -1004,15 +993,13 @@ app.post('/website/add/sitemap', async function(req,res){
 
 app.post('/sitemap/reindex', async function(req,res){
 
-console.log("WEbsite ID: ");
-console.log(req.body);
 
-// let sitemap_id = req.body.sitemap_id;
-// let websitename = req.body.websitename;
-// let weblanguage = req.body.weblanguage;
-// let website_id = req.body.website_id;
+var sitemap_id = req.body.sitemap_id;
+var websitename = req.body.websitename;
+var weblanguage = req.body.weblanguage;
+var website_id = req.body.website_id;
 	
-// console.log("WEbsite ID:"+ website_id);
+console.log("WEbsite ID:"+ website_id);
 
 // delete old songs blocks
   var checkdel = await client.deleteByQuery({
@@ -1022,7 +1009,7 @@ console.log(req.body);
     query: {
     	term : {
 		      "websitemap.keyword" : {
-		        "value" : req.body.sitemap_id
+		        "value" : sitemap_id
 		      }
 		    }
     }   
@@ -1041,106 +1028,93 @@ setTimeout( async function(){
 //Web crawling / reindex start
 
 //scrap sitemap
-let result = await getResults(req.body.sitemap_id);
+var result = await getResults(sitemap_id);
 	  	
-let docBody1 = {};
+var docBody1 = {};
 		// elasticStore(inputArray);
-let bulkArray  = [];
+var bulkArray  = [];
 if( result['invalid'] == 'invalid' ) {
 	res.send("3"); // 3 = URL is invalid
 }else if( result ) {
 
 	for(i=0; i<result['blocks'].length;i++) {
 
-		if( result['blocks'][i]['loc'] ){
-			let description = await getResults_single(result['blocks'][i]['loc']);
-			if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
-						
-			} else {
-				console.log(description);
-				docBody1 = {}
-				// docBody1['website_id'] = website_id;
-				// docBody1['websitename'] = websitename;
-				// docBody1['websitemap'] = sitemap_id;
-				// docBody1['weblanguage'] = weblanguage;
-				docBody1['website_id'] = req.body.website_id;
-				docBody1['websitename'] = req.body.websitename;
-				docBody1['websitemap'] = req.body.sitemap_id;
-				docBody1['weblanguage'] = req.body.weblanguage;
-				docBody1['location'] = result['blocks'][i]['loc'];
-				docBody1['title'] = description['title']; //new
-				// docBody1['image_link'] = description['image_link'];
-				docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
-				docBody1['caption'] = result['blocks'][i]['caption'];
-				docBody1['description'] = description['articleBody'];
-				bulkArray.push(docBody1);
+		var description = await getResults_single(result['blocks'][i]['loc']);
 
-			}
+		if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
+					
+		} else {
+
+			docBody1 = {}
+			docBody1['website_id'] = website_id;
+			docBody1['websitename'] = websitename;
+			docBody1['websitemap'] = sitemap_id;
+			docBody1['weblanguage'] = weblanguage;
+			docBody1['location'] = result['blocks'][i]['loc'];
+			docBody1['title'] = description['title']; //new
+			docBody1['image_link'] = description['image_link'];
+			docBody1['caption'] = result['blocks'][i]['caption'];
+			docBody1['description'] = description['articleBody'];
+			bulkArray.push(docBody1);
+
 		}
 	}
 
 			//Insert Blocks
 runInsertSitemapScrap(bulkArray).catch(console.log);
 			
-let itemsInserted = bulkArray.length;
+var itemsInserted = bulkArray.length;
 
-console.log("***************");
-console.log(itemsInserted+" --- "+bulkArray.length);
-console.log("***************");
+  console.log("***************");
+  console.log(itemsInserted+" --- "+bulkArray.length);
+  console.log("***************");
 
 
 // Web crawling / reindex end
 
 
 //Website sitemap summary updating
-let docBody_reindex_summary = {};
-// let website_id = ''; 
-// let websitename = ''; 
-// let websitemap = '';
-// let sm_endpoint = '';
-// let language = '';
-// let date_inserted = '';
+var docBody = {};
+var website_id = ''; 
+var websitename = ''; 
+var websitemap = '';
+var sm_endpoint = '';
+var language = '';
+var date_inserted = '';
 
 //getting sitemap summary from sitemap
 await client.get({
 	  index: 'website_sitemaps',
 	  type: 'sitemaps_summary',
-	  id: req.body.sitemap_id
+	  id: sitemap_id
 	}, function (error, response) {
 		if( error ) {
-			console.log("error aya ha live 1101 par");
 			console.log(error);
 
 		} else {
 			// var doc_id = response['_id'];
-			console.log("old sitemap summary ===>");
 			console.log(response);
-			console.log("old sitemap summary end <===");
 			
-			docBody_reindex_summary['websitemap']= req.body.sitemap_id; //complete url
-			docBody_reindex_summary['sm_endpoint']= response['_source']['sm_endpoint'];
-			docBody_reindex_summary['website_id']= response['_source']['website_id'];
-			docBody_reindex_summary['websitename']= response['_source']['websitename'];
-			docBody_reindex_summary['weblanguage']= response['_source']['weblanguage'];
-			docBody_reindex_summary['date_inserted']= response['_source']['date_inserted'];
-			docBody_reindex_summary['last_read']= new Date();
-			docBody_reindex_summary['items_discovered']= itemsInserted;
-
-			console.log(docBody_reindex_summary);
+			docBody['websitemap']= sitemap_id; //complete url
+			docBody['sm_endpoint']= response['_source']['sm_endpoint'];
+			docBody['website_id']= response['_source']['website_id'];
+			docBody['websitename']= response['_source']['websitename'];
+			docBody['weblanguage']= response['_source']['weblanguage'];
+			docBody['date_inserted']= response['_source']['date_inserted'];
+			docBody['last_read']= new Date();
+			docBody['items_discovered']= itemsInserted;
 
 			client.index({
 					index: 'website_sitemaps',
 					type: 'sitemaps_summary',
-					id: req.body.sitemap_id,	
-					body: docBody_reindex_summary
+					id: sitemap_id,	
+					body: docBody
 				}, function(err) {
 					if( err ) {
-						console.log("Reindexing line 1115 par error aya!");
 						console.log(err);
 						res.status(500).send(err);
 
 					} else {
-						console.log("Reindexing line 1121 success!");
 						res.send('1');
 					}
 				});
@@ -1388,10 +1362,10 @@ app.get('/single_entry',async function(req,res){
 
 app.post('/single/site/add', async function(req,res){
 
-	// var website_url = req.body.website_url;
+	var website_url = req.body.website_url;
 	var weblanguage = req.body.language;
 
-	let complete_url = req.body.website_url;
+	var complete_url = website_url;
 
 	let searchBody = {
 		"size" : 10,
@@ -1417,8 +1391,8 @@ app.post('/single/site/add', async function(req,res){
 		}
 	};
 
-	let check_sitemap_data = 0;
-	let check_sitemap = '';
+	var check_sitemap_data = 0;
+	var check_sitemap = '';
 	check_sitemap = await search('document_songs', searchBody)
 	  .then(results => {
 	    
@@ -1434,7 +1408,7 @@ app.post('/single/site/add', async function(req,res){
 	} else {
 
 		//scrap sitemap
-		let result = await getResults_single_scrap(complete_url);
+		var result = await getResults_single_scrap(complete_url);
 
 		console.log(result);
 		if( result['invalid'] == 'invalid' ) {
@@ -1443,20 +1417,18 @@ app.post('/single/site/add', async function(req,res){
 			
 
 		let date_ob = new Date();
-		let smBody = {};
+		smBody = {};
 		smBody['websitemap'] = "manual";
 		smBody['location'] = complete_url;
-		// smBody['weblanguage'] = weblanguage; 
-		smBody['weblanguage'] = req.body.language; 
+		smBody['weblanguage'] = weblanguage; 
 		smBody['title'] = result['title']; 
-		// smBody['image_link'] = result['image_link'];
-		smBody['image_link'] = complete_url.split('/')[2]+result['image_link'];
+		smBody['image_link'] = result['image_link'];
 		smBody['description'] = result['articleBody']; 
 		smBody['caption'] = result['caption']; 
 		smBody['date_inserted'] = date_ob;
 		smBody['last_read'] = date_ob;
 
-		let sm_summ = await client.index({
+		var sm_summ = await client.index({
 			index: 'document_songs',
 			type: 'song_block',
 			// id: uuidv1(),		
