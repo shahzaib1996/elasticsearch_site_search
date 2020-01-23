@@ -148,6 +148,35 @@
         </div>
       </div>
 
+
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/maintenance_status" method="POST">
+            <div class="row" >
+              <h3 class="op6"> Maintenance </h3>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Mode</label>
+                  <select class="form-control" name="maintenance" id="maintenance" required>
+                    <option hidden selected value="<%= maintenance%>"> <script> document.write("<%= maintenance%>"==1?'Enable':'Disabled') </script> </option>
+                    <option value="1">Enable</option>
+                    <option value="0">Disabled</option>
+                  </select>
+                </div>
+              </div>
+              
+              
+            </div>
+              
+            <div class="row">
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-info" name="submit" value="Update" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <br><br>
 
 
