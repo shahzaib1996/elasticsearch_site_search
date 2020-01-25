@@ -1217,68 +1217,67 @@ app.get('/', async function(req,res){
 		length_str = 1;
 		size = length
 		
-		
 		if( q ) {
-		// console.log("This is size:"+size);
-		q = q.toLowerCase();
-		searchBody = {
-			"from" : 0,
-			"size" : size,
-		  	"query": { 
-			    "bool": {
-			    "should" : [
-		            {
-		              "match": {
-		                "location": {
-		                  "query": q,
-		                  "boost": 10 
-		                }
-		              }
-			        },
-			        {
-		              "match": {
-		                "title": {
-		                  "query": q,
-		                  "boost": 5 
-		                }
-		              }
-		            }
-		          ],
-			      "must": [
-			        { 
-			          "query_string" : {
-			              "query" : "*"+q+"*"
-			          }
-			        }
-			      ]
-			      //dynamically place filter here
-			    }
+			// console.log("This is size:"+size);
+			q = q.toLowerCase();
+			searchBody = {
+				"from" : 0,
+				"size" : size,
+			  	"query": { 
+				    "bool": {
+					    "must" : [
+				            {
+				              "match": {
+				                "location": {
+				                  "query": q,
+				                  "boost": 5
+				                }
+				              }
+					        },
+					        {
+				              "match": {
+				                "title": {
+				                  "query": q,
+				                  "boost": 5 
+				                }
+				              }
+				            }
+				          ],
+					      "must": [
+					        { 
+					          "query_string" : {
+					              "query" : "*"+q+"*"
+					          }
+					        }
+					      ]
+				      //dynamically place filter here
+				    }
+				}
+			};
+
+			if( label ) {
+				searchBody['query']['bool']['filter'] = [];
+				searchBody['query']['bool']['filter'].push( { "term":  { "weblanguage": label }} );
 			}
-		};
 
-		if( label ) {
-			searchBody['query']['bool']['filter'] = [];
-			searchBody['query']['bool']['filter'].push( { "term":  { "weblanguage": label }} );
-		}
+			console.log(searchBody['query']['bool']['filter']);
+			
 
-		console.log(searchBody['query']['bool']['filter']);
-		
+			let search_results = await search('document_songs', searchBody)
+			  .then(results => {
 
-		let search_results = await search('document_songs', searchBody)
-		  .then(results => {
+			  	for(i=0;i<results['hits']['hits'].length;i++) {
+			  		delete results['hits']['hits'][i]['_source']['website_id'];
+			  		delete results['hits']['hits'][i]['_source']['websitemap'];
+			  	}
 
-		  	for(i=0;i<results['hits']['hits'].length;i++) {
-		  		delete results['hits']['hits'][i]['_source']['website_id'];
-		  		delete results['hits']['hits'][i]['_source']['websitemap'];
-		  	}
-
-		    save_search_stats(q,results['hits']['total']['value'],label	)
-		    res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
-		    
-		  })
-		  .catch(error => {
-		  	res.status(200).render('new_search_page', { data:[],q:q_ori,label:label,length_str:length_str } );
-		  });
+			    save_search_stats(q,results['hits']['total']['value'],label	)
+			    res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
+			    
+			  })
+			  .catch(error => {
+			  	res.status(200).render('new_search_page', { data:[],q:q_ori,label:label,length_str:length_str } );
+			  });
 
 		} else {
 			res.status(200).render('new_search_main',{ data:[] });
