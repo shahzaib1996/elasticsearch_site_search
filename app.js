@@ -1225,7 +1225,7 @@ app.get('/', async function(req,res){
 				"size" : size,
 			  	"query": { 
 				    "bool": {
-					    "must" : [
+					    "should" : [
 				            {
 				              "match": {
 				                "location": {
@@ -1242,8 +1242,7 @@ app.get('/', async function(req,res){
 				                }
 				              }
 				            }
-				          ],
-					      "must": [
+				          ,
 					        { 
 					          "query_string" : {
 					              "query" : "*"+q+"*"
@@ -1261,7 +1260,6 @@ app.get('/', async function(req,res){
 			}
 
 			console.log(searchBody['query']['bool']['filter']);
-			
 
 			let search_results = await search('document_songs', searchBody)
 			  .then(results => {
