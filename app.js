@@ -1230,7 +1230,7 @@ app.get('/', async function(req,res){
 				              "match": {
 				                "location": {
 				                  "query": q,
-				                  "boost": 5
+				                  // "boost": 5
 				                }
 				              }
 					        },
@@ -1238,16 +1238,26 @@ app.get('/', async function(req,res){
 				              "match": {
 				                "title": {
 				                  "query": q,
+				                  // "boost": 5 
+				                }
+				              }
+				            }
+				            ,
+				            {
+				              "match": {
+				                "description": {
+				                  "query": q,
 				                  "boost": 5 
 				                }
 				              }
 				            }
-				          ,
-					        { 
-					          "query_string" : {
-					              "query" : "*"+q+"*"
-					          }
-					        }
+				         //  ,
+					        // { 
+					        //   "query_string" : {
+					        //       "query" : "*"+q+"*",
+					        //       "boost": 5 
+					        //   }
+					        // }
 					      ]
 				      //dynamically place filter here
 				    }
