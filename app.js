@@ -26,6 +26,9 @@ var slength = lff['length'];
 var server_config = require('./server_config.json');
 var smaintenance_mode = server_config['maintenance'];
 
+var re_mod = require('./result_model.json');
+var sresult_model = re_mod['result_model'];
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs')
@@ -509,8 +512,9 @@ app.get('/settings',function(req,res){
 	if(req.session.username) {
 
 		// var ll = require('./length.json');
-		var ll = slength;
-		var mm = smaintenance_mode;
+		let ll = slength;
+		let mm = smaintenance_mode;
+		let rr = sresult_model;
 
 		client.get({
 		  index: 'app_config',
@@ -523,7 +527,7 @@ app.get('/settings',function(req,res){
 			} else {
 				var l = response['_source']['length'];
 				console.log(l)
-		  		res.status(200).render( 'settings' ,{status:'',cc:'',message:'',length:ll,maintenance:mm});
+		  		res.status(200).render( 'settings' ,{status:'',cc:'',message:'',length:ll,maintenance:mm,result_model:rr});
 			}
 
 		});
@@ -960,6 +964,14 @@ app.post('/website/add/sitemap', async function(req,res){
 						new_docBody['location'] = result['blocks'][i]['loc'];
 						new_docBody['title'] = description['title']; //new
 						// docBody['image_link'] = description['image_link'];
+
+						let brr = result['blocks'][i]['loc'].split('/');
+						if( brr[0] == 'https:' || brr[0] == 'http:' ) {
+						  new_docBody['image_link'] = description['image_link'];
+						} else {
+						  new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+						}
+
 						new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
 						new_docBody['caption'] = result['blocks'][i]['caption'];
 						new_docBody['description'] = description['articleBody'];
@@ -1077,12 +1089,20 @@ if( result['invalid'] == 'invalid' ) {
 				reindex_docBody1['websitemap'] = req.body.sitemap_id;
 				reindex_docBody1['weblanguage'] = req.body.weblanguage;
 
-				console.log("url number count --++--++ "+i);
+				console.log("url count --++-- "+i);
 
 				reindex_docBody1['location'] = result['blocks'][i]['loc'];
 				reindex_docBody1['title'] = description['title']; //new
-				// docBody1['image_link'] = description['image_link'];
-				reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+				// reindex_docBody1['image_link'] = description['image_link'];
+
+				let rerr = result['blocks'][i]['loc'].split('/');
+				if( rerr[0] == 'https:' || rerr[0] == 'http:' ) {
+				  reindex_docBody1['image_link'] = description['image_link'];
+				} else {
+				  reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+				}
+				// reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+				
 				reindex_docBody1['caption'] = result['blocks'][i]['caption'];
 				reindex_docBody1['description'] = description['articleBody'];
 				bulkArray.push(reindex_docBody1);
@@ -1218,6 +1238,9 @@ app.get('/', async function(req,res){
 		size = length
 		
 		if( q ) {
+
+			let search_result_page_model = (sresult_model==6)?'search_model_sixth':(sresult_model==5)?'search_model_fifth':(sresult_model==4)?'search_model_fourth':(sresult_model==3)?'search_model_third':(sresult_model==2)?'search_model_second':'search_model_first';
+
 			// console.log("This is size:"+size);
 			q = q.toLowerCase();
 			searchBody = {
@@ -1280,11 +1303,13 @@ app.get('/', async function(req,res){
 			  	}
 
 			    save_search_stats(q,results['hits']['total']['value'],label	)
-			    res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
+			    res.status(200).render(search_result_page_model, { data:results,q:q_ori,label:label,length_str:length_str } );
+			    // res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
 			    
 			  })
 			  .catch(error => {
-			  	res.status(200).render('new_search_page', { data:[],q:q_ori,label:label,length_str:length_str } );
+			  	res.status(200).render(search_result_page_model, { data:[],q:q_ori,label:label,length_str:length_str } );
+			  	// res.status(200).render('new_search_page', { data:[],q:q_ori,label:label,length_str:length_str } );
 			  });
 
 		} else {
@@ -1474,7 +1499,14 @@ app.post('/single/site/add', async function(req,res){
 		smBody['weblanguage'] = req.body.language; 
 		smBody['title'] = result['title']; 
 		// smBody['image_link'] = result['image_link'];
-		smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
+		let brr = result['image_link'].split('/');
+		if( brr[0] == 'https:' || brr[0] == 'http:' ) {
+		  smBody['image_link'] = result['image_link'];
+		} else {
+		  smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
+		}
+
+		// smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
 		smBody['description'] = result['articleBody']; 
 		smBody['caption'] = result['caption']; 
 		smBody['date_inserted'] = date_ob;
@@ -1523,7 +1555,15 @@ app.post('/single/site/reindex', async function(req,res){
 		single_sm_body['location'] = req.body.location;
 		single_sm_body['weblanguage'] = req.body.weblanguage; 
 		single_sm_body['title'] = result['title']; 
-		single_sm_body['image_link'] = result['image_link'];
+
+		let brr = result['image_link'].split('/');
+		if( brr[0] == 'https:' || brr[0] == 'http:' ) {
+		  single_sm_body['image_link'] = result['image_link'];
+		} else {
+		  single_sm_body['image_link'] = req.body.location.split('/')[2]+result['image_link'];
+		}
+
+		// single_sm_body['image_link'] = result['image_link'];
 		single_sm_body['description'] = result['articleBody']; 
 		single_sm_body['caption'] = result['caption'];
 		single_sm_body['date_inserted'] = req.body.submitted;
@@ -1782,8 +1822,8 @@ app.post('/maintenance_status', async function(req,res){
 		console.log(smaintenance_mode)
 
 		let maintenance_mode = req.body.maintenance;
-		let dBody = {};
-		dBody['maintenance'] = maintenance_mode;
+		// let dBody = {};
+		// dBody['maintenance'] = maintenance_mode;
 		
 		let json = '{ "maintenance":'+maintenance_mode+' }';
 		let jsonObj = JSON.parse(json);
@@ -1791,6 +1831,33 @@ app.post('/maintenance_status', async function(req,res){
 		let jsonContent = JSON.stringify(jsonObj);
 		let fs = require('fs');
 		fs.writeFile('./server_config.json', jsonContent, 'utf8', function(){
+			res.redirect('/settings');
+		});
+				
+
+  	} else {
+		res.render('login',{ status:'',message:'' });
+  	}
+})
+
+// ======== Maintenace Mode ============================================
+app.post('/result_model', async function(req,res){
+	
+	if(req.session.username) {
+		sresult_model = req.body.result_model;
+		console.log(sresult_model)
+
+		let result_model = req.body.result_model;
+		
+		// let dBody = {};
+		// dBody['maintenance'] = maintenance_mode;
+		
+		let json = '{ "result_model":'+result_model+' }';
+		let jsonObj = JSON.parse(json);
+		// stringify JSON Object
+		let jsonContent = JSON.stringify(jsonObj);
+		let fs = require('fs');
+		fs.writeFile('./result_model.json', jsonContent, 'utf8', function(){
 			res.redirect('/settings');
 		});
 				

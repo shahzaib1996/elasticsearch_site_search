@@ -178,6 +178,40 @@
       </div>
 
       <br><br>
+      <div class="row"> 
+        <div class="col-md-12">
+          <form class="form" action="/result_model" method="POST">
+            <div class="row" >
+              <h3 class="op6"> Search Result Model </h3>
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label>Model</label>
+                  <select class="form-control" name="result_model" id="result_model" required>
+                    <option hidden selected value="<%= result_model%>"> <script> 
+                      document.write( ("<%= result_model%>"==1)?'First (Images with text)':("<%= result_model%>"==2)?'Second (Only text)':("<%= result_model%>"==3)?'Third (Only images)':("<%= result_model%>"==4)?'Fourth (Only images with black background)':("<%= result_model%>"==5)?'Fifth':'Sixth' ) </script> </option>
+                    <option value="1">First (Images with text)</option>
+                    <option value="2">Second (Only text)</option>
+                    <option value="3">Third (Only images)</option>
+                    <option value="4">Fourth (Only images with black background)</option>
+                    <option value="5">Fifth</option>
+                    <option value="6">Sixth</option>
+                  </select>
+                </div>
+              </div>
+              
+              
+            </div>
+              
+            <div class="row">
+              <div class="col-md-2 ">
+                <input type="submit" class="btn btn-info" name="submit" value="Update" style="width: 100%;">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <br><br>
 
 
 
