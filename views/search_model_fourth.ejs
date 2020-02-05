@@ -220,7 +220,7 @@ row=`	<div class="col-md-3 col-sm-6 col-xs-6 m-t-10 ophover" >
 				<a class="" href="${value['_source']['location']}" target="_blank" >`;
 
 					if(value._source.image_link!=null&&value._source.image_link!=''){
-						row+=`<img class="img-responsive m-a" src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=250&quality=60" onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" title="Na Mogudu Na Ishtam Songs Free Download">`;
+						row+=`<img class="img-responsive m-a" src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=250&quality=60" onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" title="${tt.slice(0,66)}">`;
 					}else{
 						row+=`<img class="img-responsive m-a" src="images/default.jpg" title="${cap}">`
 					}
@@ -228,7 +228,7 @@ row=`	<div class="col-md-3 col-sm-6 col-xs-6 m-t-10 ophover" >
 			row+=`</a>
 			</div>
 			<div class="text-box">
-				<a class="tb-a" href="https://naasongs.co/na-mogudu-na-ishtam.html" target="_blank" dir="ltr" > ${tt.slice(0,66)} </a>
+				<a class="tb-a" href="https://naasongs.co/na-mogudu-na-ishtam.html" target="_blank" dir="ltr" > ${tt.slice(0,45)}... </a>
 			</div>
 		</div>`;
 		$('#append-results').append(row);})

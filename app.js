@@ -965,7 +965,7 @@ app.post('/website/add/sitemap', async function(req,res){
 						new_docBody['title'] = description['title']; //new
 						// docBody['image_link'] = description['image_link'];
 
-						let brr = result['blocks'][i]['loc'].split('/');
+						let brr = description['image_link'].split('/');
 						if( brr[0] == 'https:' || brr[0] == 'http:' ) {
 						  new_docBody['image_link'] = description['image_link'];
 						} else {
@@ -1095,7 +1095,7 @@ if( result['invalid'] == 'invalid' ) {
 				reindex_docBody1['title'] = description['title']; //new
 				// reindex_docBody1['image_link'] = description['image_link'];
 
-				let rerr = result['blocks'][i]['loc'].split('/');
+				let rerr = description['image_link'].split('/');
 				if( rerr[0] == 'https:' || rerr[0] == 'http:' ) {
 				  reindex_docBody1['image_link'] = description['image_link'];
 				} else {
