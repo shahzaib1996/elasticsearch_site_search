@@ -220,7 +220,16 @@ var dd=tt+" - "+cap;row=`
                                 <div class="gsc-table-result">
                                   <div class="gsc-table-cell-thumbnail gsc-thumbnail">
                                     <div class="gs-image-box gs-web-image-box gs-web-image-box-portrait">
-                                      <a class="gs-image" href="${value['_source']['location']}" target="_blank">`;if(value._source.image_link!=null&&value._source.image_link!=''){row+=`<img class="gs-image" src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=100&quality=50" onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" title="${cap}">`}else{row+=`<img class="gs-image" src="images/default.jpg" title="${cap}">`}
+                                      <a class="gs-image" href="${value['_source']['location']}" target="_blank">`;
+                                      if(value._source.image_link!=null&&value._source.image_link!=''){
+                                        row+=`<img class="gs-image" 
+                                        src="${value['_source']['image_link']}" 
+                                        onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" 
+                                        title="${cap}">`
+                                      }
+                                      else{
+                                        row+=`<img class="gs-image" src="images/default.jpg" title="${cap}">`
+                                      }
 row+=`</a>
                                     </div>
                                   </div>
@@ -252,3 +261,6 @@ setTimeout(function(){ $('.main-loader-div').addClass('hide'); }, 100 ); }else{$
 </script>
 </body>
 </html>
+
+<!-- src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=100&quality=50"  -->
+<!-- onerror="this.onerror=null;this.src='${value['_source']['image_link']}';"  -->

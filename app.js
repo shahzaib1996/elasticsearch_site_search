@@ -10,8 +10,8 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	// host: 'localhost:9200'
-	host: 'http://51.158.104.138:9200/'
+	host: 'localhost:9200'
+	// host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
@@ -965,11 +965,15 @@ app.post('/website/add/sitemap', async function(req,res){
 						new_docBody['title'] = description['title']; //new
 						// docBody['image_link'] = description['image_link'];
 
-						let brr = description['image_link'].split('/');
-						if( brr[0] == 'https:' || brr[0] == 'http:' ) {
-						  new_docBody['image_link'] = description['image_link'];
+						if( description['image_link'] != null && description['image_link'] != undefined ) {
+							let brr = description['image_link'].split('/');
+							if( brr[0] == 'https:' || brr[0] == 'http:' ) {
+							  new_docBody['image_link'] = description['image_link'];
+							} else {
+							  new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+							}
 						} else {
-						  new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+							new_docBody['image_link'] = description['image_link'];
 						}
 
 						new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
@@ -1095,11 +1099,15 @@ if( result['invalid'] == 'invalid' ) {
 				reindex_docBody1['title'] = description['title']; //new
 				// reindex_docBody1['image_link'] = description['image_link'];
 
-				let rerr = description['image_link'].split('/');
-				if( rerr[0] == 'https:' || rerr[0] == 'http:' ) {
-				  reindex_docBody1['image_link'] = description['image_link'];
+				if( description['image_link'] != null && description['image_link'] != undefined ) {
+					let rerr = description['image_link'].split('/');
+					if( rerr[0] == 'https:' || rerr[0] == 'http:' ) {
+					  reindex_docBody1['image_link'] = description['image_link'];
+					} else {
+					  reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+					}
 				} else {
-				  reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+					reindex_docBody1['image_link'] = description['image_link'];
 				}
 				// reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
 				
@@ -1300,6 +1308,12 @@ app.get('/', async function(req,res){
 			  	for(i=0;i<results['hits']['hits'].length;i++) {
 			  		delete results['hits']['hits'][i]['_source']['website_id'];
 			  		delete results['hits']['hits'][i]['_source']['websitemap'];
+
+			  		let ut = results['hits']['hits'][i]['_source']['image_link'].split('/');
+			  		if( !(ut.includes("https:")) && !(ut.includes("http:")) ){
+			  			results['hits']['hits'][i]['_source']['image_link'] = "http://"+results['hits']['hits'][i]['_source']['image_link'];
+			  		}
+
 			  	}
 
 			    save_search_stats(q,results['hits']['total']['value'],label	)
@@ -1499,11 +1513,15 @@ app.post('/single/site/add', async function(req,res){
 		smBody['weblanguage'] = req.body.language; 
 		smBody['title'] = result['title']; 
 		// smBody['image_link'] = result['image_link'];
-		let brr = result['image_link'].split('/');
-		if( brr[0] == 'https:' || brr[0] == 'http:' ) {
-		  smBody['image_link'] = result['image_link'];
+		if( result['image_link'] != null && result['image_link'] != undefined ) {
+			let brr = result['image_link'].split('/');
+			if( brr[0] == 'https:' || brr[0] == 'http:' ) {
+			  smBody['image_link'] = result['image_link'];
+			} else {
+			  smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
+			}
 		} else {
-		  smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
+			smBody['image_link'] = result['image_link'];
 		}
 
 		// smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
@@ -1556,11 +1574,15 @@ app.post('/single/site/reindex', async function(req,res){
 		single_sm_body['weblanguage'] = req.body.weblanguage; 
 		single_sm_body['title'] = result['title']; 
 
-		let brr = result['image_link'].split('/');
-		if( brr[0] == 'https:' || brr[0] == 'http:' ) {
-		  single_sm_body['image_link'] = result['image_link'];
+		if( result['image_link'] != null && result['image_link'] != undefined ) {
+			let brr = result['image_link'].split('/');
+			if( brr[0] == 'https:' || brr[0] == 'http:' ) {
+			  single_sm_body['image_link'] = result['image_link'];
+			} else {
+			  single_sm_body['image_link'] = req.body.location.split('/')[2]+result['image_link'];
+			}
 		} else {
-		  single_sm_body['image_link'] = req.body.location.split('/')[2]+result['image_link'];
+			single_sm_body['image_link'] = result['image_link'];
 		}
 
 		// single_sm_body['image_link'] = result['image_link'];
