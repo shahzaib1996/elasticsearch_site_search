@@ -407,6 +407,10 @@ var getResults_single_scrap = async (scrapURL) => {
   	image_link = $('body').find('img').attr('src');
   }
 
+  console.log("------articleBody-------");
+  console.log(articleBody);
+  console.log("------articleBody-------++|>");
+  
   return {
   	title:title,
   	caption:caption,
@@ -1325,7 +1329,7 @@ app.get('/', async function(req,res){
 			  		if( !(ut.includes("https:")) && !(ut.includes("http:")) ){
 			  			results['hits']['hits'][i]['_source']['image_link'] = "https://"+results['hits']['hits'][i]['_source']['image_link'];
 			  		}
-
+			  		results['hits']['hits'][i]['_source']['description']=results['hits']['hits'][i]['_source']['description'].replace(/\s{2,}/g, ' ');
 			  	}
 
 			    save_search_stats(q,results['hits']['total']['value'],label	)
