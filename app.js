@@ -10,8 +10,8 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	host: 'localhost:9200'
-	// host: 'http://51.158.104.138:9200/'
+	// host: 'localhost:9200'
+	host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
@@ -139,7 +139,7 @@ async function automatic_sitemap_reindex() {
 						if( aurr[0] == 'https:' || aurr[0] == 'http:' ) {
 						  docBody1['image_link'] = description['image_link'];
 						} else {
-						  docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+						  docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[0]+'//'+result['blocks'][i]['loc'].split('/')[2]+'/'+description['image_link'];
 						}
 					} else {
 						docBody1['image_link'] = description['image_link'];
@@ -982,13 +982,13 @@ app.post('/website/add/sitemap', async function(req,res){
 							if( brr[0] == 'https:' || brr[0] == 'http:' ) {
 							  new_docBody['image_link'] = description['image_link'];
 							} else {
-							  new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+							  new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[0]+'//'+result['blocks'][i]['loc'].split('/')[2]+'/'+description['image_link'];
 							}
 						} else {
 							new_docBody['image_link'] = description['image_link'];
 						}
 
-						new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+						// new_docBody['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
 						new_docBody['caption'] = result['blocks'][i]['caption'];
 						new_docBody['description'] = description['articleBody'];
 						bulkArray.push(new_docBody);
@@ -1116,7 +1116,7 @@ if( result['invalid'] == 'invalid' ) {
 					if( rerr[0] == 'https:' || rerr[0] == 'http:' ) {
 					  reindex_docBody1['image_link'] = description['image_link'];
 					} else {
-					  reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+					  reindex_docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[0]+'//'+result['blocks'][i]['loc'].split('/')[2]+'/'+description['image_link'];
 					}
 				} else {
 					reindex_docBody1['image_link'] = description['image_link'];
@@ -1511,7 +1511,7 @@ app.post('/single/site/add', async function(req,res){
 		//scrap sitemap
 		let result = await getResults_single_scrap(single_complete_url);
 
-		console.log(result);
+		// console.log(result);
 		if( result['invalid'] == 'invalid' ) {
 			res.send("3"); // 3 = URL is invalid
 		}else if( result ) {
@@ -1530,7 +1530,7 @@ app.post('/single/site/add', async function(req,res){
 			if( brr[0] == 'https:' || brr[0] == 'http:' ) {
 			  smBody['image_link'] = result['image_link'];
 			} else {
-			  smBody['image_link'] = single_complete_url.split('/')[2]+result['image_link'];
+			  smBody['image_link'] = single_complete_url.split('/')[0]+'//'+single_complete_url.split('/')[2]+'/'+result['image_link'];
 			}
 		} else {
 			smBody['image_link'] = result['image_link'];
@@ -1573,7 +1573,7 @@ app.post('/single/site/reindex', async function(req,res){
 //scrap sitemap
 		let result = await getResults_single_scrap(req.body.location);
 
-		console.log(result);
+		// console.log(result);
 		if( result['invalid'] == 'invalid' ) {
 			res.send("3"); // 3 = URL is invalid
 		}else if( result ) {
@@ -1591,7 +1591,7 @@ app.post('/single/site/reindex', async function(req,res){
 			if( brr[0] == 'https:' || brr[0] == 'http:' ) {
 			  single_sm_body['image_link'] = result['image_link'];
 			} else {
-			  single_sm_body['image_link'] = req.body.location.split('/')[2]+result['image_link'];
+			  single_sm_body['image_link'] = req.body.location.split('/')[0]+'//'+req.body.location.split('/')[2]+'/'+result['image_link'];
 			}
 		} else {
 			single_sm_body['image_link'] = result['image_link'];

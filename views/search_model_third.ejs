@@ -26,6 +26,7 @@
 .tb-a {padding: 0px 10px 0px 0px;color:#424242 !important;}
 .m-a {margin: auto;}
 .ophover:hover {opacity: 0.8;}
+.a_text { text-align: justify; word-break: break-all; }
 
 	
 </style>
@@ -243,7 +244,7 @@ row=`	<div class="col-md-3 col-sm-6 col-xs-6 m-t-10 ophover" >
 				<a class="" href="${value['_source']['location']}" target="_blank" >`;
 
 					if(value._source.image_link!=null&&value._source.image_link!=''){
-						row+=`<img class="img-responsive m-a" src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=250&quality=60" onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" title="${tt.slice(0,66)}">`;
+						row+=`<img class="img-responsive m-a" src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=250&quality=60" onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" title="${tt.slice(0,66)}" style="width: 100%;">`;
 					}else{
 						row+=`<img class="gs-image" src="images/default.jpg" title="${cap}">`
 					}
@@ -251,7 +252,7 @@ row=`	<div class="col-md-3 col-sm-6 col-xs-6 m-t-10 ophover" >
 			row+=`</a>
 			</div>
 			<div class="text-box">
-				<a class="tb-a" href="https://naasongs.co/na-mogudu-na-ishtam.html" target="_blank" dir="ltr" > ${tt.slice(0,45)}... </a>
+				<a class="tb-a a_text" href="${value['_source']['location']}" target="_blank" dir="ltr" > ${tt.slice(0,35)}... </a>
 			</div>
 		</div>`;
 		$('#append-results').append(row);})

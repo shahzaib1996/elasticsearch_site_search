@@ -223,9 +223,9 @@ var dd=tt+" - "+cap;row=`
                                       <a class="gs-image" href="${value['_source']['location']}" target="_blank">`;
                                       if(value._source.image_link!=null&&value._source.image_link!=''){
                                         row+=`<img class="gs-image" 
-                                        src="${value['_source']['image_link']}" 
+                                        src="https://i0.wp.com/${value['_source']['image_link'].replace("https://", "").replace("http://", "")}?w=100&quality=50" 
                                         onerror="this.onerror=null;this.src='${value['_source']['image_link']}';" 
-                                        title="${cap}">`
+                                        title="${cap}" style="width:100%;">`
                                       }
                                       else{
                                         row+=`<img class="gs-image" src="images/default.jpg" title="${cap}">`
