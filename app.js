@@ -117,7 +117,7 @@ async function automatic_sitemap_reindex() {
 
 			for(i=0; i<result['blocks'].length;i++) {
 
-				var description = await getResults_single(result['blocks'][i]['loc']);
+				let description = await getResults_single(result['blocks'][i]['loc']);
 
 				if( description['invalid'] == 'invalid' || description['articleBody'] == "" ) {
 							
@@ -133,7 +133,19 @@ async function automatic_sitemap_reindex() {
 					// docBody1['image_link'] = result['blocks'][i]['image_link'];
 					docBody1['title'] = description['title']; //new
 					// docBody1['image_link'] = description['image_link'];
-					docBody1['image_link'] = sitemap_id.split('/')[2]+description['image_link'];
+
+					if( description['image_link'] != null && description['image_link'] != undefined ) {
+						let aurr = description['image_link'].split('/');
+						if( aurr[0] == 'https:' || aurr[0] == 'http:' ) {
+						  docBody1['image_link'] = description['image_link'];
+						} else {
+						  docBody1['image_link'] = result['blocks'][i]['loc'].split('/')[2]+description['image_link'];
+						}
+					} else {
+						docBody1['image_link'] = description['image_link'];
+					}
+					// docBody1['image_link'] = sitemap_id.split('/')[2]+description['image_link'];
+
 					docBody1['caption'] = result['blocks'][i]['caption'];
 					docBody1['description'] = description['articleBody'];
 					bulkArray.push(docBody1);
@@ -1311,7 +1323,7 @@ app.get('/', async function(req,res){
 
 			  		let ut = results['hits']['hits'][i]['_source']['image_link'].split('/');
 			  		if( !(ut.includes("https:")) && !(ut.includes("http:")) ){
-			  			results['hits']['hits'][i]['_source']['image_link'] = "http://"+results['hits']['hits'][i]['_source']['image_link'];
+			  			results['hits']['hits'][i]['_source']['image_link'] = "https://"+results['hits']['hits'][i]['_source']['image_link'];
 			  		}
 
 			  	}
