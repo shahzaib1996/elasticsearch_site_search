@@ -1267,49 +1267,105 @@ app.get('/', async function(req,res){
 
 			// console.log("This is size:"+size);
 			q = q.toLowerCase();
-			searchBody = {
-				"from" : 0,
-				"size" : size,
-			  	"query": { 
-				    "bool": {
-					    "should" : [
-				            {
-				              "match": {
-				                "location": {
-				                  "query": q,
-				                  // "boost": 5
-				                }
-				              }
-					        },
-					        {
-				              "match": {
-				                "title": {
-				                  "query": q,
-				                  // "boost": 5 
-				                }
-				              }
-				            }
-				            ,
-				            {
-				              "match": {
-				                "description": {
-				                  "query": q,
-				                  "boost": 5 
-				                }
-				              }
-				            }
-				         //  ,
-					        // { 
-					        //   "query_string" : {
-					        //       "query" : "*"+q+"*",
-					        //       "boost": 5 
-					        //   }
-					        // }
-					      ]
-				      //dynamically place filter here
-				    }
-				}
-			};
+
+			if( (q.split(' ')).includes("mp3") || (q.split(' ')).includes("download") || (q.split(' ')).includes("song") || (q.split(' ')).includes("songs") ) {
+				q = q.replace("mp3", "").replace("download", "").replace("song", "").replace("songs", "");
+				searchBody = {
+					"from" : 0,
+					"size" : size,
+				  	"query": { 
+					    "bool": {
+						    "should" : [
+					            
+						        {
+					              "match": {
+					                "location": {
+					                  "query": q,
+					                  "operator": "and"
+					                }
+					              }
+						        },
+						        
+					            {
+					              "match": {
+					                "title": {
+					                  "query": q,
+					                  "operator": "and"
+					                }
+					              }
+					            }
+					            
+					            
+					            ,
+					            {
+					              "match": {
+					                "description": {
+					                  "query": q
+					                }
+					              }
+					            },
+					            
+					            {
+					              "match": {
+					                "description": {
+					                  "query": q,
+					                  "operator": "and",
+					                  "boost":10
+					                }
+					              }
+					            }
+						      ]
+					    }
+					}
+				};
+
+			} else {
+
+				searchBody = {
+					"from" : 0,
+					"size" : size,
+				  	"query": { 
+					    "bool": {
+						    "should" : [
+					            {
+					              "match": {
+					                "location": {
+					                  "query": q,
+					                  // "boost": 5
+					                }
+					              }
+						        },
+						        {
+					              "match": {
+					                "title": {
+					                  "query": q,
+					                  // "boost": 5 
+					                }
+					              }
+					            }
+					            ,
+					            {
+					              "match": {
+					                "description": {
+					                  "query": q
+					                }
+					              }
+					            }
+					         //  ,
+						        // { 
+						        //   "query_string" : {
+						        //       "query" : "*"+q+"*",
+						        //       "boost": 5 
+						        //   }
+						        // }
+						      ]
+					      //dynamically place filter here
+					    }
+					}
+				};
+				
+			}
+
 
 			if( label ) {
 				searchBody['query']['bool']['filter'] = [];
