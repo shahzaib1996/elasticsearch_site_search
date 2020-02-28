@@ -554,6 +554,7 @@ app.get('/settings',function(req,res){
 })
 
 app.post('/changepassword', async function(req,res){
+
 	if(req.session.username) {
 		var l = req.body.l;
 		var op = req.body.o_p;
@@ -567,7 +568,7 @@ app.post('/changepassword', async function(req,res){
 				console.log(error);
 		  		res.status(200).send("error-"+error);
 			} else {
-				var  dBody = {};
+				let  dBody = {};
 				dBody['email'] = response['_source']['email'];
 				dBody['username'] = response['_source']['username'];
 				var pp = response['_source']['password'];
@@ -582,10 +583,19 @@ app.post('/changepassword', async function(req,res){
 					}, function(err) {
 						if( err ) {
 							console.log(err);
-							res.status(200).render( 'settings' ,{status:'1',cc:'alert-danger',message:'Something Went Wrong!',length:l});
+							res.status(200).render( 'settings' ,{status:'1',cc:'alert-danger',message:'Something Went Wrong!',length:l,maintenance:smaintenance_mode,result_model:sresult_model});
+							
 
 						} else {
-							res.status(200).render( 'settings' ,{status:'1',cc:'alert-success',message:'Password Changed!',length:l});
+							let json = '{ "email": "example@gmail.com", "username": "admin", "password": "'+dBody['password']+'" }';
+							let jsonObj = JSON.parse(json);
+							// stringify JSON Object
+							let jsonContent = JSON.stringify(jsonObj);
+							let fs = require('fs');
+							fs.writeFile('./config.json', jsonContent, 'utf8', function(){
+								res.status(200).render( 'settings' ,{status:'1',cc:'alert-success',message:'Password Changed!',length:l,maintenance:smaintenance_mode,result_model:sresult_model});
+							});
+
 						}
 					});
 
