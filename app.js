@@ -1270,7 +1270,7 @@ app.get('/', async function(req,res){
 		
 		length_str = 1;
 		size = length
-		
+		console.log(q);
 		if( q ) {
 
 			let search_result_page_model = (sresult_model==6)?'search_model_sixth':(sresult_model==5)?'search_model_fifth':(sresult_model==4)?'search_model_fourth':(sresult_model==3)?'search_model_third':(sresult_model==2)?'search_model_second':'search_model_first';
@@ -1280,54 +1280,89 @@ app.get('/', async function(req,res){
 
 			if( (q.split(' ')).includes("mp3") || (q.split(' ')).includes("download") || (q.split(' ')).includes("song") || (q.split(' ')).includes("songs") ) {
 				q = q.replace("mp3", "").replace("download", "").replace("song", "").replace("songs", "");
+				console.log("inside q",q)
+				
+				
+				// searchBody = {
+				// 	"from" : 0,
+				// 	"size" : size,
+				//   	"query": { 
+				// 	    "bool": {
+				// 		    "should" : [
+					            
+				// 		        {
+				// 	              "match": {
+				// 	                "location": {
+				// 	                  "query": q,
+				// 	                  "operator": "and"
+				// 	                }
+				// 	              }
+				// 		        },
+						        
+				// 	            {
+				// 	              "match": {
+				// 	                "title": {
+				// 	                  "query": q,
+				// 	                  "operator": "and"
+				// 	                }
+				// 	              }
+				// 	            }
+					            
+					            
+				// 	            ,
+				// 	            {
+				// 	              "match": {
+				// 	                "description": {
+				// 	                  "query": q
+				// 	                }
+				// 	              }
+				// 	            },
+					            
+				// 	            {
+				// 	              "match": {
+				// 	                "description": {
+				// 	                  "query": q,
+				// 	                  "operator": "and",
+				// 	                  "boost":10
+				// 	                }
+				// 	              }
+				// 	            }
+				// 		      ]
+				// 	    }
+				// 	}
+				// };
+
 				searchBody = {
 					"from" : 0,
 					"size" : size,
 				  	"query": { 
 					    "bool": {
 						    "should" : [
-					            
-						        {
-					              "match": {
-					                "location": {
-					                  "query": q,
-					                  "operator": "and"
-					                }
+					            {
+					              "query_string": {
+                        "query": "*"+q+"*",
+                        "default_field": "title",
+                        "default_operator": "AND"
 					              }
 						        },
-						        
-					            {
-					              "match": {
-					                "title": {
-					                  "query": q,
-					                  "operator": "and"
-					                }
+						        {
+					              "query_string": {
+                        "query": "*"+q+"*",
+                        "default_field": "location",
+                        "default_operator": "AND"
 					              }
-					            }
-					            
-					            
-					            ,
-					            {
-					              "match": {
-					                "description": {
-					                  "query": q
-					                }
+						        },
+						        {
+					              "query_string": {
+                        "query": "*"+q+"*",
+                        "default_field": "description",
+                        "default_operator": "AND"
 					              }
-					            },
-					            
-					            {
-					              "match": {
-					                "description": {
-					                  "query": q,
-					                  "operator": "and",
-					                  "boost":10
-					                }
-					              }
-					            }
+						        }
 						      ]
 					    }
 					}
-				};
+				}
 
 			} else {
 
@@ -1338,41 +1373,73 @@ app.get('/', async function(req,res){
 					    "bool": {
 						    "should" : [
 					            {
-					              "match": {
-					                "location": {
-					                  "query": q,
-					                  // "boost": 5
-					                }
+					              "query_string": {
+                        "query": "*"+q+"*",
+                        "default_field": "title",
+                        "default_operator": "AND"
 					              }
 						        },
 						        {
-					              "match": {
-					                "title": {
-					                  "query": q,
-					                  // "boost": 5 
-					                }
+					              "query_string": {
+                        "query": "*"+q+"*",
+                        "default_field": "location",
+                        "default_operator": "AND"
 					              }
-					            }
-					            ,
-					            {
-					              "match": {
-					                "description": {
-					                  "query": q
-					                }
+						        },
+						        {
+					              "query_string": {
+                        "query": "*"+q+"*",
+                        "default_field": "description",
+                        "default_operator": "AND"
 					              }
-					            }
-					         //  ,
-						        // { 
-						        //   "query_string" : {
-						        //       "query" : "*"+q+"*",
-						        //       "boost": 5 
-						        //   }
-						        // }
+						        }
 						      ]
-					      //dynamically place filter here
 					    }
 					}
-				};
+				}
+
+				// searchBody = {
+				// 	"from" : 0,
+				// 	"size" : size,
+				//   	"query": { 
+				// 	    "bool": {
+				// 		    "should" : [
+				// 	            {
+				// 	              "match": {
+				// 	                "location": {
+				// 	                  "query": q,
+				// 	                  // "boost": 5
+				// 	                }
+				// 	              }
+				// 		        },
+				// 		        {
+				// 	              "match": {
+				// 	                "title": {
+				// 	                  "query": q,
+				// 	                  // "boost": 5 
+				// 	                }
+				// 	              }
+				// 	            }
+				// 	            ,
+				// 	            {
+				// 	              "match": {
+				// 	                "description": {
+				// 	                  "query": q
+				// 	                }
+				// 	              }
+				// 	            }
+				// 	         //  ,
+				// 		        // { 
+				// 		        //   "query_string" : {
+				// 		        //       "query" : "*"+q+"*",
+				// 		        //       "boost": 5 
+				// 		        //   }
+				// 		        // }
+				// 		      ]
+				// 	      //dynamically place filter here
+				// 	    }
+				// 	}
+				// };
 				
 			}
 
