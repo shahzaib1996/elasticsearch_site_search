@@ -10,8 +10,8 @@ const app = express();
 var path = require('path');
 var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
-	// host: 'localhost:9200'
-	host: 'http://51.158.104.138:9200/'
+	host: 'localhost:9200'
+	// host: 'http://51.158.104.138:9200/'
 
 })
 require('array.prototype.flatmap').shim();
@@ -1283,54 +1283,54 @@ app.get('/', async function(req,res){
 				console.log("inside q",q)
 				
 				
-				// searchBody = {
-				// 	"from" : 0,
-				// 	"size" : size,
-				//   	"query": { 
-				// 	    "bool": {
-				// 		    "should" : [
+				searchBody2 = {
+					"from" : 0,
+					"size" : size,
+				  	"query": { 
+					    "bool": {
+						    "should" : [
 					            
-				// 		        {
-				// 	              "match": {
-				// 	                "location": {
-				// 	                  "query": q,
-				// 	                  "operator": "and"
-				// 	                }
-				// 	              }
-				// 		        },
+						        {
+					              "match": {
+					                "location": {
+					                  "query": q,
+					                  "operator": "and"
+					                }
+					              }
+						        },
 						        
-				// 	            {
-				// 	              "match": {
-				// 	                "title": {
-				// 	                  "query": q,
-				// 	                  "operator": "and"
-				// 	                }
-				// 	              }
-				// 	            }
+					            {
+					              "match": {
+					                "title": {
+					                  "query": q,
+					                  "operator": "and"
+					                }
+					              }
+					            }
 					            
 					            
-				// 	            ,
-				// 	            {
-				// 	              "match": {
-				// 	                "description": {
-				// 	                  "query": q
-				// 	                }
-				// 	              }
-				// 	            },
+					            ,
+					            {
+					              "match": {
+					                "description": {
+					                  "query": q
+					                }
+					              }
+					            },
 					            
-				// 	            {
-				// 	              "match": {
-				// 	                "description": {
-				// 	                  "query": q,
-				// 	                  "operator": "and",
-				// 	                  "boost":10
-				// 	                }
-				// 	              }
-				// 	            }
-				// 		      ]
-				// 	    }
-				// 	}
-				// };
+					            {
+					              "match": {
+					                "description": {
+					                  "query": q,
+					                  "operator": "and",
+					                  "boost":10
+					                }
+					              }
+					            }
+						      ]
+					    }
+					}
+				};
 
 				searchBody = {
 					"from" : 0,
@@ -1398,48 +1398,48 @@ app.get('/', async function(req,res){
 					}
 				}
 
-				// searchBody = {
-				// 	"from" : 0,
-				// 	"size" : size,
-				//   	"query": { 
-				// 	    "bool": {
-				// 		    "should" : [
-				// 	            {
-				// 	              "match": {
-				// 	                "location": {
-				// 	                  "query": q,
-				// 	                  // "boost": 5
-				// 	                }
-				// 	              }
-				// 		        },
-				// 		        {
-				// 	              "match": {
-				// 	                "title": {
-				// 	                  "query": q,
-				// 	                  // "boost": 5 
-				// 	                }
-				// 	              }
-				// 	            }
-				// 	            ,
-				// 	            {
-				// 	              "match": {
-				// 	                "description": {
-				// 	                  "query": q
-				// 	                }
-				// 	              }
-				// 	            }
-				// 	         //  ,
-				// 		        // { 
-				// 		        //   "query_string" : {
-				// 		        //       "query" : "*"+q+"*",
-				// 		        //       "boost": 5 
-				// 		        //   }
-				// 		        // }
-				// 		      ]
-				// 	      //dynamically place filter here
-				// 	    }
-				// 	}
-				// };
+				searchBody2 = {
+					"from" : 0,
+					"size" : size,
+				  	"query": { 
+					    "bool": {
+						    "should" : [
+					            {
+					              "match": {
+					                "location": {
+					                  "query": q,
+					                  // "boost": 5
+					                }
+					              }
+						        },
+						        {
+					              "match": {
+					                "title": {
+					                  "query": q,
+					                  // "boost": 5 
+					                }
+					              }
+					            }
+					            ,
+					            {
+					              "match": {
+					                "description": {
+					                  "query": q
+					                }
+					              }
+					            }
+					         //  ,
+						        // { 
+						        //   "query_string" : {
+						        //       "query" : "*"+q+"*",
+						        //       "boost": 5 
+						        //   }
+						        // }
+						      ]
+					      //dynamically place filter here
+					    }
+					}
+				};
 				
 			}
 
@@ -1447,6 +1447,8 @@ app.get('/', async function(req,res){
 			if( label ) {
 				searchBody['query']['bool']['filter'] = [];
 				searchBody['query']['bool']['filter'].push( { "term":  { "weblanguage": label }} );
+				searchBody2['query']['bool']['filter'] = [];
+				searchBody2['query']['bool']['filter'].push( { "term":  { "weblanguage": label }} );
 			}
 
 			console.log(searchBody['query']['bool']['filter']);
@@ -1454,21 +1456,55 @@ app.get('/', async function(req,res){
 			let search_results = await search('document_songs', searchBody)
 			  .then(results => {
 
-			  	for(i=0;i<results['hits']['hits'].length;i++) {
-			  		delete results['hits']['hits'][i]['_source']['website_id'];
-			  		delete results['hits']['hits'][i]['_source']['websitemap'];
+			  	// for(i=0;i<results['hits']['hits'].length;i++) {
+			  	// 	delete results['hits']['hits'][i]['_source']['website_id'];
+			  	// 	delete results['hits']['hits'][i]['_source']['websitemap'];
 
-			  		let ut = results['hits']['hits'][i]['_source']['image_link'].split('/');
-			  		if( !(ut.includes("https:")) && !(ut.includes("http:")) ){
-			  			results['hits']['hits'][i]['_source']['image_link'] = "https://"+results['hits']['hits'][i]['_source']['image_link'];
-			  		}
-			  		results['hits']['hits'][i]['_source']['description']=results['hits']['hits'][i]['_source']['description'].replace(/\s{2,}/g, ' ');
-			  	}
+			  	// 	let ut = results['hits']['hits'][i]['_source']['image_link'].split('/');
+			  	// 	if( !(ut.includes("https:")) && !(ut.includes("http:")) ){
+			  	// 		results['hits']['hits'][i]['_source']['image_link'] = "https://"+results['hits']['hits'][i]['_source']['image_link'];
+			  	// 	}
+			  	// 	results['hits']['hits'][i]['_source']['description']=results['hits']['hits'][i]['_source']['description'].replace(/\s{2,}/g, ' ');
+			  	// }
 
-			    save_search_stats(q,results['hits']['total']['value'],label	)
-			    res.status(200).render(search_result_page_model, { data:results,q:q_ori,label:label,length_str:length_str } );
-			    // res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
-			    
+			    // save_search_stats(q,results['hits']['total']['value'],label	)
+			    // res.status(200).render(search_result_page_model, { data:results,q:q_ori,label:label,length_str:length_str } );
+				
+				//2 search start
+				let search_results2 = search('document_songs', searchBody2)
+				.then(results2 => {
+					let second_count = 0;
+					for(i=0;i<results2['hits']['hits'].length;i++) {
+						if( results['hits']['hits'].length < size ){
+							results['hits']['hits'].push(results2['hits']['hits'][i]);
+							second_count++;
+						}
+					}
+					results['hits']['total']['value'] = results['hits']['total']['value']+results2['hits']['total']['value'];
+					results['took'] += 5;
+					for(i=0;i<results['hits']['hits'].length;i++) {
+						delete results['hits']['hits'][i]['_source']['website_id'];
+						delete results['hits']['hits'][i]['_source']['websitemap'];
+
+						let ut = results['hits']['hits'][i]['_source']['image_link'].split('/');
+						if( !(ut.includes("https:")) && !(ut.includes("http:")) ){
+							results['hits']['hits'][i]['_source']['image_link'] = "https://"+results['hits']['hits'][i]['_source']['image_link'];
+						}
+						results['hits']['hits'][i]['_source']['description']=results['hits']['hits'][i]['_source']['description'].replace(/\s{2,}/g, ' ');
+					}
+
+
+					save_search_stats(q,results['hits']['total']['value'],label	)
+					res.status(200).render(search_result_page_model, { data:results,q:q_ori,label:label,length_str:length_str } );
+					// res.status(200).render('new_search_page', { data:results,q:q_ori,label:label,length_str:length_str } );
+					
+				})
+				.catch(error => {
+					res.status(200).render(search_result_page_model, { data:[],q:q_ori,label:label,length_str:length_str } );
+					// res.status(200).render('new_search_page', { data:[],q:q_ori,label:label,length_str:length_str } );
+				});
+				// 2 search end
+
 			  })
 			  .catch(error => {
 			  	res.status(200).render(search_result_page_model, { data:[],q:q_ori,label:label,length_str:length_str } );
